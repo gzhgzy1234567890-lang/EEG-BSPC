@@ -78,14 +78,17 @@ numpy==1.21.6  scipy==1.7.3  scikit-learn==1.0.2  matplotlib==3.5.3  mne==1.3.1
 | `BSPC_CACHE` | `<repo>/features/cache_2b` | where the 2b feature cache lives |
 | `BSPC_OUT` | `<repo>/results` | where outputs are written |
 
-**Step 1 — build the 2b feature cache** (skip if you supply `features/cache_2b/` yourself):
+**Step 1 — the 2b feature cache is already here.** `features/cache_2b/` contains the 27
+session-level `.npz` files (26 MB) that Step 2 reads, so you can skip this step entirely. If you
+would rather rebuild them from the raw GDF files:
 
 ```bash
 python src/make_features_2b.py
 ```
 
-Reads the GDF headers for recording timestamps, extracts 0.5–3.5 s after cue, band-passes
-8–30 Hz, and writes one `.npz` per session. About two minutes.
+That reads the GDF headers for recording timestamps, extracts 0.5–3.5 s after cue, band-passes
+8–30 Hz, and writes one `.npz` per session in about two minutes. It needs `mne`; Steps 2 and 3 do
+not.
 
 **Step 2 — compute every number in the paper and both figures:**
 
