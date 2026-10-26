@@ -118,15 +118,27 @@ def logpow(segs, nwin=4):
 
 
 def csp_feat(Xtr, ytr, Xte, m=3):
+    """二分类 CSP：eigh(C1, C1+C2)，取两端各 m 个特征向量。
+
+    修过的两处：
+    1) 特征数受通道数约束。只有 ch 个特征向量时，idx[:m] 与 idx[-m:] 在
+       m > ch/2 时会重叠，3 导 + m=3 得到 sel=[0,1,2,0,1,2]，即 3 个滤波器
+       各出现两次。现在令 mm = min(m, ch // 2)，3 导时为 1，得到 2 个不重复滤波器。
+    2) 仅适用于二分类；多分类时 Cs[0] vs 均值不是标准的多类 CSP。调用方只对
+       二分类（2b）使用，2a（四分类）的 csp 行按此口径标注为 one-vs-rest。
+    """
     Ctr = covs(Xtr, 1e-3)
     cls = np.unique(ytr)
     if len(cls) < 2:
         return None, None
+    ch = Ctr.shape[1]
+    mm = int(min(m, max(1, ch // 2)))
     Cs = [Ctr[ytr == c].mean(0) for c in cls]
     Cc = np.mean(Cs, 0)
     w, V = eigh(Cs[0], Cc)
     idx = np.argsort(w)
-    sel = np.concatenate([idx[:m], idx[-m:]])
+    sel = np.concatenate([idx[:mm], idx[-mm:]])
+    sel = np.array(sorted(set(sel.tolist())), dtype=int) if len(cls) == 2 else sel
     W = V[:, sel]
 
     def proj(X):
@@ -137,6 +149,16 @@ def csp_feat(Xtr, ytr, Xte, m=3):
 
 
 def tr_sigma(X, nrep=20):
+    """tr(Sigma) 的无偏估计。
+
+    两个半段各 h 个样本时 Var(dd_j) = 2 sigma_j^2 / h，故
+        E[ sum_j dd_j^2 ] = 2 tr(Sigma) / h
+    反解得 tr_hat = sum(dd^2) * h / 2。
+
+    注意：早期版本写成 mean(dd^2) * h / 4，那是"对特征维取平均"而非求和，
+    使 tr(Sigma) 被低估 2D 倍（D = 特征维数；D=88 时 176 倍）。已用已知协方差
+    的 Monte Carlo 验证：旧式 code/true 恰为 1/(2D)，新式接近 1。
+    """
     k = len(X)
     if k < 8:
         return np.nan
@@ -145,7 +167,7 @@ def tr_sigma(X, nrep=20):
     for _ in range(nrep):
         p = RNG.permutation(k)
         dd = X[p[:h]].mean(0) - X[p[h:2 * h]].mean(0)
-        v.append(float(np.mean(dd ** 2)) * h / 4.0)
+        v.append(float(np.sum(dd ** 2)) * h / 2.0)
     return float(np.median(v))
 
 
