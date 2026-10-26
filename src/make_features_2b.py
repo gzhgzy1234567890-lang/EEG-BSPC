@@ -23,7 +23,7 @@ DATA = os.environ.get("BSPC_DATA", r"E:\data")
 CACHE = os.environ.get("BSPC_CACHE", os.path.join(_ROOT, "features", "cache_2b"))
 ROOT = os.path.join(DATA, "BCICIV-2a-mat")
 OUT = os.path.join(D, "_cache2b.txt")
-
+CACHE = os.path.join(D, "cache_2b")
 if not os.path.isdir(CACHE):
     os.makedirs(CACHE)
 
