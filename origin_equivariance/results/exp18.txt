@@ -1,0 +1,8 @@
+v10 exp Q: SEED-IV, held out
+  cells 90
+  median z_w 1.001   mean penalty -0.1044   mean gain +0.2042
+  severe-loss cells 49/90 ; AUC of z_w within SEED-IV = 0.482
+
+  six datasets: z_w [0.298 4.918 0.979 0.23  0.289 1.001]
+               penalty [-0.0139 -0.0722 -0.0287  0.     -0.0147 -0.0699]
+  spearman rho = -0.943 ; exact two-sided permutation p = 12/720 = 0.0167
