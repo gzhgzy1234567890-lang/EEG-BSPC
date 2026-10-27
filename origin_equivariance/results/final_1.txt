@@ -1,0 +1,17 @@
+v8 inventory  15:38:49
+
+  ds    representation subj    cells K      D      n_target
+  2a    csp         9       9     4      6      288     
+  2a    euc         9       9     4      88     288     
+  2a    euc_ea      9       9     4      88     288     
+  2a    tan         9       9     4      253    288     
+  2b    csp         9       27    2      2      129     
+  2b    euc         9       27    2      12     129     
+  2b    euc_ea      9       27    2      12     129     
+  2b    tan         9       27    2      6      129     
+  seed  de          15      45    3      310    3394    
+  ner   Ftime       16      320   2      448    60      
+  gal   pow         12      336   2      256    68      
+
+  total cells (ordered pairs) = 1181
+  note: for the same-cap control (gal) only unordered pairs are used, n=336
