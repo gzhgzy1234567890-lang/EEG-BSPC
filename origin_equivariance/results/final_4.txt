@@ -1,0 +1,21 @@
+v8 variants of the correction  15:44:18
+  none       no correction
+  zero       target centred only (one-sided)
+  mean       two-sided, sample mean (the equivariant correction)
+  zscore     train-stat standardisation (claimed equivalent)
+  proj       subtract only the component in the row space of W
+  shrink     subtract half the offset
+  low5       subtract the offset projected on the top-5 source PCA directions
+  bal        class-balanced offset (uses target labels; upper bound)
+
+  ds    n     none     zero     mean     zscore   proj     shrink   low5     bal       
+  2a    36    0.5656   0.5254   0.6119   0.5656   0.6119   0.5965   0.5873   0.6119    
+        identical predictions to mean: zscore 0.791 of samples ; proj 1.000
+  2b    108   0.7046   0.5831   0.7375   0.7046   0.7375   0.7260   0.7318   0.7373    
+        identical predictions to mean: zscore 0.838 of samples ; proj 1.000
+  seed  45    0.4591   0.3377   0.7094   0.4591   0.7094   0.5551   0.4460   0.7092    
+        identical predictions to mean: zscore 0.490 of samples ; proj 1.000
+  ner   320   0.5886   0.5865   0.5909   0.5886   0.5909   0.5887   0.5873   0.6039    
+        identical predictions to mean: zscore 0.952 of samples ; proj 1.000
+  gal   336   0.7770   0.7484   0.7815   0.7770   0.7815   0.7817   0.7793   0.7815    
+        identical predictions to mean: zscore 0.938 of samples ; proj 1.000
