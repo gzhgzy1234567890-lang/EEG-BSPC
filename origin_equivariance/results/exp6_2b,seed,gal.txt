@@ -1,0 +1,9 @@
+v8 exp F: streaming reference   15:58:50
+  running mean = mean of the first k target trials, warm-started at the source mean
+
+  ds    n      k=5      k=10     k=20     k=50     k=all    batch   
+  2b    60     0.7335   0.7349   0.7344   0.7350   0.7322   0.7365  
+  seed  45     0.7090   0.7091   0.7092   0.7092   0.7088   0.7094  
+  gal   60     0.7910   0.7930   0.7930   0.8038   0.7905   0.7938  
+
+total 0.9 min
