@@ -1,0 +1,32 @@
+v8 screen analysis
+
+S1  cell level (n=845)
+  spearman(z   , pen ) = -0.382  (p=1.0e-30)
+  spearman(z   , gain) = +0.279  (p=1.5e-16)
+  spearman(z   , gap ) = +0.117  (p=6.5e-04)
+  spearman(t   , gain) = +0.252  (p=9.7e-14)
+  spearman(t   , pen ) = +0.100  (p=3.7e-03)
+  spearman(t   , gap ) = +0.131  (p=1.3e-04)
+  spearman(rz  , pen ) = -0.391  (p=3.4e-32)
+  spearman(rz  , z   ) = +0.525  (p=4.2e-61)
+
+S2  unit level (dataset x representation), medians
+  ds    rep     n     z_origin  rho_zero  gain      pen       gap       frac     
+  2a    csp     9     0.40      0.400     0.0590    0.0243    0.0312    1.889    
+  2a    euc     9     7.87      0.335     0.0174    -0.1840   0.0417    0.417    
+  2a    euc_ea  9     0.64      0.220     0.0590    -0.0139   -0.0417   nan      
+  2a    tan     9     0.37      0.411     0.0312    0.0139    -0.1319   nan      
+  2b    csp     27    0.22      0.499     0.0255    0.0182    0.0382    0.668    
+  2b    euc     27    57.07     23.227    0.0211    -0.1855   0.0515    0.410    
+  2b    euc_ea  27    14.20     5.265     0.0181    -0.1372   0.0497    0.363    
+  2b    tan     27    21.22     5.146     0.0203    -0.1600   0.0451    0.450    
+  gal   pow     336   0.25      0.248     0.0000    -0.0147   0.0357    0.000    
+  ner   Ftime   320   0.20      0.209     0.0000    0.0000    0.0236    0.000    
+  seed  de      45    34.15     0.980     0.2107    -0.0287   0.2995    0.703    
+
+  fraction vs rho_zero  : spearman +0.259 (p=0.500, n=9)
+  fraction vs z_origin  : spearman +0.268 (p=0.486, n=9)
+  gain     vs rho_zero  : spearman +0.210 (p=0.536, n=11)
+  pen      vs z_origin  : spearman -0.755 (p=0.007, n=11)
+  pen      vs rho_zero  : spearman -0.464 (p=0.151, n=11)
+  z_origin vs rho_zero  : spearman +0.718 (p=0.013, n=11)
