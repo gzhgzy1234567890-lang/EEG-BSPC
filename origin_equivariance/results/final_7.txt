@@ -1,0 +1,15 @@
+v8 collapse certificate  15:59:47
+  criterion (label-free): the classifier has collapsed onto class c iff
+      min_k!=c [ (delta_k - delta_c) - max_x (s_k(x) - s_c(x)) ] > 0
+  with delta_k = -w_k'mu_T, evaluated on the target scores.
+  ds    K    collapsed predicted TP     FP   FN   TN   BA=1/K
+  2a    -    1         1         1      0    0    35   3   
+        (last column: cells whose balanced accuracy is exactly 1/K, collapse or not)
+  2b    -    67        67        67     0    0    41   67  
+        (last column: cells whose balanced accuracy is exactly 1/K, collapse or not)
+  seed  -    40        40        40     0    0    5    41  
+        (last column: cells whose balanced accuracy is exactly 1/K, collapse or not)
+  ner   -    16        16        16     0    0    304  66  
+        (last column: cells whose balanced accuracy is exactly 1/K, collapse or not)
+  gal   -    0         0         0      0    0    336  3   
+        (last column: cells whose balanced accuracy is exactly 1/K, collapse or not)
