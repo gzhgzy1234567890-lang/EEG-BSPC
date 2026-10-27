@@ -1,0 +1,6 @@
+development (five datasets), n=845, positives=228
+  pooled Youden threshold t* = 0.354 ; sens 0.811 spec 0.749 prec 0.544
+
+held out (SEED-IV), n=90, positives=49, threshold fixed above
+  sensitivity 1.000  specificity 0.000  precision 0.544  accuracy 0.544
+  TP 49 FP 41 FN 0 TN 0 ; fraction flagged 1.000
