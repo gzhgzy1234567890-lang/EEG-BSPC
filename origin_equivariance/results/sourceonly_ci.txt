@@ -1,0 +1,3 @@
+source-only units: 7, cells 773
+  rho = -0.857
+  cluster bootstrap (datasets): median -0.862 95% CI [-1.000, -0.585], n=4993
