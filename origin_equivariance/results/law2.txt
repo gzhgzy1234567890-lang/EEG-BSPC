@@ -1,0 +1,17 @@
+v13: two parameterisations of the signed law
+  ds    clf    n     MAE_A    r_A      MAE_B    r_B      BAcheck 
+  2b    lda    108   0.0130   0.989    0.0567   0.861    0.096   
+  2b    logit  108   0.0127   0.990    0.0578   0.852    0.098   
+  2b    svm    108   0.0224   0.381    0.0203   0.655    0.107   
+  2a    lda    36    0.0320   0.902    0.0414   0.874    0.149   
+  2a    logit  36    0.0330   0.885    0.0563   0.824    0.128   
+  2a    svm    36    0.0161   0.610    0.0217   0.711    0.095   
+  gal   lda    336   0.0360   0.649    0.0420   0.271    0.213   
+  gal   logit  336   0.0364   0.592    0.0355   0.531    0.212   
+  gal   svm    336   0.0115   0.353    0.0127   0.191    0.248   
+  ner   lda    320   0.0285   0.385    nan      nan      nan     
+  ner   logit  320   0.0258   0.371    nan      nan      nan     
+  ner   svm    320   0.0434   0.458    nan      nan      nan     
+
+  BAcheck = mean |BA_aligned - Phi(c_B)| : how far the Gaussian model's
+  implied accuracy is from the observed aligned accuracy.
