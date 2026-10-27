@@ -1,4 +1,4 @@
-# An audit of mean correction in cross-session EEG decoding: equivariance, failure mechanism, and boundaries
+# Invariance of mean correction in cross-session EEG decoding: verification, failure mechanism and boundaries
 
 Zihao Gong ^a,†^, Jiran Li ^b,†^, Ke Huo ^a^, Yubin Han ^c^, Guangyu Shi ^a^, Yongqiang Xie ^a,*^
 
@@ -16,16 +16,16 @@ E-mail addresses: andy.zihao.gong@gmail.com (Z. Gong), dsx54188dsx@163.com (J. L
 
 A mean correction is the first step of almost every cross-session EEG pipeline, and two operations circulate under that name: centring both sessions, or centring one. We audit the choice. Equivariance: a correction is invariant to a change of the coordinate origin exactly when it translates by a translation-equivariant estimate of the target mean; that family is larger than the sample mean. Score-difference equivalence: two corrections leave every class-score difference unchanged exactly when their references differ by a vector whose projection onto the centred classifier weights vanishes. Performance: its failure is a threshold displacement whose sign is set by the threshold error the training session already carries.
 
-The audit covers 845 cells from five datasets plus 90 from SEED-IV, used once as a held-out test. A controlled origin sweep leaves the equivariant pipelines unchanged by 0.000 in balanced accuracy and drives the one-sided form to exact chance; an equal-norm direction control shows that only the component of the origin along the classifier weights matters. A Gaussian model of the displacement explains the sign of the change for mean-calibrated linear classifiers when it is parameterised the way the model requires, and we report both the parameterisation that fits better and the one the model implies. A source-only statistic, defined so that it is invariant to decision-equivalent score representations, ranks feature families (AUC 0.84) but its cross-dataset association is rho = −0.77 (p = 0.10) and its held-out operating point has zero specificity. We report it as an open question, not as a screening tool.
+The study covers 845 cells from five datasets plus 90 from SEED-IV, used once as a held-out test. A controlled origin sweep leaves the equivariant pipelines unchanged by 0.000 in balanced accuracy and drives the one-sided form toward chance; an equal-norm direction control shows that only the component of the origin along the classifier weights matters. A Gaussian model of the displacement explains the sign of the change for mean-calibrated linear classifiers when its parameters are read from the target, and a source-only version of the same model does not beat the majority sign: it is a mechanism, not a predictor.84) but its cross-dataset association is rho = −0.77 (p = 0.10) and its held-out operating point has zero specificity. We report it as an open question, not as a screening tool.
 
 **Keywords:** cross-session EEG decoding; mean correction; origin equivariance; preprocessing audit; calibration; reproducibility
 
 ## Highlights
 
 - The equivariant family of mean corrections is stated; uniqueness is not claimed.
-- Score-difference equivalence is characterised by the centred classifier weights.
+- Score-difference equivalence follows from the centred classifier weights.
 - Only the origin's projection on the weights damages the decoder, not its norm.
-- A threshold-displacement model explains the sign for LDA and logistic.
+- A threshold-displacement model explains the sign but does not predict it.
 - Three released framework components take the mean from the training fold.
 
 ## 1. Introduction
@@ -36,7 +36,7 @@ A classifier trained on one recording session and applied to another usually los
 
 *One-sided centring.* Centre one session and not the other. There are two forms, centring only the target or only the training session, and they shift the decision function in opposite directions.
 
-This paper is an audit of that choice rather than a proposal for a new decoder. It asks three questions and answers each with the weakest statement the evidence supports.
+This paper is a verification study of that choice rather than a proposal for a new decoder: it establishes which corrections are invariant, measures what the non-invariant one costs, and reports where the mechanism demonstrably holds and where it fails. It asks three questions and answers each with the weakest statement the evidence supports.
 
 **Equivariance.** Which corrections are invariant to a translation of the feature origin, and does the invariance single one out? Section 2.2 shows that the two-sided form is invariant and that the invariant family is larger than the sample mean, so the invariance cannot be used as a uniqueness argument. What it does establish is a requirement: a pipeline whose output depends on the unreported zero of the feature scale has a convention in it, and the convention is invisible.
 
@@ -44,9 +44,9 @@ This paper is an audit of that choice rather than a proposal for a new decoder. 
 
 **Performance.** Does the correction improve accuracy, and can the change be predicted? Sometimes it cannot, and the sign of the change is not governed by the size of the displacement: it is governed by where the training threshold already sits relative to the target optimum. Section 2.4 gives a Gaussian model of that mechanism, Section 4.5 tests it cell by cell under two parameterisations, and Section 6 states the boundaries.
 
-**What the audit covers.** Five public datasets, eleven dataset-by-representation units and 845 cells, chosen to span motor imagery, emotion, error-related potentials and movement, four feature families and three linear classifier families; a sixth dataset, SEED-IV, contributes 90 further cells and is used only as a held-out test of the one source-level statistic the paper defines. The measured quantities are not invented for the occasion: the origin distance of a feature family, the displacement it induces in the decision function, the sign of the resulting change, and the calibration of the resulting probabilities.
+**What the study covers.** Five public datasets, eleven dataset-by-representation units and 845 cells, chosen to span motor imagery, emotion, error-related potentials and movement, four feature families and three linear classifier families; a sixth dataset, SEED-IV, contributes 90 further cells and is used only as a held-out test of the one source-level statistic the paper defines. The measured quantities are not invented for the occasion: the origin distance of a feature family, the displacement it induces in the decision function, the sign of the resulting change, and the calibration of the resulting probabilities.
 
-**What this paper does not claim.** We do not claim that one-sided centring is frequent; we audited one published cross-session example and found it correct by construction (Section 6.4), and we put no number on the frequency of the mistake. We do not claim that two-sided centring is optimal; Section 4.5 exhibits the settings in which it is not. We do not claim that the source-only statistic is a screening instrument; its held-out operating point has zero specificity and we say so in the abstract. We do not claim that the Gaussian model is a quantitative law; it is a mechanism with a measured range of validity.
+**What this paper does not claim.** We do not claim that one-sided centring is frequent. We inspected three released framework components (Section 4.11) and all three take their reference from the training fold or from a causal running mean, so none of them can exhibit the failure; we put no number on the frequency of the mistake in custom code, and the paper is written as an invariance verification rather than as a prevalence study. We do not claim that two-sided centring is optimal; Section 4.5 exhibits the settings in which it is not. We do not claim that the source-only statistic is a screening instrument; its held-out operating point has zero specificity and we say so in the abstract. We do not claim that the Gaussian model is a quantitative law; it is a mechanism with a measured range of validity.
 
 **Relation to prior work.** Apicella et al. [4] compared normalisation schemes with domain-adaptation methods on three EEG datasets and found that an appropriate normalisation often outperforms the adaptation algorithm; our results are compatible and add a criterion, the invariance of the output to the coordinate origin. The nearest formal relatives are the Euclidean and Riemannian alignment families [5-8], which act on second-order structure; an alignment matrix that is a multiple of the identity performs no alignment, so the first-order correction audited here is not a special case of the second-order one, although the two compose (Section 4.6). Methods that remove session-specific directions [9,10] estimate a subspace in which the sessions agree rather than relocating a boundary by a constant. Calibrating a classifier to a new session by re-estimating an intercept from a few labelled trials [1,2] is the procedure onto which our analysis of label use maps; on four of five datasets it changes nothing relative to the label-free form, and on the fifth it gains 0.013 (Section 4.6).
 
@@ -89,7 +89,7 @@ Two remarks. A reference of the form μ + a with a fixed vector a is equivariant
 
 For a finite target sample the condition is sufficient but not necessary for identical predictions: if no trial crosses the boundary that the difference moves, the labels agree. A class whose score is dominated everywhere can also be shifted without changing a decision, so label equivalence is strictly weaker than score-difference equivalence.
 
-**Proposition 4 (rank preservation).** For any two samples x, x' and any two classes j, k, the comparison s_j(x) − s_k(x) versus s_j(x') − s_k(x') is unchanged by any of the six pipelines, because the added constants are identical for x and x'. Consequently threshold-free ranking measures are unchanged. The statement holds for a *fixed* model; for a refitted or standardised pipeline the scores are recomputed and it does not apply.
+**Proposition 4 (rank preservation, for score-based rankings).** For any two samples x, x' and any two classes j, k, the comparison s_j(x) − s_k(x) versus s_j(x') − s_k(x') is unchanged by any of the six pipelines, because the added constants are identical for x and x'. Pairwise margins and any ranking measure computed from the raw class scores are therefore unchanged. The statement does not extend to rankings computed from *softmax probabilities*: a per-class constant changes the normalisation, so a one-versus-rest ROC-AUC computed from softmax outputs can move even though every margin is fixed. It also holds only for a fixed model; for a refitted or standardised pipeline the scores are recomputed.
 
 ### 2.3 What governs the damage
 
@@ -121,7 +121,7 @@ Write m_kB = m_kA + ḡ + h_k with ḡ = Σ_k π_kB (m_kB − m_kA) the prior-we
 
 The second term is the change in the mixture of the source class means; it is present even when nothing about the class-conditional distributions changes. Under the constraint the h_k do not enter the mean at all — they enter the class-conditional placement, which is where the residual of Section 4.9 comes from. Subtracting μB − μA removes the class-conditional offset and the prior-induced mixture term together; on a balanced design the second term vanishes, and when the priors change it does not.
 
-If the class-conditional distributions are unchanged, p_B(x | y) = p_A(x | y), the target priors are identifiable from unlabelled target data and can be estimated by the EM procedure of Saerens et al. [12]. Without that assumption a prior change and a class-conditional offset are confounded, since both act on the first two moments of the mixture, and no label-free method separates them.
+If the class-conditional distributions are unchanged, p_B(x | y) = p_A(x | y), and the classes are distinguishable in the score space (the mixture components are not degenerate), the target priors are identifiable from unlabelled target data and can be estimated by the EM procedure of Saerens et al. [12]. Without that assumption a prior change and a class-conditional offset are confounded, since both act on the first two moments of the mixture, and no label-free method separates them.
 
 ### 2.5 The collapse identity
 
@@ -158,9 +158,9 @@ with equality resolved by the argmax tie-breaking rule (the smallest class index
 | grasp-and-lift | 2 | 12 | 12 | 1 | 336 | 0.25 |
 | SEED-IV (held out) | 4 | 15 | 45 | 1 | 90 | 56.3 |
 
-A *cell* is one dataset-representation-subject-ordered-pair combination: 845 development cells from 76 subjects and 227 sessions, plus 90 held-out cells. Because a subject contributes several representations of the same pair, 845 cells correspond to **737 distinct session pairs**; the paper says "cells" whenever it means cells. The analyses do not all cover the same cells: the per-cell displacement model uses the 800 binary cells of the four binary datasets (for BCI-2a, the two-class subproblem of classes 1 and 2), and the held-out test uses the 90 SEED-IV cells.
+A *cell* is one dataset-representation-subject-ordered-pair combination: 845 development cells from 61 subjects and 182 sessions, plus 90 held-out cells from 15 further subjects (76 subjects and 227 sessions in total). Because a subject contributes several representations of the same pair, 845 cells correspond to **737 distinct session pairs**; the paper says "cells" whenever it means cells. The analyses do not all cover the same cells: the per-cell displacement model uses the 800 binary cells of the four binary datasets (for BCI-2a, the two-class subproblem of classes 1 and 2), and the held-out test uses the 90 SEED-IV cells.
 
-**Representations.** For 2a and 2b: Euclidean log-power (`euc`), Euclidean alignment followed by log-power (`euc_ea`), Riemannian tangent space (`tan`) and CSP log-variance (`csp`). For SEED and SEED-IV the distributed differential entropy; for NER2015 the time-domain mean over eight windows; for grasp-and-lift the log power over eight windows. A representation is fitted on the training session except `euc_ea` and `tan`, which use the two sessions' covariances by construction; Section 4.6 states which.
+**Representations, and which of them are source-only.** `euc` (log power), `csp` (filters fitted on the training session) and the single representations of SEED, SEED-IV, NER2015 and grasp-and-lift are computed from the training session alone. `euc_ea` and `tan` are not: Euclidean alignment and tangent-space mapping use the session covariance, and in our pipeline both sessions contribute, so a classifier trained on them has already seen the target. The two groups are kept apart wherever the paper makes a *source-only* claim: Section 4.4 reports the statistic on the source-only representations (773 of the 845 development cells) and treats `euc_ea` and `tan` as target-informed, reporting them only where the claim does not depend on the source-only status (Tables 3 and 8).
 
 **Classifiers.** Linear discriminant analysis with Ledoit-Wolf shrinkage [11] throughout, with logistic regression (C = 1, lbfgs) and a linear support-vector machine (C = 0.01, hinge loss) in Sections 4.5 and 4.10.
 
@@ -168,7 +168,7 @@ A *cell* is one dataset-representation-subject-ordered-pair combination: 845 dev
 
 **Statistics.** Cells are aggregated per subject first, then tested across subjects with a two-sided Wilcoxon signed-rank test, a subject-level bootstrap of the median (10,000 resamples) and Cohen's dz. Cell-level correlations are descriptive; dataset-level tests use exact permutation distributions over the datasets; the unit-level analysis is reported with a cluster bootstrap that resamples datasets. No analysis treats the 845 cells as independent.
 
-**Sub-sampling.** Two analyses use a uniform subsample of a dataset's cells to bound computation: the classifier sweeps on grasp-and-lift and NER2015 (60 of 336 and 320, equally spaced indices) and the direction experiment (60 cells in each of two datasets). Every other number uses all cells.
+**Sub-sampling.** Two analyses use a uniform subsample of a dataset's cells to bound computation: the classifier sweep reported in Section 4.5's discussion of regularisation (60 cells per dataset on grasp-and-lift and NER2015, equally spaced) and the direction experiment (60 cells in each of two datasets). The per-cell model of Table 8 and everything else use all cells of the relevant dataset.
 
 ## 4. Results
 
@@ -191,23 +191,36 @@ Standardisation with training statistics is a related but different operation. W
 
 The gain of `mean` over `none` is +0.0463 on 2a, +0.0329 on 2b and +0.2503 on SEED, and small where the features have no origin offset: +0.0023 on NER2015 and +0.0045 on grasp-and-lift. Per subject it is positive in 9 of 9 on 2a (median +0.0356, 95% CI [+0.0287, +0.0659], dz = 1.52, p = 3.9 × 10⁻³), 9 of 9 on 2b (+0.0321, [+0.0187, +0.0477], dz = 1.39, p = 3.9 × 10⁻³), 15 of 15 on SEED (+0.2452, [+0.2038, +0.2958], dz = 2.71, p = 6.1 × 10⁻⁵), 10 of 16 on NER2015 (+0.0050, [−0.0018, +0.0062], p = 0.32) and 8 of 12 on grasp-and-lift (+0.0031, [+0.0007, +0.0090], p = 0.052).
 
-![Figure 3](figs/fig3.png)
-**Fig. 3.** (a) Balanced accuracy of the three pipelines by dataset; (b) the gain of the two-sided over the uncorrected pipeline, one point per subject, with the box showing the median and quartiles.
+![Figure 1](figs/fig3.png)
+**Fig. 1.** (a) Balanced accuracy of the three pipelines by dataset; (b) the gain of the two-sided over the uncorrected pipeline, one point per subject, with the box showing the median and quartiles.
 
 ### 4.2 An origin sweep: the equivariant pipelines are exactly flat
 
 To measure the effect of the origin with the cells held fixed, we added a common constant to every feature, in both sessions alike, and swept its size over ten settings; the sweep was run on all 845 cells.
 
-![Figure 1](figs/fig1.png)
-**Fig. 1.** (a) Change in balanced accuracy of the one-sided pipeline as a function of z_T, one curve per dataset; (b) the fraction of cells that land on exactly 1/K; (c) the largest change of the two equivariant pipelines over the whole sweep. The equivariant pipelines change by 0.0e+00 in every cell at every setting; the one-sided pipeline decays toward 1/K without reaching it uniformly within the sweep.
+![Figure 2](figs/fig1.png)
+**Fig. 2.** (a) Change in balanced accuracy of the one-sided pipeline as a function of z_T, one curve per dataset; (b) the fraction of cells that land on exactly 1/K; (c) the largest change of the two equivariant pipelines over the whole sweep. The equivariant pipelines change by 0.0e+00 in every cell at every setting; the one-sided pipeline decays toward 1/K without reaching it uniformly within the sweep.
 
 `none` and `mean` are exactly invariant: across 845 cells and ten settings the largest absolute change in balanced accuracy was 0.0e+00 for both, in every dataset (Fig. 1c). The one-sided pipeline decays toward 1/K as z_T grows, but it does not reach it uniformly within the sweep: on grasp-and-lift the fraction of cells at chance rises from 0.00 to 1.00 as z_T goes from 0.26 to 54.9; on BCI-2a from 0.08 to 0.97; on NER2015 from 0.05 to 0.93; on BCI-2b the sweep starts at z_T = 26 where 0.60 of the cells are already at chance and ends at 0.78; on SEED it starts at z_T = 34 where 0.90 are already at chance and ends at 1.00.
+
+**The protocol in use is transductive.** Centring the target on its own mean uses the whole session. A deployment does not have it. We therefore ran a strict prefix-calibration protocol: the first k trials of a session, in their recorded order or in a random order, are used to estimate the mean; the estimate is frozen; the remaining trials are classified with it and scored. Table 6 reports the result for LDA.
+
+**Table 4.**  Prefix calibration: balanced accuracy on the trials after a calibration prefix of k trials, averaged over cells and over five random orders (the k = 5 row of a random-order run and the recorded order give the same trend). `batch` is the whole-session correction.
+
+| dataset | batch | k = 5 | k = 20 | k = 50 | k = 100 |
+|---|---|---|---|---|---|
+| BCI-2b | 0.7375 | 0.7140 | 0.7316 | 0.7361 | 0.7510 |
+| BCI-2a | 0.6119 | 0.5485 | 0.5947 | 0.6041 | 0.6038 |
+| grasp-and-lift | 0.7815 | 0.7376 | 0.7539 | 0.7848 | — |
+| NER2015 | 0.5909 | 0.5852 | 0.5885 | 0.5692 | — |
+
+Twenty trials of calibration recover most of the batch correction on BCI-2b (0.732 against 0.738), BCI-2a (0.595 against 0.612) and grasp-and-lift (0.754 against 0.782), and fifty trials recover it on the first two and on grasp-and-lift; NER2015, whose one-sided penalty is zero, does not move. The transductive result is therefore an upper bound that a prefix of 20 to 50 trials approaches, and the number is the quantity a laboratory would need before choosing the correction.
 
 ### 4.3 The direction control
 
 The sweep injects the origin along one direction, which is not enough: Section 2.3 says the damage is governed by the projection of the origin onto the weights, so an origin orthogonal to the weights should do nothing while raising any norm-based statistic. We ran that experiment with equal-norm origins in two directions.
 
-**Table 4.** Equal-norm origins, two directions, LDA, 60 cells per dataset. `change` is the penalty relative to the no-injection baseline.
+**Table 5.**  Equal-norm origins, two directions, LDA, 60 cells per dataset. `change` is the penalty relative to the no-injection baseline.
 
 | dataset | direction | norm | z_T | penalty | change |
 |---|---|---|---|---|---|
@@ -220,16 +233,16 @@ The sweep injects the origin along one direction, which is not enough: Section 2
 | grasp-and-lift | parallel to w | 2 σ̄ | 0.27 | −0.2279 | −0.2132 |
 | grasp-and-lift | orthogonal to w | 2 σ̄ | 0.27 | −0.0147 | 0.0000 |
 | grasp-and-lift | parallel to w | 8 σ̄ | 0.49 | −0.3225 | −0.3078 |
-| grasp-and-lift | orthogonal to w | 4 σ̄ | 0.50 | −0.0147 | 0.0000 |
+| grasp-and-lift | orthogonal to w | 8 σ̄ | 0.50 | −0.0147 | 0.0000 |
 
 The two directions give the same z_T to within one unit in the second decimal, and the orthogonal one changes the penalty by exactly 0.0000 in every cell while the parallel one changes it by −0.13 and −0.21 to −0.31. A norm-based statistic is therefore blind to the direction. The projected statistic of Equation (2) is unchanged in the orthogonal arm by construction, and it is the statistic we use.
 
 ### 4.4 A source-level statistic, and its boundaries
 
-![Figure 2](figs/fig2.png)
-**Fig. 2.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, one point per dataset-by-representation unit, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells.
+![Figure 3](figs/fig2.png)
+**Fig. 3.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, one point per dataset-by-representation unit, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells.
 
-**Table 5.** The source-only statistic at the level of dataset-by-representation units, medians within a unit. z_T = ‖μ_A‖/‖sd_A‖; z_w is Equation (2) with the scale taken from the centred scores; penalty = zero − none; gain = mean − none. Sorted by z_w.
+**Table 6.**  The source-only statistic at the level of dataset-by-representation units, medians within a unit. z_T = ‖μ_A‖/‖sd_A‖; z_w is Equation (2) with the scale taken from the centred scores; penalty = zero − none; gain = mean − none. Sorted by z_w.
 
 | dataset | representation | n | z_T | z_w | penalty | gain |
 |---|---|---|---|---|---|---|
@@ -245,11 +258,11 @@ The two directions give the same z_T to within one unit in the second decimal, a
 | SEED | differential entropy | 45 | 34.2 | 12.36 | −0.029 | +0.211 |
 | BCI-2b | euc | 27 | 57.1 | 23.31 | −0.186 | +0.021 |
 
-At the level of the eleven development units the rank correlation between z_w and the penalty is −0.83, and the direction is the same at the cell level (AUC 0.841 for a loss larger than 0.05, 228 positives of 845). The statistic also resolves the four representations of BCI-2a, which the norm-based z_T does not: `euc` has z_w = 4.40 and a penalty of −0.184, while `csp`, `tan` and `euc_ea` sit between 0.29 and 0.60 with penalties between +0.024 and −0.014.
+On the source-only representations — 773 of the 845 development cells, seven units, since `euc_ea` and `tan` are target-informed — the rank correlation between z_w and the penalty is −0.857, with a cluster bootstrap over datasets of [−1.000, −0.585] (median −0.862, 4,993 resamples), and the direction is the same at the cell level (AUC 0.831 for a loss larger than 0.05). Including the two target-informed representations in the unit-level analysis changes the correlation only to −0.827, so the statistic is not being carried by the representations a source-only analysis should not use. The statistic also resolves the four representations of BCI-2a, which the norm-based z_T does not: `euc` has z_w = 4.40 and a penalty of −0.184, while `csp`, `tan` and `euc_ea` sit between 0.29 and 0.60 with penalties between +0.024 and −0.014.
 
-**Where it fails.** At the dataset level the picture weakens: the five development datasets give a rank correlation of −0.80, and adding SEED-IV (median z_w = 24.4, median penalty −0.070) gives −0.77 with an exact permutation p of 74/720 = 0.103. A threshold of 0.354 fixed by Youden's J on the five development datasets flags every one of the 90 held-out cells (sensitivity 1.000, specificity 0.000, precision 0.544), and within SEED-IV the statistic has an AUC of 0.515. The leave-one-dataset-out operating point fails on two of five development datasets (SEED: sensitivity 1.000, specificity 0.000; NER2015: 0.273, 0.864) and works on three (BCI-2a 0.714/0.864, BCI-2b 1.000/0.574, grasp-and-lift 0.704/0.828).
+**Where it fails.** At the dataset level the picture weakens: on the source-only representations the five development datasets give a rank correlation of −0.80, and adding SEED-IV (median z_w = 24.4, median penalty −0.070) gives −0.83 with an exact permutation p of 42/720 = 0.058; over all representations the six-dataset value is −0.77, p = 0.103. A threshold of 0.354 fixed by Youden's J on the five development datasets flags every one of the 90 held-out cells (sensitivity 1.000, specificity 0.000, precision 0.544), and within SEED-IV the statistic has an AUC of 0.515. The leave-one-dataset-out operating point fails on two of five development datasets (SEED: sensitivity 1.000, specificity 0.000; NER2015: 0.273, 0.864) and works on three (BCI-2a 0.714/0.864, BCI-2b 1.000/0.574, grasp-and-lift 0.704/0.828).
 
-**Table 6.** Leave-one-dataset-out operating point for the statistic. The threshold is chosen on four development datasets and evaluated on the fifth.
+**Table 7.**  Leave-one-dataset-out operating point for the statistic. The threshold is chosen on four development datasets and evaluated on the fifth.
 
 | held out | n | threshold | sensitivity | specificity | precision |
 |---|---|---|---|---|---|
@@ -265,7 +278,7 @@ The conclusion we draw is that a source-level statistic can rank *feature famili
 
 Equations (3) and (4) make a prediction for the per-cell change once c, t* and s are fixed. They can be fixed in two ways, and the two are not the same. The *oracle* choice takes c = Φ⁻¹(BA_aligned) and normalises by the pooled score standard deviation; it is oracle-assisted because c is read from the target's own accuracy. The *model* choice takes c = (m₁ − m₀)/(2σ_w) from the source class means and the within-class standard deviation, which is what an equal-variance Gaussian model implies.
 
-**Table 7.** Per-cell prediction of Equation (4) under the two parameterisations. For BCI-2a the cells are the two-class subproblem of classes 1 and 2. `MAE` is the mean absolute difference between prediction and observation on the same cell; `r` is Pearson; `sign` and `base` are the sign accuracy and the majority-class rate under the oracle parameterisation; `BA gap` is the mean absolute difference between the model's implied accuracy Φ(c) and the observed aligned accuracy under the model parameterisation.
+**Table 8.**  Per-cell prediction of Equation (4) under the two parameterisations. For BCI-2a the cells are the two-class subproblem of classes 1 and 2. `MAE` is the mean absolute difference between prediction and observation on the same cell; `r` is Pearson; `sign` and `base` are the sign accuracy and the majority-class rate under the oracle parameterisation; `BA gap` is the mean absolute difference between the model's implied accuracy Φ(c) and the observed aligned accuracy under the model parameterisation.
 
 | dataset | classifier | n | oracle r | oracle MAE | oracle sign (base) | model r | model MAE | BA gap |
 |---|---|---|---|---|---|---|---|---|
@@ -288,12 +301,14 @@ The oracle parameterisation fits well on the BCI data (r = 0.99, MAE 0.013) and 
 
 **The sign, with and without a held-out half.** With t* estimated on one half of the target and the sign evaluated on the other half, the sign-discrimination AUC is 0.914 [0.853, 0.958] (BCI-2b, LDA), 0.848 [0.767, 0.917] (BCI-2b, logistic), 0.848 [0.705, 0.955] (BCI-2a, LDA), 0.786 [0.618, 0.924] (BCI-2a, logistic), 0.667 [0.606, 0.725] and 0.662 [0.599, 0.721] on grasp-and-lift. The support-vector machine is unstable across settings (0.571, 0.328, 0.478) and we do not claim the model for it. Raw sign accuracy is close to the majority rate, which is why we report the AUC.
 
+**A source-only version of the same model does not work.** Replacing the target-optimal threshold t* by the source-optimal one — the threshold that maximises balanced accuracy on the training scores of the fitted model, in within-class units — makes the model fully source-only. The sign accuracy it reaches is at the majority baseline: 0.815 against 0.815 on BCI-2b, 0.613 against 0.604 on grasp-and-lift, and 0.750 against 0.833 on BCI-2a, with mean absolute errors of 0.06, 0.04 and 0.05. The mechanism is therefore explanatory only, as Section 6.4 states.
+
 ![Figure 4](figs/fig4.png)
 **Fig. 4.** (a) Predicted change of Equation (4) against the observed change, one point per cell, LDA, the 800 binary cells; the dotted line is the identity. (b) Distribution of the prediction error.
 
 ### 4.6 Variants, labels, and the decision-space form
 
-**Table 8.** Alternatives to the mean correction. `proj` subtracts the component of the offset in the row space of W; `shrink` half the offset; `low5` the projection onto the five leading source principal directions; `bal` the class-balanced offset, using the target labels.
+**Table 9.**  Alternatives to the mean correction. `proj` subtracts the component of the offset in the row space of W; `shrink` half the offset; `low5` the projection onto the five leading source principal directions; `bal` the class-balanced offset, using the target labels.
 
 | dataset | none | zero | mean | proj | shrink | low5 | bal |
 |---|---|---|---|---|---|---|---|
@@ -311,7 +326,7 @@ For an affine model the correction can also be applied to the K scores instead o
 
 ### 4.7 Probability calibration
 
-**Table 9.** Calibration, LDA, every development cell; ECE uses ten equal-width bins, is averaged within subject, and the interval is a bootstrap (5,000 resamples) over subjects of the mean. The paired differences are given in the text.
+**Table 10.**  Calibration, LDA, every development cell. ECE is the expected calibration error of the predicted-class probability, computed with ten equal-width confidence bins and averaged within subject; the interval is a bootstrap over subjects of the *mean* and is placed next to the median only as a summary of the spread. The Brier score is the mean squared error of the predicted probability vector, and log loss clips probabilities at 10⁻¹². The paired differences are given in the text.
 
 | dataset | n | pipeline | BA | median ECE | 95% CI | Brier | log loss |
 |---|---|---|---|---|---|---|---|
@@ -333,7 +348,7 @@ The identity of Section 2.5 is exact by construction: on all 845 cells it agrees
 
 ### 4.9 What is left
 
-After the correction a residual gap to the within-session reference remains: 0.0198 on BCI-2b, 0.0770 on SEED, 0.0257 on NER2015 and 0.0294 on grasp-and-lift. It is not an origin effect: across all 845 cells the correlation between z_T and the residual is +0.06, and within datasets it has no consistent sign. The residual is weakly associated with the class-conditional offset h_k of Equation (5) in units of the score spread: +0.21 on BCI-2a, −0.36 on BCI-2b, +0.33 on SEED, +0.30 on NER2015, +0.55 on grasp-and-lift (pooled +0.26, four of five in the same direction). The correlation is descriptive: the class-conditional offset is computed with the target labels and so is the residual, and we do not read it as a causal decomposition. A change of the within-session covariance explains less (pooled +0.10).
+After the correction a residual gap to the within-session reference remains (a gap to that reference, not a decomposition of it: the reference differs from the cross-session model in training-set size and in protocol, so the difference is an upper bound on what any label-free correction could recover, not an identified label-information term): 0.0198 on BCI-2b, 0.0770 on SEED, 0.0257 on NER2015 and 0.0294 on grasp-and-lift. It is not an origin effect: across all 845 cells the correlation between z_T and the residual is +0.06, and within datasets it has no consistent sign. The residual is weakly associated with the class-conditional offset h_k of Equation (5) in units of the score spread: +0.21 on BCI-2a, −0.36 on BCI-2b, +0.33 on SEED, +0.30 on NER2015, +0.55 on grasp-and-lift (pooled +0.26, four of five in the same direction). The correlation is descriptive: the class-conditional offset is computed with the target labels and so is the residual, and we do not read it as a causal decomposition. A change of the within-session covariance explains less (pooled +0.10).
 
 ### 4.10 Implementation details and the invariance checks
 
@@ -352,7 +367,7 @@ that is fixed at prediction time. We inspected the components of three widely
 used frameworks that a cross-session pipeline actually uses, and recorded which
 data each one takes its reference from.
 
-**Table 10.** What the inspected components centre on. Quoted lines are from the
+**Table 11.**  What the inspected components centre on. Quoted lines are from the
 public sources; the audit is small and reported as such (`results/code_audit.txt`
 in the archive).
 
@@ -371,7 +386,7 @@ patches a normalisation step onto features at prediction time, outside the fold.
 We did not audit that population, and the audit above is too small to estimate
 its size.
 
-## 5. The audit procedure
+## 5. The verification procedure
 
 The results reduce to a procedure with three measurements, one correction and one test.
 
@@ -387,9 +402,9 @@ The results reduce to a procedure with three measurements, one correction and on
 
 ## 6. Discussion
 
-### 6.1 What the audit establishes, and what it does not
+### 6.1 What the verification establishes, and what it does not
 
-Three kinds of statement are mixed in a paper of this shape, and only the second is specific to EEG. The first is a corollary of linear discriminant theory: a constant added to a feature vector moves the intercept, the prediction-relevant content of a reference is its projection onto the weights, and score differences are unchanged by class-constant shifts. We prove these and do not claim them as discoveries. The second is an empirical regularity of cross-session EEG features: which feature families carry a free origin, how large the resulting damage is on six public datasets, how the damage depends on the classifier's threshold error, and in what ways a source-level statistic fails. The third is a change in practice: centre both sides, run the invariance test, and do not use a norm-based origin statistic. The paper's contribution is the second and the third; the first is the scaffolding.
+Three kinds of statement are mixed in a paper of this shape, and only the second is specific to EEG. The first is a corollary of linear discriminant theory: a constant added to a feature vector moves the intercept, the prediction-relevant content of a reference is its projection onto the weights, and score differences are unchanged by class-constant shifts. We prove these and do not claim them as discoveries. The second is an empirical regularity of cross-session EEG features: which feature families carry a free origin, how large the resulting damage is on six public datasets, how the damage depends on the classifier's threshold error, and in what ways a source-level statistic fails. The third is a change in practice: centre both sides, run the invariance test, and do not use a norm-based origin statistic. The paper's contribution is the second and the third; the first is the scaffolding, and we say so because a reader who expects a new algorithm should know what this is not.
 
 ### 6.2 Why some features are exposed and others are not
 
@@ -417,7 +432,7 @@ Euclidean and Riemannian alignment [5-8] act on second-order structure, and the 
 
 The two centrings are different operations. The two-sided form is invariant to the coordinate origin, the invariant family is wider than the sample mean, and two corrections leave every score difference unchanged exactly when their projections onto the centred weights agree. The failure of the one-sided form is a threshold displacement; its sign is set by the threshold error the training session already carries, and on six public datasets the resulting damage ranges from nothing on time-domain contrast features to a collapse to chance on log-power and differential-entropy features with a large free origin.
 
-What the audit adds to a textbook statement is a measured boundary. The correction is exact for its own component, it composes with second-order alignment, it can be transported to the decision space of a frozen model, and it restores neither the residual label-information gap nor a calibration that the wrong convention destroyed. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and we report that as the open problem this audit leaves.
+What the verification adds to a textbook statement is a measured boundary. The correction is exact for its own component, it composes with second-order alignment, it can be transported to the decision space of a frozen model, and it restores neither the residual label-information gap nor a calibration that the wrong convention destroyed. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and we report that as the open problem this audit leaves.
 
 ## CRediT authorship contribution statement
 
