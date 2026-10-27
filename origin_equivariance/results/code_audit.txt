@@ -1,0 +1,34 @@
+public code audit: how each file references the session mean
+
+==============================================================================
+Braindecode  braindecode/braindecode/braindecode/preprocessing/preprocess.py  (688 lines)
+==============================================================================
+   476 | def _exponential_moving_mean(data: NDArray, factor_new: float) -> NDArray:
+   484 | ``pandas.DataFrame.ewm(alpha=factor_new).mean()`` does, so that a NaN does
+   539 | meaned = _exponential_moving_mean(data, factor_new)
+   543 | square_ewmed = _exponential_moving_mean(squared, factor_new)
+   548 | init_mean = np.mean(data[:, :init_block_size], axis=1, keepdims=True)
+   558 | def exponential_moving_demean(
+   586 | meaned = _exponential_moving_mean(data, factor_new)
+   590 | init_mean = np.mean(data[:, :init_block_size], axis=1, keepdims=True)
+
+==============================================================================
+MNE  mne-tools/mne-python/mne/decoding/transformer.py  (1027 lines)
+==============================================================================
+     7 | from sklearn.preprocessing import RobustScaler, StandardScaler
+    90 | def fit(self, X, y=None):
+   107 | def transform(self, X, copy=True):
+   113 | def fit_transform(self, X, y=None):
+   114 | return self.fit(X, y).transform(X)
+   134 | class Scaler(MNETransformerMixin, BaseEstimator):
+   138 | classes (e.g., :class:`sklearn.preprocessing.StandardScaler`) in that
+   161 | :class:`sklearn.preprocessing.StandardScaler`
+   179 | def fit(self, epochs_data, y=None):
+   209 | self.scaler_ = StandardScaler(
+   220 | def transform(self, epochs_data):
+   251 | def fit_transform(self, epochs_data, y=None):
+
+==============================================================================
+pyRiemann  pyRiemann/pyRiemann/pyriemann/utils/mean.py  (15 lines)
+==============================================================================
+
