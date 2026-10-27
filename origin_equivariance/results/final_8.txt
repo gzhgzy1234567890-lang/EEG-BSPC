@@ -1,0 +1,9 @@
+v8 what the residual is  15:51:58
+  residual = ref - align ; z_T = ||g||/||sd|| ; h = class-conditional part
+  ds    n     resid     rho(zT,res) rho(h,res)  rho(dcov,res)
+  2a    36    -0.0677   -0.550      0.206       -0.307      (p=5.1e-04/2.3e-01/6.9e-02)
+  2b    108   0.0198    -0.369      -0.359      -0.035      (p=8.4e-05/1.3e-04/7.2e-01)
+  seed  45    0.0770    0.414       0.325       0.343       (p=4.7e-03/3.0e-02/2.1e-02)
+  ner   320   0.0257    0.109       0.295       -0.020      (p=5.1e-02/7.7e-08/7.2e-01)
+  gal   336   0.0294    0.273       0.550       0.159       (p=3.8e-07/6.5e-28/3.5e-03)
+  pooled: rho(zT,resid)=0.060  rho(h,resid)=0.259  rho(dcov,resid)=0.097
