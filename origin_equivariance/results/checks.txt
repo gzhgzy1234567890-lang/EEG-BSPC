@@ -1,0 +1,20 @@
+v8 manuscript checks
+
+c1/c2/c4  per dataset
+  ds    n     dbl-diff    trainonly   zs-agree    zs-ba-diff 
+  2a    36    0.0e+00     0.5141      1.000       0.0e+00    
+  2b    108   0.0e+00     0.5722      1.000       0.0e+00    
+  seed  45    0.0e+00     0.3456      1.000       0.0e+00    
+  ner   320   0.0e+00     0.5845      1.000       0.0e+00    
+  gal   336   0.0e+00     0.7521      1.000       0.0e+00    
+
+c3  median z_T (cells)
+  2a    0.496
+  2b    16.123
+  seed  34.154
+  ner   0.204
+  gal   0.251
+
+c5  origin sweep: files and settings
+  exp4_2a,ner.npz                          rows=20 settings=10
+  exp4_2b,seed,gal.npz                     rows=30 settings=10
