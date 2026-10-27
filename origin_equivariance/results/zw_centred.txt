@@ -1,0 +1,14 @@
+v14: z_w with the scale from the centred scores
+
+  invariance under a class-common linear score term: |z'-z| = 4.44e-16
+
+  development cells 845, positives 228
+  AUC 0.841
+  unit-level spearman(z_w, penalty) = -0.827
+  dataset medians z_w [ 0.387  4.918 12.357  0.23   0.289]
+  dataset medians pen [-0.0139 -0.0722 -0.0287  0.     -0.0147]
+  five-dataset spearman -0.800
+
+  SEED-IV: n=90, median z_w 24.424, median penalty -0.0699, AUC 0.515
+  six-dataset spearman -0.771, exact p = 74/720 = 0.1028
+  external threshold 0.354 -> SEED-IV sens 1.000 spec 0.000 prec 0.544
