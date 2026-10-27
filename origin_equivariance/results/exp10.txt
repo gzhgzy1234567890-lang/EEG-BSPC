@@ -1,0 +1,11 @@
+v8 calibration per subject (LDA, 60 cells per dataset)
+  ds    cond   n    median ECE bootstrap 95% CI of the mean
+  2b    none   9    0.1041    [+0.0822, +0.1418]
+  2b    zero   9    0.3557    [+0.3033, +0.3774]
+  2b    mean   9    0.0900    [+0.0710, +0.1075]
+  seed  none   15   0.5467    [+0.5086, +0.5692]
+  seed  zero   15   0.6716    [+0.6617, +0.6725]
+  seed  mean   15   0.2404    [+0.2335, +0.3504]
+  gal   none   12   0.1484    [+0.1416, +0.2176]
+  gal   zero   12   0.1909    [+0.1791, +0.2391]
+  gal   mean   12   0.1466    [+0.1358, +0.2153]
