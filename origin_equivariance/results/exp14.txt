@@ -1,0 +1,33 @@
+v9 exp M: per-cell signed law   21:14:26
+
+  ds    clf    n     MAE       r         rho       sign      base      bound ok 
+  2b    lda    108   0.0130    0.989     0.983     0.917     0.815     1.00     
+  2b    logit  108   0.0127    0.990     0.953     0.889     0.769     1.00     
+  2b    svm    108   0.0224    0.381     0.515     0.676     0.528     1.00     
+  2a    lda    36    0.0320    0.902     0.955     0.889     0.833     1.00     
+  2a    logit  36    0.0330    0.885     0.807     0.750     0.750     1.00     
+  2a    svm    36    0.0161    0.610     0.648     0.611     0.528     1.00     
+  gal   lda    336   0.0360    0.649     0.697     0.693     0.604     1.00     
+  gal   logit  336   0.0364    0.592     0.625     0.649     0.607     1.00     
+  gal   svm    336   0.0115    0.353     0.427     0.420     0.292     1.00     
+  ner   lda    320   0.0285    0.385     0.400     0.556     0.406     1.00     
+  ner   logit  320   0.0258    0.371     0.303     0.509     0.425     1.00     
+  ner   svm    320   0.0434    0.458     0.441     0.666     0.503     1.00     
+
+  bound: per-cell |dhat| <= 0.1995 |s| must hold by construction; the
+  column reports the fraction of cells where it does.
+
+  pooled n=2400  MAE 0.0282  r 0.825  sign 0.623  majority baseline 0.503
+
+====================================================================================
+M2  split-sample sign prediction: t* from half the target, sign on the other half
+====================================================================================
+  ds    clf    n     sign      baseline  gain     
+  2b    lda    99    0.869     nan       +nan     
+  2b    logit  94    0.809     nan       +nan     
+  2b    svm    84    0.548     nan       +nan     
+  gal   lda    280   0.629     nan       +nan     
+  gal   logit  258   0.624     nan       +nan     
+  gal   svm    152   0.480     nan       +nan     
+
+total 3.7 min
