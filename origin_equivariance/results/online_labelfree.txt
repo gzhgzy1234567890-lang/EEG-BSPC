@@ -1,0 +1,16 @@
+v18 B1: prefix-calibration online protocol (LDA, mean over seeds and cells)
+  ds    batch    k=5       k=20      k=50      k=100    
+  2b    0.7375   0.7140    0.7316    0.7361    0.7510   
+  2a    0.6119   0.5485    0.5947    0.6041    0.6038   
+  gal   0.7815   0.7376    0.7539    0.7848    nan      
+  ner   0.5909   0.5852    0.5885    0.5692    nan      
+
+v18 B2: source-only threshold error
+  ds    clf    n     MAE       sign      base     
+  2b    lda    108   0.0634    0.815     0.815    
+  gal   lda    336   0.0377    0.613     0.604    
+  2a    lda    36    0.0528    0.750     0.833    
+
+  the source-only threshold t* is the source-optimal threshold of the
+  fitted model, in within-class SD units; the prediction uses it in
+  place of the target-optimal threshold.
