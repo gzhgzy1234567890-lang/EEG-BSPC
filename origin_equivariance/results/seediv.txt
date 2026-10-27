@@ -1,0 +1,5 @@
+SEED-IV held-out test: 90 cells, 15 subjects
+  median z_w 1.001   median z_T 56.338
+  mean penalty (zero - none) -0.1044
+  mean gain (mean - none)    +0.2042
+  fraction of cells with penalty < -0.05: 0.544
