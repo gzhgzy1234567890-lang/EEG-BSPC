@@ -1,0 +1,40 @@
+v10 exp P
+
+================================================================================
+P1  the theoretical bound, applied to the prediction and to the observation
+================================================================================
+  cells 800
+  theoretical prediction violating the bound: 0 (0.000%)
+  observed change violating the bound    : 185 (23.125%)
+  when the observation violates, |do|/|s| median 0.29, max 4.06
+
+================================================================================
+P2  z_w: two invariances and the centred/uncentred scale
+================================================================================
+  max |z_w(common score offset) - z_w|      = 1.42e-14
+  max |z_w(feature shift in null(PW)) - z_w| = 2.54e-13
+  max |z_w(centred sigma) - z_w(uncentred)|  = 24.245  (definition matters)
+
+================================================================================
+P3  threshold from four datasets, applied to the fifth
+================================================================================
+  held    n     thresh   sens     spec     prec    
+  2a      36    0.354    0.714    0.864    0.769   
+  2b      108   0.354    1.000    0.574    0.753   
+  seed    45    0.354    1.000    0.000    0.489   
+  ner     320   0.475    0.273    0.864    0.188   
+  gal     336   0.369    0.704    0.828    0.627   
+
+================================================================================
+P4  split-sample sign AUC with bootstrap intervals
+================================================================================
+  ds    clf    n     AUC      95% CI            
+  2b    lda    108   0.914    [0.853, 0.958]
+  2b    logit  108   0.848    [0.767, 0.917]
+  2b    svm    108   0.571    [0.446, 0.689]
+  gal   lda    336   0.667    [0.606, 0.725]
+  gal   logit  336   0.662    [0.599, 0.721]
+  gal   svm    336   0.478    [0.387, 0.570]
+  2a    lda    36    0.848    [0.705, 0.955]
+  2a    logit  36    0.786    [0.618, 0.924]
+  2a    svm    36    0.328    [0.160, 0.506]
