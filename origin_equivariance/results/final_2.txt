@@ -1,0 +1,18 @@
+v8 main levels and subject-level statistics  15:38:56
+
+  ds    n     none     zero     align    ref      src      gain    
+  2a    36    0.5656   0.5254   0.6119   0.5355   0.5154   0.0463  
+  2b    108   0.7046   0.5831   0.7375   0.7571   0.6734   0.0329  
+  seed  45    0.4591   0.3377   0.7094   0.7738   0.8049   0.2503  
+  ner   320   0.5886   0.5865   0.5909   0.6167   0.6167   0.0023  
+  gal   336   0.7770   0.7484   0.7815   0.8350   0.7783   0.0045  
+  all   845   0.6705   0.6346   0.6926   0.7264   0.6939   0.0222  
+
+  subject level: gain = align - none, one number per subject per dataset
+  ds    n    median    bootstrap 95% CI       dz       wilcox p up/n     zero up 
+  2a    9    0.0356    [+0.0287, +0.0659]   1.52     3.91e-03 9        2       
+  2b    9    0.0321    [+0.0187, +0.0477]   1.39     3.91e-03 9        0       
+  seed  15   0.2452    [+0.2038, +0.2958]   2.71     6.10e-05 15       0       
+  ner   16   0.0050    [-0.0018, +0.0062]   0.27     3.23e-01 10       5       
+  gal   12   0.0031    [+0.0007, +0.0090]   0.58     5.22e-02 8        3       
+  (no pooled test across datasets: the gain is on a different scale per dataset)
