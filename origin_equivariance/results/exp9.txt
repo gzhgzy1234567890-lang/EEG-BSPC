@@ -1,0 +1,16 @@
+v8 exp I: decision-space form of the correction
+  delta_k = w_k'(mu_B - mu_A); scores shifted by -delta, then argmax
+
+  ds    clf    n     feat-space dec-space max |diff|  
+  2b    lda    60    0.7365    0.7365    0.0e+00     
+  2b    logit  60    0.7367    0.7367    0.0e+00     
+  2b    svm    60    0.7188    0.7188    0.0e+00     
+  2a    lda    36    0.6119    0.6119    0.0e+00     
+  2a    logit  36    0.6126    0.6126    0.0e+00     
+  2a    svm    36    0.5837    0.5837    0.0e+00     
+  gal   lda    60    0.7938    0.7938    0.0e+00     
+  gal   logit  60    0.7735    0.7735    0.0e+00     
+  gal   svm    60    0.7532    0.7532    0.0e+00     
+
+  A value of 0.0e+00 in the last column means the two forms returned
+  identical predictions for every sample of every cell.
