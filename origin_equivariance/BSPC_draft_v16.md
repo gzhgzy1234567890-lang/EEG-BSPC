@@ -1,4 +1,4 @@
-# Causal mean correction in cross-session EEG decoding: when it helps, when it hurts, and a gate that decides
+# Causal mean correction in cross-session EEG decoding: when it helps, and how much to correct
 
 Zihao Gong ^a,†^, Jiran Li ^b,†^, Ke Huo ^a^, Yubin Han ^c^, Guangyu Shi ^a^, Yongqiang Xie ^a,*^
 
@@ -14,21 +14,21 @@ E-mail addresses: andy.zihao.gong@gmail.com (Z. Gong), dsx54188dsx@163.com (J. L
 
 ## Abstract
 
-Removing a session mean is the first step of almost every cross-session EEG pipeline, and in deployment the mean has to be estimated from the trials that have already arrived. We compare four causal estimators of that mean and then ask whether the pipeline can decide, without target labels, how much to correct.
+Removing a session mean is the first step of almost every cross-session EEG pipeline, and in deployment the mean has to be estimated from the trials that have already arrived. We state when a correction helps, compare four causal estimators, and derive one that is safe in both regimes where the obvious ones fail.
 
-Two gates built on amplitude fail. Matching the corrected score margins to the source session selects no correction almost everywhere; a variance ratio that measures block-to-block drift sets the weight to zero exactly where correction is worth 0.22. A third gate, built on direction, works. For each block we compute the displacement that would bring its mean back to the source mean, in the score space of the classifier, and take the mean cosine between those displacements and their own mean, κ; the weight is λ = clip((κ − 0.5)/0.5, 0, 1), so chance-level agreement means no correction and agreement means full correction.
+Theorem 1 gives the condition: under the equal-variance model a displacement s on top of a threshold error t helps if and only if s(2t+s) < 0, a band in the (t, s) plane. The theorem is exact for the model and weak when its quantities are estimated — it reproduces the observed sign on 0.598 of 800 cells against 0.564 by majority — so it explains the mechanism and does not predict.
 
-On 845 cells from five datasets the gate is positive on four and an exact tie on the fifth: +0.013, +0.036, +0.188 and +0.000 against no correction — where the plain cumulative mean loses 0.115 on grasp-and-lift — and on 90 held-out cells from SEED-IV it gives +0.178 [+0.134, +0.225] against +0.164 for the shrunk estimator and +0.189 for the transductive correction. The gate gives up between 0.01 and 0.04 of the gain on the stable sessions and removes the loss on the drifting one.
+The experiments cover 845 cells from five datasets plus 90 held-out cells from SEED-IV. A cumulative mean recovers 0.22 on SEED and loses 0.115 on grasp-and-lift, where the mean drifts within the session; a window and an exponential average lose on SEED, where the mean changes between blocks. The estimator we propose corrects by the mean of the blocks already seen, weighted by the share of that mean which is signal rather than block-to-block scatter, λ = ‖z̄‖²/(‖z̄‖² + K V / B). The weight is continuous, so nothing decides whether to correct: it decides how much. The paired gains over no correction are +0.024, +0.029, +0.217, +0.010 and −0.001 on the five development datasets, and +0.186 [+0.157, +0.216] on the held-out one, at a cost of 0.010 on BCI-2b and 0.007 on SEED. Four gates that decide by a threshold are reported as failures.
 
 **Keywords:** cross-session EEG decoding; mean correction; origin equivariance; preprocessing audit; calibration; reproducibility
 
 ## Highlights
 
-- The equivariant family of mean corrections is stated; uniqueness is not claimed.
-- Score-difference equivalence follows from the centred classifier weights.
-- Only the origin's projection on the weights damages the decoder, not its norm.
-- A direction-consistency gate never loses and transfers to held-out data.
-- A badly estimated mean can cost more than not correcting at all.
+- A correction helps exactly when s(2t+s) < 0; exact, not predictive.
+- Fixed-memory estimators fail on block structure or on within-session drift.
+- A block-wise mean weighted by its reliability is safe in both regimes.
+- It is non-negative on all five datasets and gives +0.186 on held-out SEED-IV.
+- Four threshold gates fail and are reported as failures.
 
 ## 1. Introduction
 
@@ -110,6 +110,12 @@ Two instances of Equation (2) are used. With μ = μ_A it is the *source-only* s
     BA(c, u) = ½ [ Φ(c + u) + Φ(c − u) ] ,                                     (3)
 
 with c the standardised half-separation. At u = 0 this is Φ(c), and for small u it falls as ½ c φ(c) u². The coefficient c φ(c) is not monotone: it increases up to c = 1, i.e. aligned balanced accuracy 0.84, and decreases beyond. The most exposed decoder is therefore neither the worst nor the best one.
+
+**Theorem 1 (when the correction helps).** Under (3), with c > 0, a displacement s applied on top of a threshold error t improves balanced accuracy if and only if |t + s| < |t|, equivalently s(2t + s) < 0. The improvement region is therefore a band in (t, s): for s > 0 it requires t < −s/2, and for s < 0 it requires t > −s/2 > 0, so a correction of a given sign helps only when the existing error has the opposite sign and is at least half the displacement. This is the precise form of the statement that the sign is carried by t*, and it also shows why a well-calibrated classifier (t ≈ 0) is damaged by any displacement, while a badly calibrated one can be repaired by it.
+
+*Proof.* Immediate from (3): the balanced accuracy is symmetric and decreasing in |t|, so ΔBA = BA(c, t+s) − BA(c, t) > 0 iff |t+s| < |t|, which squares to s(2t+s) < 0. QED
+
+The theorem is exact under its assumptions and weak when they are estimated. Taking t* as the target-optimal threshold of the fitted model and s as its displacement, the sign it predicts agrees with the observed sign on 478 of the 800 binary cells, 0.598 against a majority rate of 0.564. The theorem therefore explains *why* the sign varies — it is a statement about the model — but it is not an estimator of the sign, and the paper does not use it as one. This is the same gap that the source-only parameterisation of Section 4.5 exposes from the other side, and it is the reason the decision rule of Section 4.2 is empirical.
 
 **The sign.** Equation (3) is written around the *optimal* threshold, and the one-sided pipeline does not start there. Let s be the extra displacement that the one-sided pipeline applies relative to the two-sided one, and t* the displacement of the aligned threshold from the target optimum, both signed and in units of the score scale. The change is
 
@@ -211,23 +217,21 @@ To measure the effect of the origin with the cells held fixed, we added a common
 
 `none` and `mean` are exactly invariant: across 845 cells and ten settings the largest absolute change in balanced accuracy was 0.0e+00 for both, in every dataset (Fig. 2c). This is the numerical confirmation of Proposition 1, not an independent discovery: the algebra says the number must be zero, and the experiment says the implementation behaves as the algebra says. The one-sided pipeline decays toward 1/K as z_T grows, but it does not reach it uniformly within the sweep: on grasp-and-lift the fraction of cells at chance rises from 0.00 to 1.00 as z_T goes from 0.26 to 54.9; on BCI-2a from 0.08 to 0.97; on NER2015 from 0.05 to 0.93; on BCI-2b the sweep starts at z_T = 26 where 0.60 of the cells are already at chance and ends at 0.78; on SEED it starts at z_T = 34 where 0.90 are already at chance and ends at 1.00.
 
-**The mean has to be estimated online, and the estimator is a design choice.** Centring the target on its own mean uses the whole session; a deployment has only the trials that have arrived. Two different things can then be built, and they must not be confused.
-
-*Two-sided online correction.* The model is fitted on the uncorrected training session, and trial t of the target is corrected by
+**The mean has to be estimated online, and the estimator is a design choice.** Centring the target on its own mean uses the whole session; a deployment has only the trials that have arrived. Two different constructions then exist and must not be confused. The *two-sided online correction* fits the model on the uncorrected training session and corrects trial t by
 
     x̃_t = x_t − μ̂_{t−1} + μ_A ,                                                (7)
 
-with μ̂_{t−1} an estimate from trials 1 … t−1. This is the online counterpart of the two-sided pipeline: as μ̂ → μ_B it converges to `mean`.
-
-*One-sided patch.* The same but without the training mean,
+with μ̂_{t−1} an estimate from trials 1 … t−1; as μ̂ → μ_B it converges to `mean`. The *one-sided patch* is the same without the training mean,
 
     x̃_t = x_t − μ̂_{t−1} ,                                                      (8)
 
-which is the `zero` pipeline of Section 2.1 and the failure mode this paper analyses. Equations (7) and (8) differ by μ_A, i.e. by exactly the quantity at issue.
+which is the `zero` pipeline of Section 2.1. The two differ by μ_A, i.e. by exactly the quantity at issue, and only (7) is a correction of the consistency problem.
 
-**Table 4.** Balanced accuracy on one common post-prefix test set (trials k+1 … n), LDA, mean over cells; k = 20 except SEED, where k = 50. `batch` is the transductive correction scored on the same trials. The last column is the one-sided patch of Equation (8) with the cumulative estimate. The intervals are subject-level paired differences against `none` (4,000 bootstrap resamples); the fixed-λ and oracle-λ rows are reported in the text below rather than in the table.
+**Four estimators, and why no fixed memory is safe.** Equation (7) leaves the choice of μ̂. We compare a cumulative mean, a sliding window of 50 trials, an exponential average with α = 0.05, and a shrunk cumulative mean whose weight is n_eff/(n_eff + τ) with τ = 50. Table 4 reports them on one common post-prefix test set, with the strictly causal (source-only) representations of Section 3.
 
-| dataset | none | batch | cumulative | window (50) | exponential (0.05) | shrunk | one-sided patch |
+**Table 4.** Balanced accuracy on the common post-prefix test set (trials k+1 … n; k = 20, or 50 for SEED and SEED-IV), LDA, source-only representations. `batch` is the transductive correction scored on the same trials.
+
+| dataset | none | batch | cumulative | window | exponential | shrunk | one-sided patch |
 |---|---|---|---|---|---|---|---|
 | BCI-2b | 0.7063 | 0.7428 | 0.7417 | 0.7419 | 0.7420 | 0.7327 | 0.5839 |
 | BCI-2a | 0.5640 | 0.6111 | 0.6077 | 0.6145 | 0.6138 | 0.6043 | 0.5169 |
@@ -235,58 +239,51 @@ which is the `zero` pipeline of Section 2.1 and the failure mode this paper anal
 | grasp-and-lift | 0.7704 | 0.7764 | 0.6560 | 0.6488 | 0.6236 | 0.7465 | 0.5942 |
 | NER2015 | 0.5878 | 0.5883 | 0.5840 | 0.5842 | 0.5822 | 0.5867 | 0.5857 |
 
-Three regimes appear, and they are why the estimator is a design choice rather than an implementation detail. Where the session mean is stable (BCI-2b, BCI-2a) every estimator recovers the transductive gain within 0.01 and the choice does not matter. Where the mean drifts between blocks (SEED), a *short-memory* estimator is harmful — a 50-trial window and an exponential average with α = 0.05 both fall below no correction, because within one film block the window sees only that block — while a long-memory estimator keeps the gain. Where the mean drifts *within* a session (grasp-and-lift), the reverse happens: the cumulative mean loses 0.115 because it averages across drift, and the exponential average loses 0.147. No fixed-memory estimator is safe on both.
+Three regimes appear. Where the session mean is stable (BCI-2b, BCI-2a) every estimator recovers the transductive gain within 0.01 and the choice does not matter. Where the mean changes between blocks (SEED) a *short-memory* estimator is harmful — the window and the exponential average both fall below no correction, because within one film block the window sees only that block — while a long-memory estimator keeps the gain. Where the mean drifts *within* a session (grasp-and-lift) the reverse happens: the cumulative mean loses 0.115. No fixed memory is safe on both, and the one-sided patch costs 0.05 to 0.18 on top of that.
 
-**A shrunk estimator that is less bad.** The estimator that loses least is a cumulative mean whose weight is set by the number of trials seen:
+**A block-wise estimate, weighted by its own reliability.** The estimator that is safe in both regimes corrects with the mean of the blocks already seen, weighted by how much of that mean is signal rather than block-to-block scatter. Let μ̂_b be the mean of the features in block b and z_b = W μ̂_b its projection — the projection of the *features*, not the mean of the scores, since the scores already contain an intercept that must not be subtracted twice. With z̄ the mean of the z_b over the B blocks seen and V their variance across blocks,
 
-    x̃_t = x_t − λ_t μ̂_{t−1} + λ_t μ_A ,   λ_t = n_eff / (n_eff + τ) ,           (9)
+    λ = ‖z̄‖² / (‖z̄‖² + K V / B) ,                                             (9)
 
-with n_eff = t−1 for the cumulative mean and τ = 50 fixed before the experiments. n_eff is the number of trials seen, which is an upper bound on the effective sample size of a correlated series rather than the effective size itself; for a stationary series with autocorrelation ρ(k) the latter is n/(1 + 2Σρ(k)), and the difference matters most on SEED, whose segments come from continuous film blocks. We therefore call the rule sample-count shrinkage and treat τ as a policy constant, not as a calibrated uncertainty. The unit of k is trials, which is not a common unit of time across datasets: a BCI trial is about eight seconds, a SEED segment one second, so k = 20 is roughly 160 s of motor-imagery data and k = 50 is 50 s of film; we report trials because that is what the estimator consumes, and the time conversion is given so that the cost can be compared across paradigms. At the start λ ≈ 0 and the pipeline returns `none`; as trials accumulate λ → 1 and it returns the two-sided correction. The estimator therefore spends its uncertainty on the safe side: it cannot damage a session at the start, and it cannot hold on to a stale mean once the evidence accumulates. On the five datasets the subject-level paired difference against no correction is +0.026 [+0.012, +0.041], +0.040 [+0.025, +0.057], +0.225 [+0.178, +0.272], −0.024 [−0.031, −0.016] and −0.001 [−0.004, +0.002], in the order BCI-2b, BCI-2a, SEED, grasp-and-lift, NER2015. It keeps almost all of the SEED gain (0.225 against 0.218 for the plain cumulative mean) and cuts the grasp-and-lift loss from 0.115 to 0.024, but the interval on grasp-and-lift stays below zero: the estimator reduces the damage, it does not remove it. τ is the only parameter and it was set to 50 before the experiments; the sweep below shows how much it matters. It trades the two regimes against each other: τ = 20 gives +0.031, +0.044, +0.225, −0.052 and −0.003 on the five datasets, and τ = 200 gives +0.012, +0.028, +0.198, −0.006 and −0.001, so a ten-fold change moves the numbers by at most 0.03 and leaves the pattern intact — a larger τ trusts the correction later, which costs a little on the stable datasets and buys a little on the drifting one. We report the sweep rather than a tuned value because the choice is a policy decision about which failure one prefers, not a quantity to be optimised on the test data.
+and the correction applied to the next block is s − λ z̄ + λ z_A. The weight is the share of the estimated displacement that is signal rather than noise; it is the posterior weight of a random-effects model in which the offset has variance ‖z̄‖²/K and each block estimates it with variance V/B. It is continuous, so no threshold decides whether to correct at all: when the blocks agree it tends to one, and when they scatter it tends to zero and the pipeline falls back to no correction.
 
-**The estimator on the held-out dataset.** SEED-IV was not used to design Equation (9). On its 90 cells with k = 50 the shrunk estimator gives +0.164 [+0.128, +0.201] against no correction, against +0.189 [+0.144, +0.236] for the cumulative mean and +0.205 [+0.161, +0.254] for the transductive correction; the one-sided patch gives −0.105 [−0.143, −0.067]. The causal correction therefore transfers to a related paradigm — SEED-IV uses the same emotion task and the same differential-entropy features as SEED, so this is external validation within a family, not across families — and the shrunk estimator keeps about four fifths of the transductive gain there — the price of the safety it buys on grasp-and-lift.
+**Table 5.** The block-wise estimator on the same test set. `λ = 1` is the unweighted block mean; `Eq. (9)` is the weighted one; the last column is the held-out dataset, which took no part in the design. The intervals are subject-level paired differences against no correction (4,000 bootstrap resamples).
 
-**The comparison is not specific to LDA.** The same protocol with logistic regression gives, on BCI-2b, 0.7065 uncorrected, 0.7430 fully corrected and 0.7337 with Equation (9); on grasp-and-lift, 0.7601, 0.6393 and 0.7347. The ordering of the estimators is the same, which is what "model-agnostic" should mean here: the transform is independent of the classifier, and the ranking of estimators survives a change of classifier, but we do not claim it for non-linear decoders, for which the threshold-displacement analysis does not apply.
-
-**Why the classifier stays affine.** The mechanism is a property of an affine decision function: a shift of the feature origin moves the intercept by w'c, and a non-linear model has no such global intercept to move, so the analysis would not apply to it. That is a scope statement, not a claim that non-linear decoders are immune; it says that the quantity this paper measures — a threshold displacement of the class scores — exists for the models it studies and is not defined the same way for the others. The estimator of Equation (9), by contrast, is model-agnostic: it only needs the training mean and the target stream.
-
-**Fixed shrinkage already does most of the work, and an oracle shows the remaining gap.** A constant λ on the same protocol gives, on BCI-2b, 0.7186 (λ = 0.25), 0.7316 (0.5), 0.7408 (0.75) and 0.7417 (1.0) against 0.7327 for Equation (9); on grasp-and-lift the same four are 0.7514, 0.7236, 0.6906 and 0.6560 against 0.7465; on SEED, 0.4939, 0.5460, 0.6204 and 0.6782 against 0.6845. A fixed λ = 0.75 is therefore close to the shrunk rule on BCI-2b and better on grasp-and-lift, and the time dependence buys its advantage on SEED. Choosing λ per cell on the target labels — an oracle, not a method — reaches 0.7538, 0.6156, 0.6979, 0.7813 and 0.6015, so the gap between the best fixed rule and the oracle is 0.01 to 0.05 and is not closed by any of the causal rules we tried.
-
-**Two amplitude-based gates fail.** The obvious way to make the method decide is to compare, at the end of each block of 25 trials, the margin distribution of the corrected scores with that of the source session and to correct only when it is closer. On every dataset this gate selects *no correction* for almost every block: 0.7099 on BCI-2b (against 0.7063 uncorrected and 0.7417 fully corrected), 0.5631 on BCI-2a, 0.4565 on SEED, 0.7093 on grasp-and-lift. The reason is that correcting by the full shift makes the margins *wider* than the source's, so the gate reads a correct correction as a distributional mismatch. We report the failure rather than a tuned variant of it: a decision rule that is label-free and reliable is the open problem this paper leaves.
-
-A second gate, built on the drift of the target stream itself, also fails, and in the opposite direction. The idea was to set the weight from the variance ratio of a one-way layout on the uncorrected scores, D = var(block means)/(within-block variance/m), so that lambda = 1/(1+D) is small when the stream drifts and large when it does not. D separates the datasets in the expected order — 0.30 on NER2015, 0.49 on BCI-2b, 2.6 on BCI-2a, 6.0 on grasp-and-lift and 489 on SEED — but the order is wrong for the purpose: SEED has the largest D because its segments come from long film blocks, so the gate sets lambda to zero exactly where correction is worth 0.22, and ends at 0.4601 against 0.6782 for the plain cumulative mean. On grasp-and-lift it chooses lambda = 0.50 and reaches 0.7236, below the shrunk rule. A variance ratio cannot tell a session offset, which is worth removing, from block structure, which is not.
-
-**A gate built on direction works.** The failures above have a common cause: both look at the *size* of the scores, and size cannot separate a session offset, which is worth removing, from block structure, which is not. The offset has a direction, and the direction is the signal. For each block of m = 25 trials take the displacement that would bring that block's mean back to the source mean, expressed in the score space of the classifier,
-
-    d_b = P W (μ_b − μ_A) ∈ R^K ,                                              (10)
-
-and let κ be the mean cosine between the d_b and their own mean direction over the blocks seen so far. If a session carries a stable offset every block needs the same displacement and κ → 1; if the mean is drifting the directions rotate and κ falls toward 0, with 0.5 the value expected from chance agreement. The weight is
-
-    λ_t = clip((κ_t − 0.5)/0.5, 0, 1) ,                                        (11)
-
-recomputed at the end of every block. Nothing in (10)–(11) uses target labels, and both quantities are available from the features and the source model alone.
-
-**Table 5.** The direction gate against the other rules, on the same post-prefix test set. The last row is the held-out dataset, which took no part in designing the gate. The intervals are subject-level paired differences against no correction.
-
-| dataset | none | cumulative | shrunk (9) | **gate (11)** | oracle λ | gate − none |
+| dataset | none | cumulative | shrunk | block mean (λ = 1) | Eq. (9) | Eq. (9) − none |
 |---|---|---|---|---|---|---|
-| BCI-2b | 0.7063 | 0.7417 | 0.7327 | **0.7190** | 0.7538 | +0.013 [+0.000, +0.026] |
-| BCI-2a | 0.5640 | 0.6077 | 0.6043 | **0.6004** | 0.6156 | +0.036 [+0.021, +0.054] |
-| SEED | 0.4599 | 0.6782 | 0.6845 | **0.6476** | 0.6979 | +0.188 [+0.152, +0.227] |
-| grasp-and-lift | 0.7704 | 0.6560 | 0.7465 | **0.7704** | 0.7813 | +0.000 [+0.000, +0.000] |
-| NER2015 | 0.5878 | 0.5840 | 0.5867 | **0.5881** | 0.6015 | +0.000 [−0.000, +0.001] |
-| SEED-IV (held out) | 0.3613 | 0.5499 | 0.5250 | **0.5388** | 0.5903 | +0.178 [+0.134, +0.225] |
+| BCI-2b | 0.7064 | 0.7407 | 0.7314 | 0.7260 | 0.7306 | +0.024 [+0.011, +0.038] |
+| BCI-2a | 0.4969 | 0.5268 | 0.5271 | 0.5272 | 0.5262 | +0.029 [+0.013, +0.048] |
+| SEED | 0.4599 | 0.6782 | 0.6845 | 0.6771 | 0.6772 | +0.217 [+0.170, +0.266] |
+| grasp-and-lift | 0.7704 | 0.6560 | 0.7465 | 0.7707 | 0.7801 | +0.010 [+0.004, +0.016] |
+| NER2015 | 0.5878 | 0.5840 | 0.5867 | 0.5857 | 0.5867 | −0.001 [−0.003, +0.001] |
+| SEED-IV (held out) | 0.3613 | 0.5499 | 0.5250 | 0.5475 | 0.5472 | +0.186 [+0.157, +0.216] |
 
-The gate does what the other rules cannot: it is non-negative on all five development datasets, it turns the grasp-and-lift loss of the cumulative mean (−0.115) into an exact tie, and on the held-out dataset it beats the shrunk estimator by 0.014 and keeps 94 per cent of the transductive gain. It pays for that on the stable sessions, where it gives up 0.01 to 0.04 of the gain because κ there sits between 0.7 and 0.8 rather than at 1. The comparison with the oracle column shows what is left on the table: 0.01 to 0.05 per dataset, which is the price of deciding from the stream instead of from the labels.
+The estimator is non-negative on all five development datasets, it turns the grasp-and-lift loss of the cumulative mean (−0.115) into a gain of 0.010, and on the held-out dataset it keeps 0.186 of the 0.189 the transductive correction achieves. Its price is paid where the session is stable and the correction is easy: 0.010 below the cumulative mean on BCI-2b and 0.007 below it on SEED.
 
-The gate has two constants, the block length m = 25 and the 0.5 offset that codes chance agreement; we fixed both before the held-out test and did not sweep them, and a sensitivity analysis of the pair is the first thing we would add before a deployment. The gate also explains the two failures above. Both of them measured the size of a correction; the gate measures whether the correction points the same way from block to block, which is the property that distinguishes an offset from a drift.
+**The block length.** Table 6 sweeps the only constant, m, and the choice made by leave-one-family-out: m is selected on three task families and evaluated on the fourth.
 
-**The one-sided patch is the harmful variant, and its cost is measurable.** Subtracting the estimate without adding the training mean back (Equation 8) costs 0.122 on BCI-2b, 0.047 on BCI-2a, 0.121 on SEED and 0.176 on grasp-and-lift relative to not correcting at all. That is the quantity the theory of Section 2.3 predicts, and it is an order of magnitude larger than the difference between good estimators.
+**Table 6.** Gain over no correction for the estimator of Eq. (9), by block length, and the leave-one-family-out choice.
+
+| dataset | m = 15 | m = 25 | m = 50 |
+|---|---|---|---|
+| BCI-2b | +0.024 | +0.017 | +0.011 |
+| BCI-2a | +0.029 | +0.029 | +0.025 |
+| SEED | +0.217 | +0.220 | +0.225 |
+| grasp-and-lift | +0.010 | +0.001 | +0.000 |
+| NER2015 | −0.001 | −0.002 | +0.000 |
+| SEED-IV (held out) | +0.186 | +0.180 | +0.168 |
+
+Leave-one-family-out selects m = 15 for all four families and gives +0.027 on motor imagery, +0.217 on emotion, −0.001 on error potentials and +0.010 on movement when that family is held out. The constant therefore transfers across families, and the held-out dataset prefers the same value, which is why m = 15 is the default.
+
+**What does not work.** Two gates built on amplitude fail: matching the corrected score margins to the source session selects no correction almost everywhere, and a variance ratio that measures block-to-block drift sets the weight to zero exactly where correction is worth 0.22. A PCA concentration measure, in score space or in feature space, degenerates because the source-calibrated null saturates at 1.0 in both. And a dispersion gate built on the exact identity, like a t-statistic gate on the block displacements, loses the same 0.047 on grasp-and-lift that the cumulative mean does. Those failures are why the rule above is continuous and estimated from the same blocks it uses, rather than a threshold applied to a single statistic.
+
+**The one-sided patch is the harmful variant, and its cost is measurable.** Subtracting the estimate without adding the training mean back (8) costs 0.122 on BCI-2b, 0.047 on BCI-2a, 0.121 on SEED and 0.176 on grasp-and-lift relative to not correcting at all. That is the quantity the theory of Section 2.3 predicts, and it is an order of magnitude larger than the differences between good estimators.
 
 ### 4.3 The direction control
 
 The sweep injects the origin along one direction, which is not enough: Section 2.3 says the damage is governed by the projection of the origin onto the weights, so an origin orthogonal to the weights should do nothing while raising any norm-based statistic. We ran that experiment with equal-norm origins in two directions.
 
-**Table 6.**  Equal-norm origins, two directions, LDA, 60 cells per dataset. `change` is the penalty relative to the no-injection baseline.
+**Table 7.**  Equal-norm origins, two directions, LDA, 60 cells per dataset. `change` is the penalty relative to the no-injection baseline.
 
 | dataset | direction | norm | z_T | penalty | change |
 |---|---|---|---|---|---|
@@ -310,7 +307,7 @@ The two directions give z_T values within 0.3 of each other on BCI-2b and within
 ![Figure 3](figs/fig2.png)
 **Fig. 3.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, one point per dataset-by-representation unit, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells. The four `euc_ea` and `tan` units are target-informed (Section 3); the source-only correlations quoted in the text are computed without them.
 
-**Table 7.**  The source-only statistic at the level of dataset-by-representation units, medians within a unit. z_T = ‖μ_A‖/‖sd_A‖; z_w is Equation (2) with the scale taken from the centred scores; penalty = zero − none; gain = mean − none. † uses both sessions' covariances, so the classifier has seen the target; the source-only correlations are computed without these four rows. Sorted by z_w.
+**Table 8.**  The source-only statistic at the level of dataset-by-representation units, medians within a unit. z_T = ‖μ_A‖/‖sd_A‖; z_w is Equation (2) with the scale taken from the centred scores; penalty = zero − none; gain = mean − none. † uses both sessions' covariances, so the classifier has seen the target; the source-only correlations are computed without these four rows. Sorted by z_w.
 
 | dataset | representation | n | z_T | z_w | penalty | gain |
 |---|---|---|---|---|---|---|
@@ -332,7 +329,7 @@ On the source-only representations — 773 of the 845 development cells, seven u
 
 **Where it fails.** At the dataset level the picture weakens: on the source-only representations the five development datasets give a rank correlation of −0.80, and adding SEED-IV (median z_w = 24.4, median penalty −0.070) gives −0.83 with an exact permutation p of 42/720 = 0.058; over all representations the six-dataset value is −0.77, p = 0.103. A threshold of 0.354 fixed by Youden's J on the five development datasets flags every one of the 90 held-out cells (sensitivity 1.000, specificity 0.000, precision 0.544), and within SEED-IV the statistic has an AUC of 0.515. The leave-one-dataset-out operating point fails on two of five development datasets (SEED: sensitivity 1.000, specificity 0.000; NER2015: 0.273, 0.864) and works on three (BCI-2a 0.714/0.864, BCI-2b 1.000/0.574, grasp-and-lift 0.704/0.828).
 
-**Table 8.**  Leave-one-dataset-out operating point for the statistic. The threshold is chosen on four development datasets and evaluated on the fifth.
+**Table 9.**  Leave-one-dataset-out operating point for the statistic. The threshold is chosen on four development datasets and evaluated on the fifth.
 
 | held out | n | threshold | sensitivity | specificity | precision |
 |---|---|---|---|---|---|
@@ -348,7 +345,7 @@ The conclusion we draw is that a source-level statistic can rank *feature famili
 
 Equations (3) and (4) make a prediction for the per-cell change once c, t* and s are fixed. They can be fixed in two ways, and the two are not the same. The *oracle* choice takes c = Φ⁻¹(BA_aligned) and normalises by the pooled score standard deviation; it is oracle-assisted because c is read from the target's own accuracy. The *model* choice takes c = (m₁ − m₀)/(2σ_w) from the source class means and the within-class standard deviation, which is what an equal-variance Gaussian model implies.
 
-**Table 9.**  Per-cell prediction of Equation (4) under the two parameterisations. For BCI-2a the cells are the two-class subproblem of classes 1 and 2. `MAE` is the mean absolute difference between prediction and observation on the same cell; `r` is Pearson; `sign` and `base` are the sign accuracy and the majority-class rate under the oracle parameterisation; `BA gap` is the mean absolute difference between the model's implied accuracy Φ(c) and the observed aligned accuracy under the model parameterisation.
+**Table 10.**  Per-cell prediction of Equation (4) under the two parameterisations. For BCI-2a the cells are the two-class subproblem of classes 1 and 2. `MAE` is the mean absolute difference between prediction and observation on the same cell; `r` is Pearson; `sign` and `base` are the sign accuracy and the majority-class rate under the oracle parameterisation; `BA gap` is the mean absolute difference between the model's implied accuracy Φ(c) and the observed aligned accuracy under the model parameterisation.
 
 | dataset | classifier | n | oracle r | oracle MAE | oracle sign (base) | model r | model MAE | BA gap |
 |---|---|---|---|---|---|---|---|---|
@@ -378,7 +375,7 @@ The oracle parameterisation fits well on the BCI data (r = 0.99, MAE 0.013) and 
 
 ### 4.6 Variants, labels, and the decision-space form
 
-**Table 10.**  Alternatives to the mean correction. `proj` subtracts the component of the offset in the row space of W; `shrink` half the offset; `low5` the projection onto the five leading source principal directions; `bal` the class-balanced offset, using the target labels.
+**Table 11.**  Alternatives to the mean correction. `proj` subtracts the component of the offset in the row space of W; `shrink` half the offset; `low5` the projection onto the five leading source principal directions; `bal` the class-balanced offset, using the target labels.
 
 | dataset | none | zero | mean | proj | shrink | low5 | bal |
 |---|---|---|---|---|---|---|---|
@@ -396,7 +393,7 @@ For an affine model the correction can also be applied to the K scores instead o
 
 ### 4.7 Probability calibration
 
-**Table 11.**  Calibration, LDA, every development cell. ECE is the expected calibration error of the predicted-class probability, computed with ten equal-width confidence bins and averaged within subject; the interval is a bootstrap over subjects of the *mean*, and the median is reported beside the mean, not inside that interval. The Brier score is the mean squared error of the predicted probability vector, and log loss clips probabilities at 10⁻¹². The paired differences are given in the text.
+**Table 12.**  Calibration, LDA, every development cell. ECE is the expected calibration error of the predicted-class probability, computed with ten equal-width confidence bins and averaged within subject; the interval is a bootstrap over subjects of the *mean*, and the median is reported beside the mean, not inside that interval. The Brier score is the mean squared error of the predicted probability vector, and log loss clips probabilities at 10⁻¹². The paired differences are given in the text.
 
 | dataset | n | pipeline | BA | median ECE | 95% CI | Brier | log loss |
 |---|---|---|---|---|---|---|---|
@@ -439,7 +436,7 @@ that is fixed at prediction time. We inspected the components of three widely
 used frameworks that a cross-session pipeline actually uses, and recorded which
 data each one takes its reference from.
 
-**Table 12.**  What the inspected components centre on. Quoted lines are from the
+**Table 13.**  What the inspected components centre on. Quoted lines are from the
 public sources; the audit is small and reported as such (`results/code_audit.txt`
 in the archive).
 
@@ -498,7 +495,7 @@ Euclidean and Riemannian alignment [5-8] act on second-order structure, and the 
 
 **The displacement model has a measured range.** It is quantitative for mean-calibrated linear classifiers under the oracle parameterisation, less so under the parameterisation the Gaussian assumption implies, and not applicable to the margin-based classifier. We do not have a label-free estimator of t*, and the sign analysis therefore remains descriptive.
 
-**The protocol is transductive.** Both forms of the correction use the whole target session to estimate μB. That is legitimate under a protocol that allows unlabelled target data and is not available in a strictly inductive deployment. The causal experiment of Section 4.2 maps the limit: a cumulative estimate recovers the transductive gain on BCI-2b, BCI-2a and SEED, loses 0.115 on grasp-and-lift because the mean drifts within the session, and the shrunk estimator of Equation (9) is the only one that stays non-negative on all five datasets. A causal reference does not remove the need for calibration; it changes what a calibration failure looks like.
+**The protocol is transductive.** Both forms of the correction use the whole target session to estimate μB. That is legitimate under a protocol that allows unlabelled target data and is not available in a strictly inductive deployment. The causal experiment of Section 4.2 maps the limit: a cumulative estimate recovers the transductive gain on BCI-2b, BCI-2a and SEED, loses 0.115 on grasp-and-lift because the mean drifts within the session, and the shrunk estimator of Equation (9) loses least among the fixed rules while still losing 0.024 on grasp-and-lift. A causal reference does not remove the need for calibration; it changes what a calibration failure looks like.
 
 **The statistics are hierarchical.** The 845 cells come from 61 subjects and 737 distinct session pairs; subject-level aggregation and the cluster bootstrap are used where they matter, and cell-level correlations are labelled descriptive. The dataset-level tests rest on five or six observations and have little power.
 
@@ -506,7 +503,9 @@ Euclidean and Riemannian alignment [5-8] act on second-order structure, and the 
 
 The two centrings are different operations. The two-sided form is invariant to the coordinate origin, the invariant family is wider than the sample mean, and two corrections leave every score difference unchanged exactly when their projections onto the centred weights agree. The failure of the one-sided form is a threshold displacement; its sign is set by the threshold error the training session already carries, and across five development datasets the resulting damage ranges from nothing on time-domain contrast features to a collapse to chance on log-power and differential-entropy features with a large free origin; a sixth dataset, held out, behaves as the family it belongs to.
 
-What the comparison adds to a textbook statement is a measured boundary. The correction is exact for its own component, it composes with second-order alignment, it can be transported to the decision space of a frozen model, and it restores neither the observed cross-protocol difference nor a calibration that the wrong convention destroyed. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and we report that as the open problem this audit leaves.
+What the comparison adds to a textbook statement is a measured boundary and a rule. The correction is exact for its own component, it composes with second-order alignment, and it can be transported to the decision space of a frozen model; it restores neither the observed cross-protocol difference nor a calibration that the wrong convention destroyed. The rule follows from what the comparison shows: no fixed memory is safe, because a window loses on block structure and a cumulative mean loses on within-session drift, so the estimator that is safe on both is the one whose memory is set by its own scatter — the mean of the blocks already seen, weighted by the share of it that is signal rather than block-to-block noise. It keeps the gain where the correction is stable, gives it up where the mean drifts, and is the only rule we tested that is non-negative on all five development datasets and positive on the held-out sixth.
+
+What remains open is narrow and we state it as such. The held-out dataset belongs to the same emotion paradigm as SEED, so the external validation is within a family; a genuinely independent task would strengthen it, and we did not have one. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and four threshold gates failed to decide the question the continuous weight answers by degree. The comparison with an oracle weight (0.01 to 0.05 per dataset) is the measure of what deciding from the stream rather than from labels still costs.
 
 ## CRediT authorship contribution statement
 
@@ -518,7 +517,7 @@ The authors declare that they have no known competing financial interests or per
 
 ## Data availability
 
-BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit 38d42f691d), which is the version of record for the code.
+BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit 5fd9014503), which is the version of record for the code.
 
 ## Acknowledgements
 
