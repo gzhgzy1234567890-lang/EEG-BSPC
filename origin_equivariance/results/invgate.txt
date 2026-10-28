@@ -1,0 +1,25 @@
+v34: origin-invariant weight, lambda from ||dbar||^2 with d_b = PW(mu_b - mu_A)
+
+  2b    m=15  gain +0.0269 [+0.0160, +0.0388]  translation agreement 1.000
+  2b    m=25  gain +0.0175 [+0.0081, +0.0286]  translation agreement 1.000
+  2b    m=50  gain +0.0108 [+0.0044, +0.0181]  translation agreement 1.000
+
+  2a    m=15  gain +0.0251 [+0.0088, +0.0441]  translation agreement 1.000
+  2a    m=25  gain +0.0275 [+0.0109, +0.0468]  translation agreement 1.000
+  2a    m=50  gain +0.0256 [+0.0116, +0.0407]  translation agreement 1.000
+
+  seed  m=15  gain +0.2158 [+0.1674, +0.2646]  translation agreement 1.000
+  seed  m=25  gain +0.2160 [+0.1675, +0.2648]  translation agreement 1.000
+  seed  m=50  gain +0.2187 [+0.1711, +0.2670]  translation agreement 1.000
+
+  gal   m=15  gain +0.0075 [+0.0042, +0.0110]  translation agreement 1.000
+  gal   m=25  gain +0.0008 [-0.0013, +0.0029]  translation agreement 1.000
+  gal   m=50  gain +0.0000 [+0.0000, +0.0000]  translation agreement 1.000
+
+  ner   m=15  gain -0.0010 [-0.0034, +0.0015]  translation agreement 1.000
+  ner   m=25  gain -0.0015 [-0.0033, +0.0002]  translation agreement 1.000
+  ner   m=50  gain -0.0001 [-0.0006, +0.0004]  translation agreement 1.000
+
+  seed4 m=15  gain +0.1827 [+0.1539, +0.2122]
+  seed4 m=25  gain +0.1760 [+0.1479, +0.2049]
+  seed4 m=50  gain +0.1628 [+0.1354, +0.1902]
