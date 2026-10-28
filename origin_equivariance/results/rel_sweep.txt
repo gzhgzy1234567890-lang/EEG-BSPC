@@ -1,0 +1,13 @@
+v33: block length sweep of the reliability-weighted estimator
+  2b    m=15 +0.0242 m=25 +0.0171 m=50 +0.0108
+  2a    m=15 +0.0293 m=25 +0.0292 m=50 +0.0250
+  seed  m=15 +0.2173 m=25 +0.2197 m=50 +0.2250
+  gal   m=15 +0.0097 m=25 +0.0008 m=50 +0.0000
+  ner   m=15 -0.0011 m=25 -0.0017 m=50 -0.0001
+  seed4 m=15 +0.1859 m=25 +0.1802 m=50 +0.1679
+
+family LODO over m
+  hold MI        -> m=15  train +0.0753  held +0.0267
+  hold emotion   -> m=15  train +0.0155  held +0.2173
+  hold ErrP      -> m=15  train +0.0701  held -0.0011
+  hold movement  -> m=15  train +0.0674  held +0.0097
