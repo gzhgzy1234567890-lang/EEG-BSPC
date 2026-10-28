@@ -1,0 +1,6 @@
+mean and dbl give identical predictions                    PASS  
+z-score and none agree sample by sample                    PASS  
+feature-space and score-space corrections agree            PASS  
+z_w invariant to a class-common score term                 PASS  |dz|=4.4e-16
+collapse identity consistent with the observed collapse    PASS  collapsed=False
+causal mean at trial t ignores future trials               PASS  
