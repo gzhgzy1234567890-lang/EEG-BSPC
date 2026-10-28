@@ -14,9 +14,9 @@ E-mail addresses: andy.zihao.gong@gmail.com (Z. Gong), dsx54188dsx@163.com (J. L
 
 ## Abstract
 
-A mean correction is the first step of almost every cross-session EEG pipeline, and two operations circulate under that name: centring both sessions, or centring one. We audit the choice. Equivariance: a correction is invariant to a change of the coordinate origin exactly when it translates by a translation-equivariant estimate of the target mean; that family is larger than the sample mean. Score-difference equivalence: two corrections leave every class-score difference unchanged exactly when their references differ by a vector whose projection onto the centred classifier weights vanishes. Performance: its failure is a threshold displacement whose sign is set by the threshold error the training session already carries.
+A mean correction is the first step of almost every cross-session EEG pipeline, and two operations circulate under that name: centring both sessions, or centring one. We ask which is invariant, what the other costs, and whether the correction survives when the target session arrives one trial at a time. Equivariance: a correction is invariant to a change of the coordinate origin exactly when it translates by a translation-equivariant estimate of the target mean; that family is larger than the sample mean. Score-difference equivalence: two corrections leave every class-score difference unchanged exactly when their references differ by a vector whose projection onto the centred classifier weights vanishes.
 
-The study covers 845 cells from five datasets plus 90 from SEED-IV, used once as a held-out test. A controlled origin sweep leaves the equivariant pipelines unchanged by 0.000 in balanced accuracy and drives the one-sided form toward chance; an equal-norm direction control shows that only the component of the origin along the classifier weights matters. A Gaussian model of the displacement explains the sign of the change for mean-calibrated linear classifiers when its parameters are read from the target, and a source-only version of the same model does not beat the majority sign: it is a mechanism, not a predictor.84) but its cross-dataset association is rho = −0.77 (p = 0.10) and its held-out operating point has zero specificity. We report it as an open question, not as a screening tool.
+The study covers 845 cells from five datasets plus 90 held-out cells from SEED-IV. An origin sweep leaves the equivariant pipelines unchanged by 0.000 in balanced accuracy and drives the one-sided form toward chance; an equal-norm direction control shows that only the component of the origin along the weights matters. A Gaussian model of the displacement explains the sign of the change when its parameters are read from the target, and a source-only version does not beat the majority sign: it is a mechanism, not a predictor. On a common post-prefix test set, a causal running mean matches the batch correction on BCI-2b and BCI-2a, approaches it on SEED as the calibration window grows, and fails on grasp-and-lift, where no correction is better than a badly estimated one. A source-only statistic ranks feature families but does not screen sessions.
 
 **Keywords:** cross-session EEG decoding; mean correction; origin equivariance; preprocessing audit; calibration; reproducibility
 
@@ -25,7 +25,7 @@ The study covers 845 cells from five datasets plus 90 from SEED-IV, used once as
 - The equivariant family of mean corrections is stated; uniqueness is not claimed.
 - Score-difference equivalence follows from the centred classifier weights.
 - Only the origin's projection on the weights damages the decoder, not its norm.
-- A threshold-displacement model explains the sign but does not predict it.
+- A causal running mean matches the batch correction; a frozen prefix fails.
 - Three released framework components take the mean from the training fold.
 
 ## 1. Introduction
@@ -42,7 +42,7 @@ This paper is a verification study of that choice rather than a proposal for a n
 
 **Equivalence.** When do two corrections give the same predictions? Section 2.3 gives the exact condition in terms of the centred classifier weights, and separates it from the finite-sample question of whether any particular set of trials crosses the boundary that moves.
 
-**Performance.** Does the correction improve accuracy, and can the change be predicted? Sometimes it cannot, and the sign of the change is not governed by the size of the displacement: it is governed by where the training threshold already sits relative to the target optimum. Section 2.4 gives a Gaussian model of that mechanism, Section 4.5 tests it cell by cell under two parameterisations, and Section 6 states the boundaries.
+**Performance.** Does the correction improve accuracy, and can the change be predicted? Sometimes it cannot, and the sign of the change is not governed by the size of the displacement: it is governed by where the training threshold already sits relative to the target optimum. Section 2.3 gives a Gaussian model of that mechanism, Section 4.5 tests it cell by cell under two parameterisations, and Section 6 states the boundaries.
 
 **What the study covers.** Five public datasets, eleven dataset-by-representation units and 845 cells, chosen to span motor imagery, emotion, error-related potentials and movement, four feature families and three linear classifier families; a sixth dataset, SEED-IV, contributes 90 further cells and is used only as a held-out test of the one source-level statistic the paper defines. The measured quantities are not invented for the occasion: the origin distance of a feature family, the displacement it induces in the decision function, the sign of the resulting change, and the calibration of the resulting probabilities.
 
@@ -58,7 +58,7 @@ Let A denote the training session with features X_A and labels y_A, and B the ta
 
     s_k(x) = w_k'x + b_k ,   k = 1 ... K ,                                   (1)
 
-with prediction argmax_k s_k(x). Let W be the K × D matrix whose rows are w_k, S the K-column matrix of scores on a sample, and P = I_K − 11'/K the projector that removes the class mean from a K-vector. Linear discriminant analysis with Ledoit-Wolf shrinkage [11] is the primary classifier; Section 4.5 also uses logistic regression and a linear support-vector machine [17].
+with prediction argmax_k s_k(x). Let W be the K × D matrix whose rows are w_k, S the N × K matrix whose rows are the score vectors of N samples, and P = I_K − 11'/K the K × K projector that removes the class mean from a K-vector. The centred scores are therefore S P, an N × K matrix, and σ_k is the standard deviation of its k-th column. Linear discriminant analysis with Ledoit-Wolf shrinkage [11] is the primary classifier; Section 4.5 also uses logistic regression and a linear support-vector machine [17].
 
 **Table 1.** The pipelines compared in this paper.
 
@@ -73,11 +73,11 @@ with prediction argmax_k s_k(x). Let W be the K × D matrix whose rows are w_k, 
 
 ### 2.2 Equivariance, and what it does not determine
 
-**Proposition 1 (equivariance).** Under the translation T_c : x ↦ x + c applied to all data with the classifier refitted, the `mean` and `dbl` pipelines return predictions identical to those they returned before the translation, for every c, provided the fit has an unpenalised intercept.
+**Proposition 1 (equivariance).** Under the translation T_c : x ↦ x + c applied to all data with the classifier refitted, the `mean` and `dbl` pipelines return predictions identical to those they returned before the translation, for every c, provided the fit belongs to the class of linear models whose intercept is unpenalised and whose fitting objective is invariant to a common translation of the inputs — LDA with a pooled or shrunk covariance, logistic regression with an unpenalised intercept, and a linear support-vector machine with an unpenalised intercept all qualify; a model whose intercept is penalised, or whose regulariser acts on the intercept, does not.
 
-*Proof for `mean`.* The fit receives X_A + c; with an unpenalised intercept the weights are unchanged and the intercepts become b_k − w_k'c. The candidate features become (x + c) − (μB + c) + (μA + c) = (x − μB + μA) + c, whose scores are w_k'[(x − μB + μA) + c] + b_k − w_k'c, the scores the candidates received before the translation. The argmax is unchanged. For `dbl` both the training and the candidate features are unchanged, so no assumption on the fit is needed. For `none` the same cancellation occurs on both sides. QED
+*Proof for `mean`.* The fit receives X_A + c; by the assumption on the objective the weights are unchanged and the intercepts become b_k − w_k'c. The candidate features become (x + c) − (μB + c) + (μA + c) = (x − μB + μA) + c, whose scores are w_k'[(x − μB + μA) + c] + b_k − w_k'c, the scores the candidates received before the translation. The argmax is unchanged. For `dbl` both the training and the candidate features are unchanged, so no assumption on the fit is needed. For `none` the same cancellation occurs on both sides. QED
 
-**Proposition 2 (the equivariant family).** A correction x ↦ x − γ(X) is equivariant, i.e. γ(X + c1) = γ(X) + c1 for every c, if and only if γ(X) = μ(X) + h(X − μ(X)) for some h that is translation-invariant. The family therefore contains more than the sample mean.
+**Proposition 2 (the equivariant family).** Let c ∈ R^D and let γ : R^{N×D} → R^D. A correction x ↦ x − γ(X) is equivariant, i.e. γ(X + 1c') = γ(X) + c for every c ∈ R^D, if and only if γ(X) = μ(X) + h(X − 1μ(X)') for some h : R^{N×D} → R^D that is translation-invariant. The family therefore contains more than the sample mean.
 
 *Proof.* Write γ(X) = μ(X) + [γ(X) − μ(X)] and note that μ(X + c1) = μ(X) + c. Equivariance holds iff the bracket is unchanged by translation, i.e. iff it is a function of the centred sample only. QED
 
@@ -95,9 +95,9 @@ For a finite target sample the condition is sufficient but not necessary for ide
 
 **The displacement.** For a sample mean μ and a classifier with scores S, define
 
-    ρ(μ) = ‖ D_σ⁻¹ P W μ ‖ / √K ,   D_σ = diag(σ_1, …, σ_K),   σ_k = SD[(P S)_{:,k}] .   (2)
+    ρ(μ) = ‖ D_σ⁻¹ P W μ ‖ / √K ,   D_σ = diag(σ_1, …, σ_K),   σ_k = SD[(S P)_{:,k}] ,   (2)
 
-The scale is taken from the **centred** scores P S, and this matters: with σ_k taken from the raw columns, adding a class-common linear term a'x to every score leaves all predictions unchanged but changes the per-class score spreads, so the statistic would depend on how a decision function is written rather than on what it decides. With the scale from P S both numerator and scale are invariant, because P(W + 1a') = PW and P(S + a'x) = P S; we verify this numerically in Section 4.10. Equation (2) is the definition throughout; the scalar form |w'μ_A|/σ_s used later is its binary special case, valid when K = 2 or when all σ_k are equal.
+The scale is taken from the **centred** scores S P, and this matters: with σ_k taken from the raw columns, adding a class-common linear term a'x to every score leaves all predictions unchanged but changes the per-class score spreads, so the statistic would depend on how a decision function is written rather than on what it decides. With the scale from S P both numerator and scale are invariant, because P(W + 1a') = PW and (S + 1a'x) P = S P; we verify this numerically in Section 4.10. Equation (2) is the definition throughout; the scalar form |w'μ_A|/σ_s used later is its binary special case, valid when K = 2 or when all σ_k are equal.
 
 Two instances of Equation (2) are used. With μ = μ_A it is the *source-only* statistic z_w, computable before any target data; with μ = μ_B it is the displacement ρ that the one-sided pipeline induces, computable from the target features but not from its labels.
 
@@ -125,11 +125,11 @@ If the class-conditional distributions are unchanged, p_B(x | y) = p_A(x | y), a
 
 ### 2.5 The collapse identity
 
-After `zero` centring the classifier returns a single class c for every target sample if and only if, for every k ≠ c,
+After `zero` centring the classifier returns a single class c for every target sample of the finite target set X_B if and only if, for every k ≠ c,
 
-    w_k'μB − w_c'μB  ≥  max_x [ s_k(x) − s_c(x) ] ,                            (6)
+    w_k'μB − w_c'μB  ≥  max_{x ∈ X_B} [ s_k(x) − s_c(x) ] ,                    (6)
 
-with equality resolved by the argmax tie-breaking rule (the smallest class index wins in our implementation). This is an identity: it rewrites argmax_k s_k(x − μB) = c for all x. It is useful operationally, because it can be checked from the fitted weights, the target mean and the target scores before any label, and because it distinguishes collapse from chance-level accuracy. It is not a predictive method, and the simplest label-free check of collapse remains counting the distinct predicted classes.
+with equality resolved by the argmax tie-breaking rule (the smallest class index wins in our implementation). This is an identity: it rewrites argmax_k s_k(x − μB) = c for all x in X_B. The maximum is taken over the finite target set, not over R^D; over R^D it need not be bounded when the two weight vectors differ. It is useful operationally, because it can be checked from the fitted weights, the target mean and the target scores before any label, and because it distinguishes collapse from chance-level accuracy. It is not a predictive method, and the simplest label-free check of collapse remains counting the distinct predicted classes.
 
 ## 3. Data and protocol
 
@@ -168,6 +168,10 @@ A *cell* is one dataset-representation-subject-ordered-pair combination: 845 dev
 
 **Statistics.** Cells are aggregated per subject first, then tested across subjects with a two-sided Wilcoxon signed-rank test, a subject-level bootstrap of the median (10,000 resamples) and Cohen's dz. Cell-level correlations are descriptive; dataset-level tests use exact permutation distributions over the datasets; the unit-level analysis is reported with a cluster bootstrap that resamples datasets. No analysis treats the 845 cells as independent.
 
+**Which tests are primary.** One test is confirmatory: the subject-level Wilcoxon signed-rank test of the gain of `mean` over `none`, run separately per dataset and reported with its median, interval and effect size. Everything else — the classifier family comparison, the calibration differences, the unit-level correlations and the operating points — is exploratory, and we report it without a multiplicity correction and say so. Because the cells are very unevenly distributed across datasets (NER2015 and grasp-and-lift contribute 656 of 845), the pooled cell mean is dominated by those two datasets; the per-dataset numbers are the ones to read, and the equal-weight mean of the five per-dataset gains is 0.067 against the cell-weighted 0.022.
+
+**Preprocessing detail.** The 2a/2b features use a fourth-order Butterworth band-pass at 8–30 Hz applied to the continuous signal, epochs from 2.0 s to 6.0 s after cue onset, and a per-trial log-variance in each of the four bands for `euc`; `csp` uses four filters per class fitted on the training session; `tan` maps the session covariance to the tangent space at the identity of the training session; `euc_ea` divides by the session covariance before the log. SEED and SEED-IV use the distributed differential-entropy features unmodified (five bands). NER2015 and grasp-and-lift use the mean and the log power over eight windows respectively. Classifiers use scikit-learn defaults except where stated: LDA with Ledoit-Wolf shrinkage, logistic regression with C = 1 and the lbfgs solver, linear SVM with C = 0.01, all with a fixed random state of 0. A minimal reproduction of Table 3 from the cached features is `python src/pv8_final.py 1,2` followed by `python src/pv8_figs.py`; the archive's README lists the command for every table.
+
 **Sub-sampling.** Two analyses use a uniform subsample of a dataset's cells to bound computation: the classifier sweep reported in Section 4.5's discussion of regularisation (60 cells per dataset on grasp-and-lift and NER2015, equally spaced) and the direction experiment (60 cells in each of two datasets). The per-cell model of Table 8 and everything else use all cells of the relevant dataset.
 
 ## 4. Results
@@ -201,20 +205,31 @@ To measure the effect of the origin with the cells held fixed, we added a common
 ![Figure 2](figs/fig1.png)
 **Fig. 2.** (a) Change in balanced accuracy of the one-sided pipeline as a function of z_T, one curve per dataset; (b) the fraction of cells that land on exactly 1/K; (c) the largest change of the two equivariant pipelines over the whole sweep. The equivariant pipelines change by 0.0e+00 in every cell at every setting; the one-sided pipeline decays toward 1/K without reaching it uniformly within the sweep.
 
-`none` and `mean` are exactly invariant: across 845 cells and ten settings the largest absolute change in balanced accuracy was 0.0e+00 for both, in every dataset (Fig. 1c). The one-sided pipeline decays toward 1/K as z_T grows, but it does not reach it uniformly within the sweep: on grasp-and-lift the fraction of cells at chance rises from 0.00 to 1.00 as z_T goes from 0.26 to 54.9; on BCI-2a from 0.08 to 0.97; on NER2015 from 0.05 to 0.93; on BCI-2b the sweep starts at z_T = 26 where 0.60 of the cells are already at chance and ends at 0.78; on SEED it starts at z_T = 34 where 0.90 are already at chance and ends at 1.00.
+`none` and `mean` are exactly invariant: across 845 cells and ten settings the largest absolute change in balanced accuracy was 0.0e+00 for both, in every dataset (Fig. 2c). This is the numerical confirmation of Proposition 1, not an independent discovery: the algebra says the number must be zero, and the experiment says the implementation behaves as the algebra says. The one-sided pipeline decays toward 1/K as z_T grows, but it does not reach it uniformly within the sweep: on grasp-and-lift the fraction of cells at chance rises from 0.00 to 1.00 as z_T goes from 0.26 to 54.9; on BCI-2a from 0.08 to 0.97; on NER2015 from 0.05 to 0.93; on BCI-2b the sweep starts at z_T = 26 where 0.60 of the cells are already at chance and ends at 0.78; on SEED it starts at z_T = 34 where 0.90 are already at chance and ends at 1.00.
 
-**The protocol in use is transductive.** Centring the target on its own mean uses the whole session. A deployment does not have it. We therefore ran a strict prefix-calibration protocol: the first k trials of a session, in their recorded order or in a random order, are used to estimate the mean; the estimate is frozen; the remaining trials are classified with it and scored. Table 6 reports the result for LDA.
+**The protocol in use is transductive, and that matters.** Centring the target on its own mean uses the whole session. A deployment does not have it. We therefore scored five methods on *one common set of test trials*: the trials that follow a calibration prefix of k trials, in the recorded order. The methods are the batch correction (μ from all target trials, scored on the same post-prefix trials), a frozen prefix (μ from the first k trials), a causal running mean (trial i is centred on the mean of trials 1 … i−1), standardisation by the source statistics only, and no correction.
 
-**Table 4.**  Prefix calibration: balanced accuracy on the trials after a calibration prefix of k trials, averaged over cells and over five random orders (the k = 5 row of a random-order run and the recorded order give the same trend). `batch` is the whole-session correction.
+**Table 4.** Balanced accuracy on the common post-prefix test trials, LDA, mean over cells. `batch` is transductive and is scored on the same trials as the others, so the comparison is paired. The subject-level paired difference is for the frozen prefix against `batch` at k = 50.
 
-| dataset | batch | k = 5 | k = 20 | k = 50 | k = 100 |
-|---|---|---|---|---|---|
-| BCI-2b | 0.7375 | 0.7140 | 0.7316 | 0.7361 | 0.7510 |
-| BCI-2a | 0.6119 | 0.5485 | 0.5947 | 0.6041 | 0.6038 |
-| grasp-and-lift | 0.7815 | 0.7376 | 0.7539 | 0.7848 | — |
-| NER2015 | 0.5909 | 0.5852 | 0.5885 | 0.5692 | — |
+| dataset | k | batch | frozen prefix | running mean | source std | none |
+|---|---|---|---|---|---|---|
+| BCI-2b | 5 | 0.7408 | 0.7034 | 0.7413 | 0.5735 | 0.7072 |
+| BCI-2b | 50 | 0.7516 | 0.7486 | 0.7483 | 0.5748 | 0.7146 |
+| BCI-2a | 5 | 0.6124 | 0.4939 | 0.6087 | 0.5208 | 0.5656 |
+| BCI-2a | 50 | 0.6111 | 0.5917 | 0.6083 | 0.5201 | 0.5623 |
+| SEED | 5 | 0.7094 | 0.5265 | 0.6714 | 0.3388 | 0.4592 |
+| SEED | 50 | 0.7094 | 0.5283 | 0.6782 | 0.3390 | 0.4599 |
+| SEED | 200 | 0.7085 | 0.5156 | 0.6992 | 0.3396 | 0.4598 |
+| grasp-and-lift | 5 | 0.7836 | 0.6944 | 0.6658 | 0.7000 | 0.7782 |
+| grasp-and-lift | 20 | 0.7764 | 0.6855 | 0.6560 | 0.6941 | 0.7704 |
+| NER2015 | 5 | 0.5957 | 0.5878 | 0.5908 | 0.5772 | 0.5932 |
+| NER2015 | 20 | 0.5883 | 0.5842 | 0.5840 | 0.5777 | 0.5878 |
 
-Twenty trials of calibration recover most of the batch correction on BCI-2b (0.732 against 0.738), BCI-2a (0.595 against 0.612) and grasp-and-lift (0.754 against 0.782), and fifty trials recover it on the first two and on grasp-and-lift; NER2015, whose one-sided penalty is zero, does not move. The transductive result is therefore an upper bound that a prefix of 20 to 50 trials approaches, and the number is the quantity a laboratory would need before choosing the correction.
+Three different behaviours appear, and they are the reason the protocol matters. On BCI-2b the causal running mean matches the batch correction from the fifth trial onward (0.7413 against 0.7408) and the frozen prefix converges to it by fifty trials (difference −0.003, 95% CI [−0.006, +0.000]). On BCI-2a the running mean is again within 0.004 of batch at every k, while the frozen prefix is 0.019 below it at k = 50 (CI [−0.037, −0.006]). On SEED the frozen prefix fails and keeps failing — 0.527 at k = 5 and 0.516 at k = 200 — because the session is a sequence of film blocks whose mean shifts from block to block, so a prefix estimates the mean of the first block and nothing else; the running mean tracks the shift and climbs from 0.671 to 0.699, within 0.010 of the transductive value. On grasp-and-lift both online estimates are far below batch (0.666 and 0.694 against 0.784) and *below doing nothing* (0.778), so with a rapidly drifting mean a badly estimated correction is worse than no correction; NER2015 has no origin offset and every method is the same within 0.006.
+
+The practical reading is therefore not "correct with a prefix" but "correct causally, and check that the correction beats no correction": a running mean is the only estimator that survives block structure, and none of them rescues a mean that drifts faster than the window can follow.
+
+This experiment also gives the one-sided pipeline a realistic origin. A practitioner who observes drift and adds a running-mean normaliser at prediction time, without re-fitting the model on centred training data, has built exactly the `zero` pipeline of Section 2.1: the model sees raw features, the input sees centred ones. Table 4 is the cost of that patch on five datasets — small on BCI-2b and BCI-2a, nil on NER2015, and on grasp-and-lift a loss of 0.11 against not patching at all.
 
 ### 4.3 The direction control
 
@@ -260,6 +275,8 @@ The two directions give the same z_T to within one unit in the second decimal, a
 
 On the source-only representations — 773 of the 845 development cells, seven units, since `euc_ea` and `tan` are target-informed — the rank correlation between z_w and the penalty is −0.857, with a cluster bootstrap over datasets of [−1.000, −0.585] (median −0.862, 4,993 resamples), and the direction is the same at the cell level (AUC 0.831 for a loss larger than 0.05). Including the two target-informed representations in the unit-level analysis changes the correlation only to −0.827, so the statistic is not being carried by the representations a source-only analysis should not use. The statistic also resolves the four representations of BCI-2a, which the norm-based z_T does not: `euc` has z_w = 4.40 and a penalty of −0.184, while `csp`, `tan` and `euc_ea` sit between 0.29 and 0.60 with penalties between +0.024 and −0.014.
 
+**The statistic is defined relative to a feature origin.** z_w uses the absolute source mean, so it answers the question "how far is this family's origin from the classifier's reference, in units of the score spread", not "how exposed is this family in an absolute sense". Translating every feature by a vector c changes the numerator to ‖D_σ⁻¹PW(μ_A + c)‖; a translation in the null space of PW leaves it unchanged, and a translation along the weights moves it one-for-one. The numbers in Table 5 are therefore comparable within one convention — the convention in which each dataset's features are built — and not across conventions; a feature family that is shifted by a constant before the pipeline would receive a different z_w. This is one reason we do not offer an absolute threshold, and it is a limitation of the quantity rather than of the measurement.
+
 **Where it fails.** At the dataset level the picture weakens: on the source-only representations the five development datasets give a rank correlation of −0.80, and adding SEED-IV (median z_w = 24.4, median penalty −0.070) gives −0.83 with an exact permutation p of 42/720 = 0.058; over all representations the six-dataset value is −0.77, p = 0.103. A threshold of 0.354 fixed by Youden's J on the five development datasets flags every one of the 90 held-out cells (sensitivity 1.000, specificity 0.000, precision 0.544), and within SEED-IV the statistic has an AUC of 0.515. The leave-one-dataset-out operating point fails on two of five development datasets (SEED: sensitivity 1.000, specificity 0.000; NER2015: 0.273, 0.864) and works on three (BCI-2a 0.714/0.864, BCI-2b 1.000/0.574, grasp-and-lift 0.704/0.828).
 
 **Table 7.**  Leave-one-dataset-out operating point for the statistic. The threshold is chosen on four development datasets and evaluated on the fifth.
@@ -291,11 +308,11 @@ Equations (3) and (4) make a prediction for the per-cell change once c, t* and s
 | grasp-and-lift | LDA | 336 | 0.649 | 0.0360 | 0.693 (0.604) | 0.271 | 0.0420 | 0.213 |
 | grasp-and-lift | logistic | 336 | 0.592 | 0.0364 | 0.649 (0.607) | 0.531 | 0.0355 | 0.212 |
 | grasp-and-lift | SVM | 336 | 0.353 | 0.0115 | 0.420 (0.292) | 0.191 | 0.0127 | 0.248 |
-| NER2015 | LDA | 320 | 0.385 | 0.0285 | 0.556 (0.406) | not estimable | — | — |
+| NER2015 | LDA | 320 | 0.385 | 0.0285 | 0.556 (0.406) | not estimable (282 of 320 cells have a degenerate within-class spread) | — | — |
 | NER2015 | logistic | 320 | 0.371 | 0.0258 | 0.509 (0.425) | not estimable | — | — |
 | NER2015 | SVM | 320 | 0.458 | 0.0434 | 0.666 (0.503) | not estimable | — | — |
 
-The oracle parameterisation fits well on the BCI data (r = 0.99, MAE 0.013) and the model parameterisation fits less well (r = 0.86, MAE 0.057); the model's implied accuracy is 0.10 to 0.21 away from the observed aligned accuracy, which is a direct statement that the equal-variance assumption does not hold on these scores. Part of the oracle fit is built in, because c is read from BA_aligned and BA_aligned also enters the observed change. We therefore treat Equation (4) as a mechanism with a measured range of validity, not as a predictive law.
+The oracle parameterisation fits well on the BCI data (r = 0.99, MAE 0.013) and the model parameterisation fits less well (r = 0.86, MAE 0.057); the model's implied accuracy is 0.10 to 0.21 away from the observed aligned accuracy, which is a direct statement that the equal-variance assumption does not hold on these scores. Part of the oracle fit is built in, because c is read from BA_aligned and BA_aligned also enters the observed change. Equation (4) is the standard threshold-shift formula of a two-class Gaussian model; what it adds here is not a new phenomenon but the statement that the sign of the effect is carried by t* and that t* is a property of the training session's own calibration, which is why the same correction helps a well-calibrated LDA and hurts a margin-anchored SVM. We therefore treat it as a mechanism with a measured range of validity, not as a predictive law. The label-free check above is the evidence for the second half of that sentence.
 
 **The bound applies to the model, not to the data.** The inequality |Δ| ≤ 0.1995|s| follows from the derivative of Equation (3). Over the 800 binary cells the prediction violates it in 0 of 800 cases and the observation violates it in 185, i.e. 23.1 per cent, with a median ratio |Δ_obs|/|s| of 0.29 among the violations and a maximum of 4.1: empirical balanced accuracy is a step function of the scores and can jump.
 
@@ -348,7 +365,7 @@ The identity of Section 2.5 is exact by construction: on all 845 cells it agrees
 
 ### 4.9 What is left
 
-After the correction a residual gap to the within-session reference remains (a gap to that reference, not a decomposition of it: the reference differs from the cross-session model in training-set size and in protocol, so the difference is an upper bound on what any label-free correction could recover, not an identified label-information term): 0.0198 on BCI-2b, 0.0770 on SEED, 0.0257 on NER2015 and 0.0294 on grasp-and-lift. It is not an origin effect: across all 845 cells the correlation between z_T and the residual is +0.06, and within datasets it has no consistent sign. The residual is weakly associated with the class-conditional offset h_k of Equation (5) in units of the score spread: +0.21 on BCI-2a, −0.36 on BCI-2b, +0.33 on SEED, +0.30 on NER2015, +0.55 on grasp-and-lift (pooled +0.26, four of five in the same direction). The correlation is descriptive: the class-conditional offset is computed with the target labels and so is the residual, and we do not read it as a causal decomposition. A change of the within-session covariance explains less (pooled +0.10).
+After the correction a difference from the within-session reference remains. We call it the *observed cross-protocol difference*: the reference differs from the cross-session model in training-set size and in evaluation protocol, and it is not a ceiling — on BCI-2a the corrected pipeline (0.6119) is above it (0.5355), so the difference cannot be read as an information gap nor as a bound on what a label-free method could recover: 0.0198 on BCI-2b, 0.0770 on SEED, 0.0257 on NER2015 and 0.0294 on grasp-and-lift. It is not an origin effect: across all 845 cells the correlation between z_T and the residual is +0.06, and within datasets it has no consistent sign. The residual is weakly associated with the class-conditional offset h_k of Equation (5) in units of the score spread: +0.21 on BCI-2a, −0.36 on BCI-2b, +0.33 on SEED, +0.30 on NER2015, +0.55 on grasp-and-lift (pooled +0.26, four of five in the same direction). The correlation is descriptive: the class-conditional offset is computed with the target labels and so is the residual, and we do not read it as a causal decomposition. A change of the within-session covariance explains less (pooled +0.10).
 
 ### 4.10 Implementation details and the invariance checks
 
@@ -398,7 +415,7 @@ The results reduce to a procedure with three measurements, one correction and on
 
 **The invariance test.** Translate every feature by a constant, refit, and check that the predictions are unchanged. The test is one line of code and needs no labels. It has two blind spots that follow from Proposition 3: a translation in the null space of P W changes nothing, and a target sample that does not cross the moved boundary changes no label. The test is therefore a sufficient but not a necessary detector, and it should be run with a translation large relative to the score range; we use ten within-session standard deviations in the sweep of Section 4.2.
 
-**Report the residual separately.** The correction recovers the origin component; the rest is the label-information gap of Section 2.4, and reporting the two separately prevents a corrected pipeline from being credited with the whole gap.
+**Report the residual separately.** The correction recovers the origin component; the rest is an observed difference from the within-session reference, not an identified information gap, and reporting the two separately prevents a corrected pipeline from being credited with the whole difference.
 
 ## 6. Discussion
 
@@ -426,13 +443,13 @@ Euclidean and Riemannian alignment [5-8] act on second-order structure, and the 
 
 **The protocol is transductive.** Both forms of the correction use the whole target session to estimate μB. That is legitimate under a protocol that allows unlabelled target data and is not available in a strictly inductive deployment. The running-mean experiment shows the limit: with the trials in a random order five trials suffice (0.7334 against 0.7365 on BCI-2b), while with the recorded order the same pipeline is exact on BCI-2b (0.7409) and clearly worse on the block-structured datasets (0.6724 against 0.7094 on SEED; 0.6781 against 0.7938 on grasp-and-lift). A running reference does not remove the need for a calibration block.
 
-**The statistics are hierarchical.** The 845 cells come from 76 subjects and 737 distinct session pairs; subject-level aggregation and the cluster bootstrap are used where they matter, and cell-level correlations are labelled descriptive. The dataset-level tests rest on five or six observations and have little power.
+**The statistics are hierarchical.** The 845 cells come from 61 subjects and 737 distinct session pairs; subject-level aggregation and the cluster bootstrap are used where they matter, and cell-level correlations are labelled descriptive. The dataset-level tests rest on five or six observations and have little power.
 
 ## 7. Conclusion
 
-The two centrings are different operations. The two-sided form is invariant to the coordinate origin, the invariant family is wider than the sample mean, and two corrections leave every score difference unchanged exactly when their projections onto the centred weights agree. The failure of the one-sided form is a threshold displacement; its sign is set by the threshold error the training session already carries, and on six public datasets the resulting damage ranges from nothing on time-domain contrast features to a collapse to chance on log-power and differential-entropy features with a large free origin.
+The two centrings are different operations. The two-sided form is invariant to the coordinate origin, the invariant family is wider than the sample mean, and two corrections leave every score difference unchanged exactly when their projections onto the centred weights agree. The failure of the one-sided form is a threshold displacement; its sign is set by the threshold error the training session already carries, and across five development datasets the resulting damage ranges from nothing on time-domain contrast features to a collapse to chance on log-power and differential-entropy features with a large free origin; a sixth dataset, held out, behaves as the family it belongs to.
 
-What the verification adds to a textbook statement is a measured boundary. The correction is exact for its own component, it composes with second-order alignment, it can be transported to the decision space of a frozen model, and it restores neither the residual label-information gap nor a calibration that the wrong convention destroyed. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and we report that as the open problem this audit leaves.
+What the verification adds to a textbook statement is a measured boundary. The correction is exact for its own component, it composes with second-order alignment, it can be transported to the decision space of a frozen model, and it restores neither the observed cross-protocol difference nor a calibration that the wrong convention destroyed. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and we report that as the open problem this audit leaves.
 
 ## CRediT authorship contribution statement
 
@@ -444,7 +461,7 @@ The authors declare that they have no known competing financial interests or per
 
 ## Data availability
 
-BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit ef99716ec2), which is the version of record for the code.
+BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit 9c32dcfd1e), which is the version of record for the code.
 
 ## Acknowledgements
 
@@ -458,9 +475,9 @@ This research did not receive any specific grant from funding agencies in the pu
 
 [3] C. Vidaurre, C. Sannelli, K.-R. Müller, B. Blankertz, Machine-learning-based coadaptive calibration for brain-computer interfaces, Neural Comput. 23 (2011) 791–816.
 
-[4] R. Apicella, F. Isgrò, A. Pollastro, R. Prevete, On the effects of data normalisation on EEG-based BCI classification, IEEE Trans. Neural Syst. Rehabil. Eng. 31 (2023) 4591–4601.
+[4] R. Apicella, F. Isgrò, A. Pollastro, R. Prevete, On the effects of data normalization on EEG-based BCI classification, Eng. Appl. Artif. Intell. 123 (2023) 106205.
 
-[5] A. Barachant, S. Bonnet, M. Congedo, C. Jutten, Riemannian geometry for EEG-based brain-computer interfaces: a primer and a review, Brain-Comput. Interfaces 4 (2017) 155–174.
+[5] M. Congedo, A. Barachant, R. Bhatia, Riemannian geometry for EEG-based brain-computer interfaces: a primer and a review, Brain-Comput. Interfaces 4 (2017) 155–174.
 
 [6] H. He, D. Wu, Transfer learning for brain-computer interfaces: a Euclidean space data alignment approach, IEEE Trans. Biomed. Eng. 67 (2020) 399–410.
 
@@ -468,7 +485,7 @@ This research did not receive any specific grant from funding agencies in the pu
 
 [8] P. Zanini, M. Congedo, C. Jutten, S. Said, Y. Berthoumieu, Transfer learning: a Riemannian geometry framework with applications to brain-computer interfaces, IEEE Trans. Biomed. Eng. 65 (2018) 1107–1116.
 
-[9] W. Samek, K.-R. Müller, T. Kawanabe, M. Kawanabe, Brain-computer interfacing in discriminative and stationary subspaces, in: Proc. IEEE EMBS, 2012, pp. 2873–2876.
+[9] W. Samek, K.-R. Müller, M. Kawanabe, C. Vidaurre, Brain-computer interfacing in discriminative and stationary subspaces, in: Proc. IEEE EMBS, 2012, pp. 2873–2876.
 
 [10] B. Blankertz, M. Kawanabe, R. Tomioka, F. U. Hohlefeld, V. V. Nikulin, K.-R. Müller, Invariant common spatial patterns: alleviating nonstationarities in brain-computer interfacing, in: Adv. Neural Inf. Process. Syst. 20, 2008, pp. 113–120.
 
