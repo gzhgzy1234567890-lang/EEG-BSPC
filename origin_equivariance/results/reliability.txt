@@ -1,0 +1,27 @@
+v32: class-balanced offset observation (15) and reliability weight (16)
+
+dev      2b    none      cum       shrunk    balanced  rel      
+               0.7064    0.7407    0.7314    0.6367    0.6405   
+    balanced vs none -0.0697 [-0.1049, -0.0355]  worse
+    rel      vs none -0.0659 [-0.0983, -0.0345]  worse
+dev      2a    none      cum       shrunk    balanced  rel      
+               0.4969    0.5268    0.5271    0.4008    0.4025   
+    balanced vs none -0.0961 [-0.1638, -0.0333]  worse
+    rel      vs none -0.0943 [-0.1607, -0.0338]  worse
+dev      seed  none      cum       shrunk    balanced  rel      
+               0.4599    0.6782    0.6845    0.3460    0.3463   
+    balanced vs none -0.1139 [-0.1618, -0.0656]  worse
+    rel      vs none -0.1135 [-0.1615, -0.0654]  worse
+dev      gal   none      cum       shrunk    balanced  rel      
+               0.7704    0.6560    0.7465    0.7271    0.7520   
+    balanced vs none -0.0433 [-0.0498, -0.0371]  worse
+    rel      vs none -0.0184 [-0.0216, -0.0154]  worse
+dev      ner   none      cum       shrunk    balanced  rel      
+               0.5878    0.5840    0.5867    0.5908    0.5939   
+    balanced vs none +0.0031 [-0.0039, +0.0105]  tie
+    rel      vs none +0.0061 [+0.0007, +0.0126]  better
+
+heldout  seed4 none      cum       shrunk    balanced  rel      
+               0.3613    0.5499    0.5250    0.2583    0.2579   
+    balanced vs none -0.1030 [-0.1314, -0.0779]  worse
+    rel      vs none -0.1033 [-0.1318, -0.0786]  worse
