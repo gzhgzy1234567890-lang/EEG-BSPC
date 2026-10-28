@@ -1,4 +1,4 @@
-# Causal mean correction in cross-session EEG decoding: when it helps, and how much to correct
+# Failure regimes of causal mean correction in cross-session EEG decoding
 
 Zihao Gong ^a,†^, Jiran Li ^b,†^, Ke Huo ^a^, Yubin Han ^c^, Guangyu Shi ^a^, Yongqiang Xie ^a,*^
 
@@ -14,45 +14,41 @@ E-mail addresses: andy.zihao.gong@gmail.com (Z. Gong), dsx54188dsx@163.com (J. L
 
 ## Abstract
 
-Removing a session mean is the first step of almost every cross-session EEG pipeline, and in deployment the mean has to be estimated from the trials that have already arrived. We state when a correction helps, compare four causal estimators, and derive one that is safe where the obvious ones fail.
+Removing a session mean is the first step of almost every cross-session EEG pipeline, and in deployment the mean has to be estimated from the trials that have already arrived. We ask why the same correction helps on one benchmark and hurts on another.
 
-Theorem 1 gives the condition: under the equal-variance model a displacement s on a threshold error t helps iff s(2t+s) < 0. Exact for the model and weak when estimated (it reproduces the sign on 0.598 of 800 cells against 0.564 by majority), it explains the mechanism and does not predict.
+Three layers of evidence are separated. The theory says which shifts can matter at all: a correction is origin-equivariant exactly when it translates by a translation-equivariant estimate of the target mean, and only the projection of the displacement onto the centred classifier weights can change any score difference. On 845 cells from five development datasets plus 90 held-out cells from SEED-IV, under one strictly causal protocol, the *strength* of the correction sets the sign: grasp-and-lift falls from 0.773 to 0.665 (change −0.108 [−0.131, −0.083], negative in 12 of 12 subjects) while SEED rises from 0.459 to 0.674 (+0.214 [+0.167, +0.260], negative in 0 of 15); the BCI datasets rise slightly and NER2015 is flat. The estimator matters much less than the strength it produces. The temporal structure of the measured displacement covaries with that loss: a linear ramp explains 80 per cent of the variance of the grasp-and-lift block means against 25 per cent expected from block order alone, and the excess correlates with the loss across subjects (rho = 0.78, p = 0.003; 0.71 with the four equal blocks; 0.73 to 0.86 leaving one subject out), weakly within the other datasets and only 0.43 when they are pooled and centred.
 
-The experiments cover 845 cells from five datasets plus 90 held-out cells from SEED-IV. A cumulative mean recovers 0.22 on SEED and loses 0.115 on grasp-and-lift; a window and an exponential average lose on SEED. The estimator we propose corrects by the mean of the blocks seen, weighted by the share of it that is signal: λ = ‖d̄‖²/(‖d̄‖² + K V_d/B), with d_b = P W (μ_b − μ_A). The weight is continuous, so nothing decides whether to correct: it decides how much. The paired gains over no correction are +0.027, +0.025, +0.216, +0.008 and −0.001 on the five development datasets, and +0.183 [+0.154, +0.212] on the held-out one, at a cost of 0.007 on BCI-2b and 0.003 on SEED. Shifting the feature origin leaves every prediction unchanged. The weight itself adds little over an unweighted block mean; the block-wise structure carries the gain. Four gates that decide by a threshold are reported as failures.
+Controlled simulations separate constant offset, drift, step change and class-prior change, and reproduce the pattern without any estimator dominating; they are mechanistic hypotheses, not identified causes of the shifts in these recordings.
 
 **Keywords:** cross-session EEG decoding; mean correction; origin equivariance; preprocessing audit; calibration; reproducibility
 
 ## Highlights
 
-- A correction helps exactly when s(2t+s) < 0; exact, not predictive.
-- Fixed-memory estimators fail on block structure or on within-session drift.
-- A block-wise mean weighted by its reliability is safe in both regimes.
-- It is non-negative on all five datasets and gives +0.186 on held-out SEED-IV.
-- Four threshold gates fail and are reported as failures.
+- Correction strength, not the estimator, sets the sign of the change.
+- Grasp-and-lift loses 0.108 at full strength; SEED gains 0.214; every subject agrees.
+- Excess temporal trend tracks the loss across the twelve grasp-and-lift subjects.
+- Controlled regimes separate offset, drift, steps and class-prior change.
+- No estimator in the comparison dominates across regimes.
 
 ## 1. Introduction
 
-A classifier trained on one recording session and applied to another usually loses accuracy, and the first step of almost every cross-session pipeline is to remove a mean. The step appears under several names — re-centring, mean removal, per-session normalisation, baseline correction — and it appears in pipelines that are otherwise unlike each other and inside calibration protocols [1-3]. It is also the step that is most often described ambiguously, because two different operations are called by the same name.
+A classifier trained on one recording session and applied to another usually loses accuracy, and the first step of almost every cross-session pipeline is to remove a mean. The step appears under several names — re-centring, mean removal, per-session normalisation, baseline correction — and it appears in pipelines that are otherwise unlike each other and inside calibration protocols [1-3]. Two different operations are called by the same name: centring both sessions on their own means, or centring one. The first is consistent with the model that is fitted; the second shifts every score by a constant that the model never saw.
 
-*Two-sided centring.* Centre the training session on its own mean, fit the classifier on the centred data, and centre the target session on its own mean before predicting.
+It is natural to read the second one as a bug to be avoided and the first as the fix, and the literature mostly does. This paper started from that reading and ended somewhere else. On a feedback-error dataset the correction recovers 0.22 of balanced accuracy; on a movement dataset recorded within one session it loses 0.11; on two motor-imagery datasets it is worth about 0.03; on a time-domain contrast dataset it is worth nothing. The sign of the effect is not a property of the correction, and it is not a property of how accurately the target mean is estimated: the estimators we compare track the same quantity and differ far less from each other than the effect they produce. What differs across the datasets is how the target mean moves during the session, and what differs across models is whether that movement reaches the decision at all.
 
-*One-sided centring.* Centre one session and not the other. There are two forms, centring only the target or only the training session, and they shift the decision function in opposite directions.
+The paper is organised around three statements, each supported by a different kind of evidence.
 
-This paper compares the estimators a deployment can actually build from that choice, measures what the inconsistent variant costs, and reports where each estimator holds and where it fails. It asks three questions and answers each with the weakest statement the evidence supports.
+**Decision geometry.** A shift of the feature origin changes decisions only through its projection onto the classifier weights, and it changes nothing at all if the projection is class-constant. This is a statement about affine decision functions (Propositions 1–4) and it is checked rather than asserted: an origin injected orthogonally to the discriminant leaves every prediction unchanged while a norm-based statistic of the same origin is blind to the difference (Section 4.3), and a correction built on the raw feature mean and one built on the projected mean give identical predictions to machine precision.
 
-**Equivariance.** Which corrections are invariant to a translation of the feature origin, and does the invariance single one out? Section 2.2 shows that the two-sided form is invariant and that the invariant family is larger than the sample mean, so the invariance cannot be used as a uniqueness argument. What it does establish is a requirement: a pipeline whose output depends on the unreported zero of the feature scale has a convention in it, and the convention is invisible.
+**Correction strength.** Given that a shift does reach the decision, how much of it to remove is a separate question, and it dominates the choice of estimator. Sweeping a single weight from 0 to 1 — every method correcting by the same displacement — moves grasp-and-lift down by 0.108 and SEED up by 0.214, with every subject of each benchmark on the same side of zero (Section 4.13). The estimators compared in Section 4.2 differ by at most a few hundredths on the same data. It is therefore the *strength* of the correction, not the rule that computes it, that decides whether a deployment gains or loses.
 
-**Equivalence.** When do two corrections give the same predictions? Section 2.3 gives the exact condition in terms of the centred classifier weights, and separates it from the finite-sample question of whether any particular set of trials crosses the boundary that moves.
+**Temporal structure.** If the right strength is a property of the recording, it should be visible in how the recording moves. It is, at least for the benchmark where the effect is largest: the share of the variance of the grasp-and-lift block displacements that a linear ramp explains is 0.80 against 0.25 expected from block order alone, and that excess correlates with the correction loss across the twelve subjects (rho = 0.776, Section 4.14). The relation is weak or absent in the other datasets, and it is an association, not an identification of what moved the mean.
 
-**Performance.** Does the correction improve accuracy, and can the change be predicted? Sometimes it cannot, and the sign of the change is not governed by the size of the displacement: it is governed by where the training threshold already sits relative to the target optimum. Section 2.3 gives a Gaussian model of that mechanism, Section 4.5 tests it cell by cell under two parameterisations, and Section 6 states the boundaries.
+Two further results bound the claims. First, the one-sided form is not merely inconsistent, it is damaging in a way that can be predicted from the threshold the training session already carries (Theorem 1), and the size of the damage is an order of magnitude larger than the differences between good estimators. Second, a source-level statistic computed before the target session exists orders feature families but does not screen sessions, and four threshold-based decision rules we tried fail (Sections 4.4 and 4.12); we report them as failures rather than as a method.
 
-**What the study covers.** Five public datasets, eleven dataset-by-representation units and 845 cells, chosen to span motor imagery, emotion, error-related potentials and movement, four feature families and three linear classifier families; a sixth dataset, SEED-IV, contributes 90 further cells and is used only as a held-out test of the one source-level statistic the paper defines. The measured quantities are not invented for the occasion: the origin distance of a feature family, the displacement it induces in the decision function, the sign of the resulting change, and the calibration of the resulting probabilities.
+**What this paper is not.** It does not propose a new correction that is safe in general, and it does not identify the cause of the session shifts it measures. Its contribution is the separation of three questions that are usually answered together — whether a shift reaches the decision, how much of it to remove, and what in the recording predicts the answer — and the measurement of each on six public datasets under one strictly causal protocol.
 
-**What this paper does not claim.** We do not claim that one-sided centring is frequent. We inspected three released framework components (Section 4.11) and all three take their reference from the training fold or from a causal running mean, so none of them can exhibit the failure; we put no number on the frequency of the mistake in custom code, and the paper is written as an invariance verification rather than as a prevalence study. We do not claim that two-sided centring is optimal; Section 4.5 exhibits the settings in which it is not. We do not claim that the source-only statistic is a screening instrument; its held-out operating point has zero specificity and we say so in the abstract. We do not claim that the Gaussian model is a quantitative law; it is a mechanism with a measured range of validity.
-
-**The operation is in current use.** A recent controlled benchmark makes the question concrete rather than academic: Rahimipour and Van Hulle [20] compare a tangent-space pipeline with unsupervised test-time recentering against deep sequence models on eight public motor-imagery datasets and conclude that the recentering, not the architecture, carries the cross-session advantage — the pipeline beats its recentering-free twin only across sessions, and is indistinguishable from it within a session. Their recentering is computed at test time, i.e. transductively, and it acts in the tangent space of the SPD manifold rather than on a Euclidean feature mean; the two operations share the word but not the object, and what we analyse here is the Euclidean one. That is also the operation a deployment can compute from a stream of feature vectors, which is why the causal question in Section 4.2 is worth asking of it. If the correction is the operative ingredient, then which correction it is, and whether it survives being computed online, are the questions worth answering.
-
-**Relation to prior work.** Apicella et al. [4] compared normalisation schemes with domain-adaptation methods on three EEG datasets and found that an appropriate normalisation often outperforms the adaptation algorithm; our results are compatible and add a criterion, the invariance of the output to the coordinate origin. The nearest formal relatives are the Euclidean and Riemannian alignment families [5-8], which act on second-order structure; an alignment matrix that is a multiple of the identity performs no alignment, so the first-order correction audited here is not a special case of the second-order one, although the two compose (Section 4.6). Methods that remove session-specific directions [9,10] estimate a subspace in which the sessions agree rather than relocating a boundary by a constant. Calibrating a classifier to a new session by re-estimating an intercept from a few labelled trials [1,2] is the procedure onto which our analysis of label use maps; on four of five datasets it changes nothing relative to the label-free form, and on the fifth it gains 0.013 (Section 4.6).
+**Relation to prior work.** Apicella et al. [4] compared normalisation schemes with domain-adaptation methods on three EEG datasets and found that an appropriate normalisation often outperforms the adaptation algorithm; our results say that the *amount* of normalisation is the operative variable, which is compatible with theirs and adds a criterion. Euclidean and Riemannian alignment [5-8] act on second-order structure; an alignment matrix that is a multiple of the identity performs no alignment, so the first-order correction studied here is not a special case of the second-order one, although the two compose (Section 4.6). Methods that remove session-specific directions [9,10] estimate a subspace in which the sessions agree rather than relocating a boundary by a constant. Recent work attributes the cross-session advantage of a tangent-space pipeline to its test-time recentering rather than to its architecture [20]; that recentering is transductive, and Section 4.2 measures what the causal version of it does. Calibrating an intercept from a few labelled trials [1,2] changes nothing relative to the label-free form on four of five datasets and gains 0.013 on the fifth (Section 4.6).
 
 ## 2. Theory
 
@@ -227,7 +223,7 @@ with μ̂_{t−1} an estimate from trials 1 … t−1; as μ̂ → μ_B it conve
 
 which is the `zero` pipeline of Section 2.1. The two differ by μ_A, i.e. by exactly the quantity at issue, and only (7) is a correction of the consistency problem.
 
-**Four estimators, and why no fixed memory is safe.** Equation (7) leaves the choice of μ̂. We compare a cumulative mean, a sliding window of 50 trials, an exponential average with α = 0.05, and a shrunk cumulative mean whose weight is n_eff/(n_eff + τ) with τ = 50. Table 4 reports them on one common post-prefix test set, with the strictly causal (source-only) representations of Section 3.
+**Four estimators, and why no fixed memory works everywhere.** Equation (7) leaves the choice of μ̂. We compare a cumulative mean, a sliding window of 50 trials, an exponential average with α = 0.05, and a shrunk cumulative mean whose weight is n_eff/(n_eff + τ) with τ = 50. Table 4 reports them on one common post-prefix test set, with the strictly causal (source-only) representations of Section 3.
 
 **Table 4.** Balanced accuracy on the common post-prefix test set (trials k+1 … n; k = 20, or 50 for SEED and SEED-IV), LDA, source-only representations. `batch` is the transductive correction scored on the same trials.
 
@@ -239,9 +235,11 @@ which is the `zero` pipeline of Section 2.1. The two differ by μ_A, i.e. by exa
 | grasp-and-lift | 0.7704 | 0.7764 | 0.6560 | 0.6488 | 0.6236 | 0.7465 | 0.5942 |
 | NER2015 | 0.5878 | 0.5883 | 0.5840 | 0.5842 | 0.5822 | 0.5867 | 0.5857 |
 
+The pattern, and not the ranking, is what matters here: the benchmark that gains most and the benchmark that loses most respond to the same knob in opposite directions, which Section 4.13 isolates by fixing every estimator and varying only the strength.
+
 Three regimes appear. Where the session mean is stable (BCI-2b, BCI-2a) every estimator recovers the transductive gain within 0.01 and the choice does not matter. Where the mean changes between blocks (SEED) a *short-memory* estimator is harmful — the window and the exponential average both fall below no correction, because within one film block the window sees only that block — while a long-memory estimator keeps the gain. Where the mean drifts *within* a session (grasp-and-lift) the reverse happens: the cumulative mean loses 0.115. No fixed memory is safe on both, and the one-sided patch costs 0.05 to 0.18 on top of that.
 
-**A block-wise estimate, weighted by its own reliability.** The estimator that is safe in both regimes corrects with the mean of the blocks already seen, weighted by how much of that mean is signal rather than block-to-block scatter. The weight must be built from *displacements relative to the source session*, not from absolute projections, or it would depend on where the feature origin sits and contradict Proposition 1. Let d_b = P W (μ̂_b − μ_A) be the displacement that block b asks for, in the score space, with μ̂_b the mean of the features in block b; let d̄ be the mean of the d_b over the B blocks seen and V_d their variance across blocks. The weight and the correction are
+**A block-wise estimate, weighted by its own reliability.** The estimator that stays closest to the right strength in both regimes corrects with the mean of the blocks already seen, weighted by how much of that mean is signal rather than block-to-block scatter. The weight must be built from *displacements relative to the source session*, not from absolute projections, or it would depend on where the feature origin sits and contradict Proposition 1. Let d_b = P W (μ̂_b − μ_A) be the displacement that block b asks for, in the score space, with μ̂_b the mean of the features in block b; let d̄ be the mean of the d_b over the B blocks seen and V_d their variance across blocks. The weight and the correction are
 
     λ = ‖d̄‖² / (‖d̄‖² + K V_d / B) ,        s_corrected = s − λ d̄ .            (9)
 
@@ -276,6 +274,8 @@ The estimator is positive on four of the five development datasets, indistinguis
 Leave-one-family-out selects m = 15 for all four families and gives +0.026 on motor imagery, +0.216 on emotion, −0.001 on error potentials and +0.008 on movement when that family is held out. The constant therefore transfers across families, and the held-out dataset prefers the same value, which is why m = 15 is the default.
 
 **What does not work.** Two gates built on amplitude fail: matching the corrected score margins to the source session selects no correction almost everywhere, and a variance ratio that measures block-to-block drift sets the weight to zero exactly where correction is worth 0.22. A PCA concentration measure, in score space or in feature space, degenerates because the source-calibrated null saturates at 1.0 in both. And a dispersion gate built on the exact identity, like a t-statistic gate on the block displacements, loses the same 0.047 on grasp-and-lift that the cumulative mean does. Those failures are why the rule above is continuous and estimated from the same blocks it uses, rather than a threshold applied to a single statistic.
+
+Section 4.12 places these observations in a controlled parameter space and shows which structure of non-stationarity each failure needs.
 
 **The one-sided patch is the harmful variant, and its cost is measurable.** Subtracting the estimate without adding the training mean back (8) costs 0.122 on BCI-2b, 0.047 on BCI-2a, 0.121 on SEED and 0.176 on grasp-and-lift relative to not correcting at all. That is the quantity the theory of Section 2.3 predicts, and it is an order of magnitude larger than the differences between good estimators.
 
@@ -455,6 +455,111 @@ patches a normalisation step onto features at prediction time, outside the fold.
 We did not audit that population, and the audit above is too small to estimate
 its size.
 
+### 4.12 Synthetic analysis of correction failure regimes
+
+The comparisons above are observational: they say which estimator wins where, not why. To separate the mechanisms we built a controlled generator in which the target session carries a class-conditional distribution that is fixed and a session-level offset that is the sum of a constant term, a linear drift, step changes at block boundaries, and — in a separate condition — a change of the class proportions only. The classifier, the causal protocol, the block length and the estimator implementations are the ones used on the EEG data (Section 4.2), so the synthetic and real numbers come from one code path. Class separation was calibrated so that the uncorrected target sits at balanced accuracy 0.70; with a trivially separable task every correction is unnecessary and the comparison is vacuous.
+
+**The real shifts differ in structure, and the difference is measurable.** For every cell we took the sequence of block displacements d_b = P W (μ_b − μ_A) and summarised it by the share of its variance explained by a linear ramp (R² of a per-component fit), the Theil–Sen trend scaled to the session, and the median block-to-block change.
+
+**Table 14.** Temporal structure of the block-mean displacement on the real data, median over cells, block length 15.
+
+| dataset | R² of a linear ramp | trend | block-to-block change | blocks per session |
+|---|---|---|---|---|
+| grasp-and-lift | **0.80** | 3.18 | 0.62 | 5 |
+| SEED | 0.06 | 0.35 | 0.05 | 227 |
+| BCI-2b | 0.10 | 0.66 | 0.60 | 9 |
+| BCI-2a | 0.12 | 0.97 | 0.80 | 20 |
+| NER2015 | 0.21 | 1.45 | 1.20 | 4 |
+
+A linear ramp explains 80 per cent of the variance of the grasp-and-lift displacements and 6 per cent on SEED, where the offset is large and almost constant and the block-to-block change is two orders of magnitude smaller relative to it. The two datasets that break opposite estimators are therefore not two samples of the same kind of non-stationarity.
+
+**Table 15.** Controlled regimes, balanced accuracy, mean over 5 seeds; class separation calibrated to 0.70 uncorrected. `a` is the constant offset and `v` the total drift, both in units of the mean distance between class means.
+
+| regime | none | cumulative | Eq. (9) | predictive | Kalman | ADWIN |
+|---|---|---|---|---|---|---|
+| a = 0, v = 0 | 0.685 | 0.686 | 0.687 | 0.687 | 0.679 | 0.687 |
+| a = 1, v = 0 (offset only) | 0.473 | 0.686 | 0.686 | 0.682 | 0.677 | 0.687 |
+| a = 0, v = 1 (drift only) | 0.587 | 0.652 | 0.642 | 0.648 | **0.675** | 0.666 |
+| a = 0, v = 2 (strong drift) | 0.488 | 0.584 | 0.567 | 0.576 | **0.678** | 0.639 |
+| a = 1, v = 2 (offset + drift) | 0.344 | 0.584 | 0.574 | 0.573 | **0.674** | 0.639 |
+| steps every 8 blocks | 0.333 | 0.417 | 0.408 | 0.408 | 0.612* | 0.584 |
+| class priors only (0.4) | 0.681 | 0.672 | 0.679 | 0.677 | 0.649* | 0.671 |
+| priors + offset | 0.680 | 0.668 | 0.676 | 0.677 | 0.600* | 0.672 |
+
+![Figure 5](figs/fig_regimes.png)
+**Fig. 5.** The failure-regime map. (a) Predictive minus variance-ratio accuracy across the constant-offset and drift grid; blue means the variance-ratio rule is better, red the predictive rule, an asterisk marks cells whose paired 95 per cent interval crosses zero. (b) Step changes: change from no correction for four rules. (c) Class-prior change with and without a constant offset.
+
+The tracker column is marked with an asterisk because its implementation did not survive an audit (Section 4.12.1): in the synthetic generator it is well behaved, but on the real data its state can run away from the displacement it is applied to, so its real-data numbers are not used as evidence anywhere in this paper. The synthetic rows are still informative about the *direction* of the trade-off, and they are read as such.
+
+Three regimes separate cleanly. A *constant* offset is corrected by anything, including the cumulative mean, so the choice of estimator is irrelevant there. A *drift* punishes long memory and rewards tracking: Kalman is the best estimator in both drift rows, by 0.03 to 0.10 over the fixed-memory rules. Step changes reward a short window as well. A change of the class *proportions*, with the class-conditional distributions untouched, does the opposite: it leaves the shrinkage rules almost unaffected (0.676 to 0.679) and costs the tracker 0.06 to 0.08, because a tracker follows the change in the mixture as if it were a change in the offset.
+
+Under the drift rows the predictive weight loses to Kalman, which is the honest reading of Table 13; under the prior-change rows it is Kalman that loses. No estimator in the table dominates, and the fixed-memory rules lose in the drift rows by as much as the tracker loses in the prior rows.
+
+**4.12.1 An audit of the tracker, and what it cost us.** Before reading anything into the tracker column we varied its two variances and its initial covariance on the real data: the original setting (P₀ = 1, process noise from the variance of successive differences, measurement noise from the current block), a matched initialisation (P₀ = r), and two fixed ratios (q = 0.05 r and q = 0.50 r), all with causally estimated measurement noise. The estimator is not stable across these settings. On SEED the aggressive setting gives 0.380 against 0.459 uncorrected and the matched settings collapse to chance; on grasp-and-lift the same pattern appears (0.628 against 0.773, then chance). The diagnostic that explains it is the one-step state error, ||state − d_b||/||d_b||, which is 0.11 on SEED, 0.99 on BCI-2a and 3.6 to 3.8 on grasp-and-lift and NER2015: the state is not tracking the displacement it is applied to, so the correction is applied with a vector that can be several times too large.
+
+A state-space tracker with a fixed gain is therefore *not* a fair representative of "fast tracking" in this setting, and we do not use its real-data numbers as evidence. The negative-transfer results that the paper does rely on are those of the estimators whose implementation we could verify (cumulative, block, variance-ratio, predictive, ADWIN), and the synthetic tracker rows are read as a statement about the direction of a trade-off, not as a measurement of it. A properly tuned tracker, with its variances fitted on the source session rather than on the target stream, remains an obvious baseline for future work and we did not establish it here.
+
+**What this establishes and what it does not.** The simulations reproduce the qualitative pattern of the real benchmarks — a dataset whose block displacements are trend-dominated (grasp-and-lift, R² = 0.80) breaks the long-memory rules, and a dataset with a large, almost constant offset (SEED, R² = 0.06) breaks the tracker — and they show that each of these behaviours follows from a mechanism that is stated in the generator. They do not identify which mechanism dominates a given recording: the generator can produce a similar performance pattern from more than one parameter setting, and the real drift structure we measure is a description of the block means, not a decomposition of causes. The synthetic results are therefore mechanistic hypotheses that are consistent with the EEG data, not a proof of what happened in those sessions.
+
+### 4.12.2 Ablation of the weighting rules, and a control that constrains them
+
+The estimators of Section 4.2 differ in how they set the weight. This subsection separates the two things such a rule can contribute: the average strength it applies, and the way that strength is distributed over time. On grasp-and-lift, where the predictive rule was introduced:
+
+| rule | average weight | balanced accuracy |
+|---|---|---|
+| fixed λ = 0.25 | 0.25 (fixed) | 0.7584 |
+| fixed λ = 0.50 | 0.50 (fixed) | 0.7318 |
+| matched: a constant equal to the cell's own mean predictive weight | 0.25 | 0.7617 |
+| shuffled: the predictive weights permuted across the blocks of the cell | 0.25 | 0.7622 |
+| predictive (leave-one-block-out) | 0.25 | 0.7621 |
+| variance-ratio, Eq. (9) | 0.56 | 0.6703 |
+
+The predictive rule beats a *global* fixed weight by 0.0037 [−0.0006, +0.0089], reproduces its own performance when every cell is given its own constant weight, and loses nothing when its weights are permuted. Matching the average strength therefore accounts for its benefit here, and rearranging the weights in time produces no detectable loss. BCI-2a is the exception, where the matched control is 0.0057 [+0.0026, +0.0088] behind the rule, so time allocation is not worthless everywhere; on the other four datasets the difference is within noise.
+
+Two cautions on reading this table. The matched and shuffled rows are *post-hoc diagnostics*: they use the whole session to build the constant or the permutation, and neither is a deployable procedure, so they belong to the ablation and not to the list of online methods. And "no detectable difference" is not equivalence; the intervals are wide enough to admit a small effect, which is why the claim is that the strength accounts for the benefit, not that the timing carries none.
+
+### 4.13 Correction strength, not the estimator, sets the sign
+
+The comparison above varies the estimator. This one varies only the *strength*: every method corrects by the same displacement, the mean of the completed blocks, and differs solely in the weight put on it, which is held fixed within a session.
+
+![Figure 6](figs/fig_lambda.png)
+**Fig. 6.** Balanced accuracy as a function of the correction strength λ, cells aggregated within subject and bootstrapped over subjects (6,000 resamples, band = 95 per cent). (a) absolute; (b) change from no correction.
+
+**Table 16.** The correction-strength response, subject level. D = BA(λ = 1) − BA(λ = 0), averaged within subject and bootstrapped over subjects.
+
+| dataset | λ=0 | 0.10 | 0.25 | 0.50 | 0.75 | λ=1 | D [95% CI] | subjects with D < 0 |
+|---|---|---|---|---|---|---|---|---|
+| grasp-and-lift | 0.773 | 0.767 | 0.758 | 0.732 | 0.700 | 0.665 | −0.108 [−0.131, −0.083] | 12 / 12 |
+| SEED | 0.459 | 0.473 | 0.493 | 0.545 | 0.618 | 0.674 | +0.214 [+0.167, +0.260] | 0 / 15 |
+| BCI-2b | 0.706 | 0.713 | 0.719 | 0.730 | 0.736 | 0.739 | +0.032 [+0.017, +0.048] | 1 / 9 |
+| BCI-2a | 0.497 | 0.502 | 0.510 | 0.524 | 0.526 | 0.526 | +0.029 [+0.012, +0.048] | 1 / 9 |
+| NER2015 | 0.592 | 0.592 | 0.591 | 0.589 | 0.588 | 0.587 | −0.004 [−0.010, +0.002] | 10 / 16 |
+
+Two benchmarks respond in opposite directions, and the split is not a matter of degree: every grasp-and-lift subject loses accuracy as the correction is strengthened, and not one SEED subject does. The BCI sessions are already close to their best at λ = 1 and gain little from any correction, and NER2015, whose features carry no free origin, is flat. The value of λ that is best on the grid is therefore a property of the recording, not of the algorithm: about zero for grasp-and-lift, one for SEED and the BCI datasets. Section 4.14 asks what property of the recording it tracks.
+
+A caveat on the reading. These are grid optima, not a continuous optimum, and λ was applied as a constant chosen per session; the figure says how the benchmarks respond, not that a deployment can know the right value in advance. An estimator that produces λ from the stream is a way of guessing that constant, and Section 4.2 compares several.
+
+### 4.14 Temporal structure of the shift covaries with the loss
+
+If the right strength is a property of the recording, it should be visible in how the target mean moves. For every cell we took the block displacements d_b = P W (μ_b − μ_A), fitted a linear ramp to each score component, and measured R², the share of their variance the ramp explains. The number is only interpretable against a null: with five blocks, block order alone produces R² ≈ 0.25 by chance. We therefore permuted the block order 500 times per cell and report the excess ΔR² = R² − E[R²_null].
+
+**Table 17.** Temporal structure and its relation to the correction loss, median over cells.
+
+| dataset | blocks | R² | R² under permuted order | ΔR² | lag-1 | loss |
+|---|---|---|---|---|---|---|
+| grasp-and-lift | 5 | 0.800 | 0.255 | +0.528 | +0.65 | +0.102 |
+| SEED | 227 | 0.063 | 0.004 | +0.059 | +0.95 | −0.181 |
+| BCI-2b | 9 | 0.104 | 0.130 | −0.017 | −0.16 | −0.020 |
+| BCI-2a | 20 | 0.120 | 0.053 | +0.067 | +0.17 | −0.024 |
+| NER2015 | 4 | 0.213 | 0.329 | −0.096 | −0.39 | 0.000 |
+
+![Figure 7](figs/fig_trend.png)
+**Fig. 7.** (a) Excess trend ΔR² against the correction loss, one point per subject, datasets in different colours; (b) the grasp-and-lift subjects alone.
+
+Across the twelve grasp-and-lift subjects the association is rho = +0.776 (p = 0.003); it survives using only the four equal-length blocks (rho = 0.706) and leaving out any single subject (0.727 to 0.864). Within the other datasets it is weaker and not significant (SEED 0.364, BCI-2b 0.200, BCI-2a 0.450, NER2015 −0.035), and when the three largest are pooled with the dataset means removed the association is rho = +0.432 [+0.163, +0.634] over 36 subjects. The strong number is therefore the within-dataset one, and it is a statement about grasp-and-lift, not a law about EEG.
+
+Three limits belong with it. The permutation null is iid, so it destroys the temporal correlation that the block means actually carry (lag-1 is 0.65 on grasp-and-lift and 0.95 on SEED); ΔR² therefore measures order dependence, not specifically a linear drift, and a block-bootstrap null would be more conservative. Five blocks give the R² a coarse resolution, which is why the inference is at the subject level and not per cell. And the association is an association: the trend covaries with the loss, it does not identify what produced the trend.
+
 ## 5. The verification procedure
 
 The results reduce to a procedure with three measurements, one correction and one test.
@@ -503,9 +608,11 @@ Euclidean and Riemannian alignment [5-8] act on second-order structure, and the 
 
 The two centrings are different operations. The two-sided form is invariant to the coordinate origin, the invariant family is wider than the sample mean, and two corrections leave every score difference unchanged exactly when their projections onto the centred weights agree. The failure of the one-sided form is a threshold displacement; its sign is set by the threshold error the training session already carries, and across five development datasets the resulting damage ranges from nothing on time-domain contrast features to a collapse to chance on log-power and differential-entropy features with a large free origin; a sixth dataset, held out, behaves as the family it belongs to.
 
-What the comparison adds to a textbook statement is a measured boundary and a rule. The correction is exact for its own component, it composes with second-order alignment, and it can be transported to the decision space of a frozen model; it restores neither the observed cross-protocol difference nor a calibration that the wrong convention destroyed. The rule follows from what the comparison shows: no fixed memory is safe, because a window loses on block structure and a cumulative mean loses on within-session drift, so the estimator that is safe on both is the one whose memory is set by its own scatter — the mean of the blocks already seen, weighted by the share of it that is signal rather than block-to-block noise. It keeps the gain where the correction is stable, gives it up where the mean drifts, and is the only rule we tested that is non-negative on all five development datasets and positive on the held-out sixth.
+What the comparison adds to a textbook statement is a measured boundary and a map. The correction is exact for its own component, it composes with second-order alignment, and it can be transported to the decision space of a frozen model; it restores neither the observed cross-protocol difference nor a calibration that the wrong convention destroyed.
 
-What remains open is narrow and we state it as such. The held-out dataset belongs to the same emotion paradigm as SEED, so the external validation is within a family; a genuinely independent task would strengthen it, and we did not have one. A source-only statistic computed before the target session exists ranks feature families but does not screen sessions, and four threshold gates failed to decide the question the continuous weight answers by degree. The comparison with an oracle weight (0.01 to 0.05 per dataset) is the measure of what deciding from the stream rather than from labels still costs.
+The map answers the question the data forced on us: why does a correction that tracks the change accurately sometimes make decoding worse? Because the strength that helps is a property of the recording. Sweeping it from zero to one moves grasp-and-lift down by 0.108 and SEED up by 0.214, with every subject of each benchmark on the same side, and no estimator in our comparison changes that ordering — different estimators only pick different points on the same response curve. The temporal structure of the measured displacement covaries with which side a recording is on: a linear ramp explains 0.80 of the variance of the grasp-and-lift block means against 0.25 expected from block order, and the excess correlates with the loss across the twelve subjects (rho = 0.78). That is an association measured on five-block sessions, not an identified cause, and the pooled across-dataset version of it is much weaker (0.43).
+
+What remains open we state plainly. The synthetic regimes reproduce the pattern of the real benchmarks but do not identify which mechanism dominates a given recording; the held-out dataset belongs to the same emotion paradigm as SEED; the comparison with an oracle weight (0.01 to 0.05 per dataset) marks what deciding from the stream rather than from labels still costs; and the weighting rules we compared, including the predictive one, differ far less from each other than the strength they produce differs across recordings. The question we would put to the field is the one the map raises: a correction that tracks the distribution is not the same as a correction that improves decoding, and what separates them is how much of it is applied.
 
 ## CRediT authorship contribution statement
 
@@ -517,7 +624,7 @@ The authors declare that they have no known competing financial interests or per
 
 ## Data availability
 
-BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit ee6e1eebfe), which is the version of record for the code.
+BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit ce4e290260), which is the version of record for the code.
 
 ## Acknowledgements
 
