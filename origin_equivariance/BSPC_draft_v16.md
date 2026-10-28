@@ -26,7 +26,7 @@ The study covers 845 cells from five datasets plus 90 held-out cells from SEED-I
 - Score-difference equivalence follows from the centred classifier weights.
 - Only the origin's projection on the weights damages the decoder, not its norm.
 - A causal running mean matches the batch correction; a frozen prefix fails.
-- Three released framework components take the mean from the training fold.
+- A badly estimated mean can cost more than not correcting at all.
 
 ## 1. Introduction
 
@@ -47,6 +47,8 @@ This paper is a verification study of that choice rather than a proposal for a n
 **What the study covers.** Five public datasets, eleven dataset-by-representation units and 845 cells, chosen to span motor imagery, emotion, error-related potentials and movement, four feature families and three linear classifier families; a sixth dataset, SEED-IV, contributes 90 further cells and is used only as a held-out test of the one source-level statistic the paper defines. The measured quantities are not invented for the occasion: the origin distance of a feature family, the displacement it induces in the decision function, the sign of the resulting change, and the calibration of the resulting probabilities.
 
 **What this paper does not claim.** We do not claim that one-sided centring is frequent. We inspected three released framework components (Section 4.11) and all three take their reference from the training fold or from a causal running mean, so none of them can exhibit the failure; we put no number on the frequency of the mistake in custom code, and the paper is written as an invariance verification rather than as a prevalence study. We do not claim that two-sided centring is optimal; Section 4.5 exhibits the settings in which it is not. We do not claim that the source-only statistic is a screening instrument; its held-out operating point has zero specificity and we say so in the abstract. We do not claim that the Gaussian model is a quantitative law; it is a mechanism with a measured range of validity.
+
+**The operation is in current use.** A recent controlled benchmark makes the question concrete rather than academic: Rahimipour and Van Hulle [20] compare a tangent-space pipeline with unsupervised test-time recentering against deep sequence models on eight public motor-imagery datasets and conclude that the recentering, not the architecture, carries the cross-session advantage — the pipeline beats its recentering-free twin only across sessions, and is indistinguishable from it within a session. Their recentering is computed at test time, i.e. transductively, which is precisely the protocol whose causal counterpart we measure in Section 4.2. If the correction is the operative ingredient, then which correction it is, and whether it survives being computed online, are the questions worth answering.
 
 **Relation to prior work.** Apicella et al. [4] compared normalisation schemes with domain-adaptation methods on three EEG datasets and found that an appropriate normalisation often outperforms the adaptation algorithm; our results are compatible and add a criterion, the invariance of the output to the coordinate origin. The nearest formal relatives are the Euclidean and Riemannian alignment families [5-8], which act on second-order structure; an alignment matrix that is a multiple of the identity performs no alignment, so the first-order correction audited here is not a special case of the second-order one, although the two compose (Section 4.6). Methods that remove session-specific directions [9,10] estimate a subspace in which the sessions agree rather than relocating a boundary by a constant. Calibrating a classifier to a new session by re-estimating an intercept from a few labelled trials [1,2] is the procedure onto which our analysis of label use maps; on four of five datasets it changes nothing relative to the label-free form, and on the fifth it gains 0.013 (Section 4.6).
 
@@ -255,9 +257,9 @@ The two directions give the same z_T to within one unit in the second decimal, a
 ### 4.4 A source-level statistic, and its boundaries
 
 ![Figure 3](figs/fig2.png)
-**Fig. 3.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, one point per dataset-by-representation unit, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells.
+**Fig. 3.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, one point per dataset-by-representation unit, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells. The four `euc_ea` and `tan` units are target-informed (Section 3); the source-only correlations quoted in the text are computed without them.
 
-**Table 6.**  The source-only statistic at the level of dataset-by-representation units, medians within a unit. z_T = ‖μ_A‖/‖sd_A‖; z_w is Equation (2) with the scale taken from the centred scores; penalty = zero − none; gain = mean − none. Sorted by z_w.
+**Table 6.**  The source-only statistic at the level of dataset-by-representation units, medians within a unit. z_T = ‖μ_A‖/‖sd_A‖; z_w is Equation (2) with the scale taken from the centred scores; penalty = zero − none; gain = mean − none. † uses both sessions' covariances, so the classifier has seen the target; the source-only correlations are computed without these four rows. Sorted by z_w.
 
 | dataset | representation | n | z_T | z_w | penalty | gain |
 |---|---|---|---|---|---|---|
@@ -265,11 +267,11 @@ The two directions give the same z_T to within one unit in the second decimal, a
 | NER2015 | time mean | 320 | 0.20 | 0.230 | 0.000 | 0.000 |
 | grasp-and-lift | log power | 336 | 0.25 | 0.289 | −0.015 | 0.000 |
 | BCI-2a | csp | 9 | 0.40 | 0.287 | +0.024 | +0.059 |
-| BCI-2a | tan | 9 | 0.37 | 0.309 | +0.014 | +0.031 |
-| BCI-2a | euc_ea | 9 | 0.64 | 0.597 | −0.014 | +0.059 |
+| BCI-2a | tan † | 9 | 0.37 | 0.309 | +0.014 | +0.031 |
+| BCI-2a | euc_ea † | 9 | 0.64 | 0.597 | −0.014 | +0.059 |
 | BCI-2a | euc | 9 | 7.87 | 4.399 | −0.184 | +0.017 |
-| BCI-2b | tan | 27 | 21.2 | 5.117 | −0.160 | +0.020 |
-| BCI-2b | euc_ea | 27 | 14.2 | 5.405 | −0.137 | +0.018 |
+| BCI-2b | tan † | 27 | 21.2 | 5.117 | −0.160 | +0.020 |
+| BCI-2b | euc_ea † | 27 | 14.2 | 5.405 | −0.137 | +0.018 |
 | SEED | differential entropy | 45 | 34.2 | 12.36 | −0.029 | +0.211 |
 | BCI-2b | euc | 27 | 57.1 | 23.31 | −0.186 | +0.021 |
 
@@ -431,6 +433,8 @@ The electrical reading should not be pushed far. An amplifier gain change and a 
 
 ### 6.3 Relation to alignment methods
 
+A recent benchmark attributes the cross-session advantage of a tangent-space pipeline to its test-time recentering [20]. Our results accept the mechanism and qualify its availability: the recentering in that pipeline is transductive, and Section 4.2 shows that a causal version reproduces the gain from the fifth trial on BCI-2b and BCI-2a, only approaches it on SEED as the window grows, and on grasp-and-lift falls below not correcting at all. The mechanism is real; whether a deployment can have it is a separate question with a measured answer.
+
 Euclidean and Riemannian alignment [5-8] act on second-order structure, and the Riemannian Gaussian–Laplace framework of [16] is a recent example of the same programme. An alignment matrix that is a multiple of the identity performs no alignment, so the first-order correction is not a special case of the second-order one, and Section 4.6 shows that the two compose in all four BCI representations. Where the two intersect is the label-shift problem of Section 2.4: aligning a covariance implicitly assumes that the class mixture is unchanged, and re-weighting the classes changes the average covariance in a way that alignment cannot distinguish from a change of state. Under the label-shift assumption the prior is estimable [12]; without it the same ambiguity applies to both families.
 
 ### 6.4 Limitations
@@ -507,11 +511,13 @@ This research did not receive any specific grant from funding agencies in the pu
 
 [19] W.-L. Zheng, W. Liu, Y. Lu, B.-L. Lu, A. Cichocki, EmotionMeter: a multimodal framework for recognizing human emotions, IEEE Trans. Cybern. 49 (2019) 1110–1122.
 
+[20] M. Rahimipour, M. M. Van Hulle, Simple geometric recentering rivals deep sequence models for cross-session EEG motor-imagery decoding, bioRxiv (2026) 2026.07.07.736991, version 1, posted 11 July 2026, accessed 28 October 2026. https://doi.org/10.64898/2026.07.07.736991
+
 ## Figure captions
 
 **Fig. 1.** (a) Change in balanced accuracy of the one-sided pipeline as a function of z_T, one curve per dataset; (b) the fraction of cells that land on exactly 1/K; (c) the largest change of the two equivariant pipelines over the whole sweep.
 
-**Fig. 2.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells.
+**Fig. 2.** (a) Unit medians of the source-only statistic against the penalty of the one-sided pipeline, with the held-out SEED-IV point shown as a star; (b) the same relation over the development cells. The four `euc_ea` and `tan` units are target-informed (Section 3); the source-only correlations quoted in the text are computed without them.
 
 **Fig. 3.** (a) Balanced accuracy of the three pipelines by dataset; (b) the gain of the two-sided over the uncorrected pipeline, one point per subject.
 
