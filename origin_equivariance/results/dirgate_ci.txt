@@ -1,0 +1,28 @@
+v25b: direction gate, subject-level paired differences against none
+  2b    ( 9 subjects)
+    dirgate  +0.0127  95% CI [+0.0001, +0.0257]  better
+    shrunk   +0.0264  95% CI [+0.0121, +0.0414]  better
+    cum      +0.0354  95% CI [+0.0172, +0.0536]  better
+  2a    ( 9 subjects)
+    dirgate  +0.0364  95% CI [+0.0209, +0.0537]  better
+    shrunk   +0.0403  95% CI [+0.0250, +0.0574]  better
+    cum      +0.0436  95% CI [+0.0247, +0.0642]  better
+  seed  (15 subjects)
+    dirgate  +0.1877  95% CI [+0.1515, +0.2267]  better
+    shrunk   +0.2246  95% CI [+0.1780, +0.2719]  better
+    cum      +0.2183  95% CI [+0.1700, +0.2651]  better
+  gal   (12 subjects)
+    dirgate  +0.0000  95% CI [+0.0000, +0.0000]  tie
+    shrunk   -0.0239  95% CI [-0.0313, -0.0155]  worse
+    cum      -0.1145  95% CI [-0.1382, -0.0908]  worse
+  ner   (16 subjects)
+    dirgate  +0.0003  95% CI [-0.0003, +0.0010]  tie
+    shrunk   -0.0011  95% CI [-0.0036, +0.0015]  tie
+    cum      -0.0038  95% CI [-0.0087, +0.0012]  tie
+
+  SEED-IV held out (90 cells, 15 subjects)
+    dirgate  +0.1775  95% CI [+0.1335, +0.2249]  better
+    shrunk   +0.1637  95% CI [+0.1278, +0.2010]  better
+    cum      +0.1886  95% CI [+0.1443, +0.2355]  better
+    oracle   +0.2290  95% CI [+0.1904, +0.2687]  better
+    mean kappa 0.92
