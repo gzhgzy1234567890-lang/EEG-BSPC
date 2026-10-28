@@ -1,0 +1,16 @@
+v22 A: the real session shift, decomposed (LDA)
+  score shift = ||P W d||, null part = ||d - W^+ W d||, d = mu_B - mu_A
+
+  score-space shift  vs penalty: rho +0.030 (n=845)   vs gain: rho +0.219
+  null part          vs penalty: rho +0.077 (n=845)   vs gain: rho -0.299
+
+  within-dataset correlations (median over the five):
+    score-space shift: [ 0.351  0.075  0.589  0.038 -0.041]
+    null part:         [ 0.008 -0.519  0.156 -0.011  0.19 ]
+
+v22 B: Holm across the five per-dataset Wilcoxon tests of mean - none
+  seed  raw 6.10e-05  Holm 0.000
+  2a    raw 3.90e-03  Holm 0.016
+  2b    raw 3.90e-03  Holm 0.016
+  gal   raw 5.20e-02  Holm 0.104
+  ner   raw 3.20e-01  Holm 0.320
