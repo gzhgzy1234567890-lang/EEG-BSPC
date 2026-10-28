@@ -465,7 +465,7 @@ The authors declare that they have no known competing financial interests or per
 
 ## Data availability
 
-BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit a532f1d7c6), which is the version of record for the code.
+BCI Competition IV datasets 2a and 2b are available from the competition organisers. SEED and SEED-IV are available from the BCMI Laboratory, Shanghai Jiao Tong University, on request for academic use; the present study used the differential-entropy features distributed with those releases, unmodified. NER2015 and grasp-and-lift are Kaggle competition datasets and are publicly available. The analysis code, the feature-cache schema and the plain-text output of every number reported in this paper are archived at https://github.com/gzhgzy1234567890-lang/EEG-BSPC/tree/main/origin_equivariance (analysis commit 9c32dcfd1e), which is the version of record for the code.
 
 ## Acknowledgements
 
