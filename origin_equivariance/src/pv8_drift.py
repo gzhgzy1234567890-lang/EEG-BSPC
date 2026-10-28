@@ -44,8 +44,11 @@ def main():
             d = Bt.mean(0) - A.mean(0)
             s = W @ d
             s = s - s.mean()
-            Wp = np.linalg.pinv(W)
-            d_null = d - Wp @ (W @ d)
+            P = np.eye(K) - np.ones((K, K)) / K
+            A = P @ W
+            Ap = np.linalg.pinv(A)
+            d_par = Ap @ (A @ d)
+            d_null = d - d_par
             pen = (C.ba(yb, classes[np.argmax(C.score_matrix(clf, Bt - Bt.mean(0)), 1)])
                    - C.ba(yb, classes[np.argmax(C.score_matrix(clf, Bt), 1)]))
             gain = (C.ba(yb, classes[np.argmax(C.score_matrix(clf, Bt - (Bt.mean(0) - A.mean(0))), 1)])
