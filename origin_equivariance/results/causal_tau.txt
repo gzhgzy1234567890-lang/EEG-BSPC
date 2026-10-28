@@ -1,0 +1,6 @@
+tau sensitivity of Equation (9); paired difference against none
+  2b    tau=20 +0.0313   tau=50 +0.0264   tau=200 +0.0119
+  2a    tau=20 +0.0440   tau=50 +0.0403   tau=200 +0.0282
+  seed  tau=20 +0.2249   tau=50 +0.2246   tau=200 +0.1984
+  gal   tau=20 -0.0515   tau=50 -0.0239   tau=200 -0.0059
+  ner   tau=20 -0.0027   tau=50 -0.0011   tau=200 -0.0006
