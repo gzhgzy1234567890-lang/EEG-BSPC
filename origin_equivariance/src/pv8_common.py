@@ -24,13 +24,12 @@ from sklearn.svm import LinearSVC
 from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold
 from scipy.stats import norm
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-BASE = os.environ.get("BSPC_OUT", os.path.dirname(HERE))
-if HERE not in sys.path:
-    sys.path.insert(0, HERE)
+D = r"G:\Work_work\math\EEG\local_analysis"
+if D not in sys.path:
+    sys.path.insert(0, D)
 import bspc_feat as B  # noqa: E402
 
-OUT = os.path.join(BASE, "results")
+OUT = r"G:\Work_work\math\EEG\paper_v8\results"
 if not os.path.isdir(OUT):
     os.makedirs(OUT)
 
