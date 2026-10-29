@@ -33,7 +33,7 @@ LBL = {"2a": "BCI-2a", "2b": "BCI-2b", "seed": "SEED", "ner": "NER2015",
 plt.rcParams.update({"font.size": 8, "axes.labelsize": 8, "axes.titlesize": 8,
                      "legend.fontsize": 7, "xtick.labelsize": 7, "ytick.labelsize": 7,
                      "axes.spines.top": False, "axes.spines.right": False,
-                     "figure.dpi": 200, "savefig.bbox": "tight"})
+                     "figure.dpi": 200, "savefig.dpi": 300, "savefig.bbox": "tight"})
 
 
 def load_sweep():
