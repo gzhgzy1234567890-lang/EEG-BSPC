@@ -1,0 +1,12 @@
+v43: temporal structure of the real block-mean displacement, m=15
+  trend = Theil-Sen slope x B / mean||d||   jump = median|d_{b+1}-d_b|/mean||d||
+
+  ds     cells  trend    jump     scatter  R2       blocks  
+  gal    336    3.176    0.619    0.731    0.800    5.0     
+  seed   45     0.349    0.048    0.229    0.063    227.0   
+  2b     54     0.657    0.603    0.526    0.104    9.0     
+  2a     18     0.965    0.802    0.375    0.120    20.0    
+  ner    320    1.447    1.204    0.707    0.213    4.0     
+
+  Spearman over all cells: trend vs jump
+    rho(trend, jump) = -0.064 over 773 cells
