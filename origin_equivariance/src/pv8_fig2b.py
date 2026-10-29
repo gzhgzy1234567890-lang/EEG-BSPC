@@ -79,32 +79,27 @@ def main():
     pen = np.array([r[3] for r in rows])
     np.savez(OUT, ds=ds, rep=rep, zw=z, pen=pen)
     dev = ds != "seed4"
-    fig, ax = plt.subplots(1, 2, figsize=(6.4, 2.5))
+    fig, ax = plt.subplots(1, 2, figsize=(7.2, 2.9))
     for u in sorted(set(zip(ds[dev], rep[dev]))):
         m = (ds == u[0]) & (rep == u[1])
         ax[0].scatter(np.median(z[m]), np.median(pen[m]), s=np.sqrt(m.sum()) * 6 + 8,
                       color="#888888", edgecolor="k", lw=0.3)
     m4 = ds == "seed4"
-    ax[0].scatter(np.median(z[m4]), np.median(pen[m4]), s=150, marker="*",
-                  color="#c0392b", edgecolor="k", lw=0.4,
-                  label="SEED-IV (held out)", zorder=5)
     ax[0].axhline(0, color="k", lw=0.5, ls=":")
     ax[0].set_xscale("log")
     ax[0].set_xlabel(r"source-only statistic $z_w$")
     ax[0].set_ylabel("penalty of the one-sided pipeline")
-    ax[0].set_title("(a) unit medians, held-out star", loc="left")
+    ax[0].set_title("(a) dataset-representation units", loc="left")
     ax[0].legend(frameon=False, loc="upper right")
     ax[1].scatter(np.log10(np.maximum(z[dev], 1e-2)), pen[dev], s=3,
                   color="#888888", alpha=0.5)
-    ax[1].scatter(np.log10(np.maximum(z[m4], 1e-2)), pen[m4], s=6, marker="*",
-                  color="#c0392b", alpha=0.8)
     ax[1].axhline(0, color="k", lw=0.5, ls=":")
     ax[1].set_xlabel(r"$\log_{10} z_w$")
     ax[1].set_ylabel("penalty")
     ax[1].set_title("(b) every cell", loc="left")
     fig.tight_layout()
     for ext in ("pdf", "png"):
-        fig.savefig(os.path.join(HERE, "figs", "fig2.%s" % ext))
+        fig.savefig(os.path.join(HERE, "figs", "fig2.%s" % ext), dpi=300)
     print("fig2 redone; dev cells", int(dev.sum()), "held out", int(m4.sum()))
 
 
