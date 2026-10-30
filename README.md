@@ -166,6 +166,29 @@ figures/                   Figure 1 and Figure 2 as submitted
 
 ---
 
+## Independent replication: sleep-EDF
+
+`sleep_edf/` contains the replication reported in Section 4.7 of the paper. It took no part in the
+development of the analysis, and its protocol was frozen before the run.
+
+| File | Content |
+|---|---|
+| `sleep_edf_test.py` | one night -> consecutive 30-min series -> cells; features, LDA, causal correction |
+| `sleep_edf_run.py` | runs every night, aggregates at the subject level, bootstrap and sign test |
+| `gal_composition_confound.py` | the label-level composition audit of grasp-and-lift (Section 4.6) |
+| `results/sleep_edf_cells.json` | 5,537 cells: 45 recordings, 32 subjects, mean difference -0.1084 |
+
+Data: the public sleep-EDF cassette, read from `E:\data\sleep-edf\sleep-cassette` (set `S.ROOT` to your
+copy). No raw data are shipped.
+
+The unit of inference is the **subject**: the files are named `SC4<subject><recording>E0-PSG.edf`, so the
+subject is the first five characters and the sixth is the recording index. With that key, 45 recordings
+collapse to 32 subjects, 13 of which contribute two recordings; the mean difference is -0.1084 (bootstrap
+[-0.121, -0.096]), negative in 32 of 32 subjects (sign test p = 4.7e-10), and the recording-level result is
+-0.109, negative in 45 of 45 (p = 5.7e-14).
+
+---
+
 ## License
 
 MIT. See `LICENSE`.
