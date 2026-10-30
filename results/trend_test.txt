@@ -1,0 +1,28 @@
+gal   cells=336  median B=5    R2 0.800  null 0.255  dR2 0.528  lag1 +0.65  loss +0.1022
+seed  cells=45   median B=227  R2 0.063  null 0.004  dR2 0.059  lag1 +0.95  loss -0.1810
+2b    cells=54   median B=9    R2 0.104  null 0.130  dR2 -0.017  lag1 -0.16  loss -0.0198
+2a    cells=18   median B=20   R2 0.120  null 0.053  dR2 0.067  lag1 +0.17  loss -0.0243
+ner   cells=320  median B=4    R2 0.213  null 0.329  dR2 -0.096  lag1 -0.39  loss +0.0000
+
+subject-level association between excess trend and correction loss
+  gal   12 subjects  rho(dR2, loss) +0.776  p=0.003
+  seed  15 subjects  rho(dR2, loss) +0.364  p=0.182
+  2b     9 subjects  rho(dR2, loss) +0.200  p=0.606
+  2a     9 subjects  rho(dR2, loss) +0.450  p=0.224
+  ner   16 subjects  rho(dR2, loss) -0.035  p=0.899
+
+gal per subject: median R2, null, dR2, loss
+  subj1 R2 0.848  null 0.252  dR2 +0.584  loss +0.132  (B=5)
+  subj10 R2 0.865  null 0.258  dR2 +0.610  loss +0.142  (B=5)
+  subj11 R2 0.819  null 0.254  dR2 +0.559  loss +0.083  (B=5)
+  subj12 R2 0.762  null 0.254  dR2 +0.492  loss +0.170  (B=5)
+  subj2 R2 0.744  null 0.248  dR2 +0.487  loss +0.040  (B=5)
+  subj3 R2 0.831  null 0.254  dR2 +0.533  loss +0.088  (B=5)
+  subj4 R2 0.844  null 0.257  dR2 +0.590  loss +0.177  (B=5)
+  subj5 R2 0.711  null 0.257  dR2 +0.446  loss +0.041  (B=5)
+  subj6 R2 0.779  null 0.258  dR2 +0.491  loss +0.084  (B=5)
+  subj7 R2 0.683  null 0.253  dR2 +0.426  loss +0.061  (B=5)
+  subj8 R2 0.783  null 0.254  dR2 +0.514  loss +0.131  (B=5)
+  subj9 R2 0.747  null 0.251  dR2 +0.473  loss +0.080  (B=5)
+
+pooled gal+seed+2b, clustered by subject: rho +0.788  95% CI [+0.517, +0.910]  (27 subjects)

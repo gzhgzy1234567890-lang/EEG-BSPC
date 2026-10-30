@@ -1,193 +1,73 @@
-# Align, don't zero
+# EEG-BSPC — code, features and result files
 
-Code and results for
+This repository holds the analysis code and the result files for the two manuscripts below. The second
+(alignment) paper's pipeline is kept because the first paper reuses its feature caches and comparison
+tables; the first is the current submission.
 
-> **Align, don't zero: consistent feature centring for cross-session EEG decoding**
+**Current submission (BSPC):**
 
-This repository contains the analysis pipeline, the independent re-implementation used for
-reproduction, the feature builder for BCI-IV-2b, and the raw text output of every number
-reported in the paper.
+> When online mean correction harms EEG decoding: a reproducible negative transfer within recording
+> series, and where it helps instead
 
----
+**Earlier paper (alignment):**
 
-## What the paper claims, and where each claim is computed
-
-| Claim | Where |
-|---|---|
-| The two centring conventions differ in score by exactly `wᵀμ_T` | `src/paper_numbers.py` (Eq. 4 is algebra) |
-| Centring on zero collapses 3 of 4 feature sets of BCI-IV-2b to chance | `src/paper_numbers.py` |
-| Aligning improves balanced accuracy in 9/9 subjects on both datasets | `src/paper_numbers.py` |
-| `z_pool` orders the damage across eight representations | `src/paper_numbers.py` |
-| The intervention leaves the other conditions exactly unchanged (576/576) | `src/paper_numbers.py` |
-| Alignment is non-inferior to the within-session reference on 2b, not on 2a | `src/paper_numbers.py` |
-| The residual is concentrated in protocol-crossing pairs | `src/paper_numbers.py` |
-| All of the above reproduce under an independent implementation, four seeds | `src/reproduce.py` |
-
-`src/reproduce.py` shares no feature-extraction or evaluation code with `src/paper_numbers.py`
-on purpose. It re-derives log band power, Euclidean-aligned log power, tangent-space features,
-CSP log variance and balanced accuracy from scratch, and re-runs six pre-registered claims under
-four random seeds. Two claims are included as *directional* checks: the discriminant-projection
-descriptor `z_disc` is expected **not** to outperform `z_pool` (it does not, rho = +0.50 against
--0.90), and no mediation is claimed.
+> Align, don't zero: consistent feature centring for cross-session EEG decoding
 
 ---
 
-## A note on a bug that this repository previously contained
+## Where each claim of the current paper comes from
 
-An early version of both `paper_numbers.py` and `reproduce.py` estimated `tr(Σ)` as
-
-```python
-np.mean(dd ** 2) * h / 4.0        # WRONG: averages over features instead of summing
-```
-
-which underestimates `tr(Σ)` by a factor of `2D` — a factor of 176 at `D = 88`. Because the same
-expression appeared in both files, the fact that four random seeds agreed did not detect it. A
-Monte Carlo with a known covariance confirms the ratio `code/true = 1/(2D)` to three digits; the
-correct estimator is
-
-```python
-np.sum(dd ** 2) * h / 2.0         # E[sum_j dd_j^2] = 2 tr(Σ) / h
-```
-
-The correction reverses the conclusion of the paper's former Section 6 on shrinkage: with an
-unbiased noise estimate the excess energy is small enough that full subtraction beats every
-shrunken weighting, and that section has been removed. If you are re-using the shrinkage code
-from an earlier version, do not.
-
-A second bug affected the CSP representation: with 3 channels and `m = 3`,
-`idx[:m]` and `idx[-m:]` select the same three eigenvectors, so the "6-dimensional" CSP feature of
-the 3-channel dataset was three filters each counted twice. The fix caps the number of filters at
-`ch // 2`.
-
----
-
-## Data
-
-Both datasets are public and are **not** included here.
-
-**BCI Competition IV 2a** — nine subjects, four motor-imagery classes, 22 EEG channels.
-Download `A01T.mat` … `A09T.mat` and `A01E.mat` … `A09E.mat` from
-<https://www.bbci.de/competition/iv/#dataset1> into one directory:
-
-```
-$BSPC_DATA/BCICIV-2a-mat/A01T.mat
-$BSPC_DATA/BCICIV-2a-mat/A01E.mat
-...
-```
-
-**BCI Competition IV 2b** — nine subjects, two motor-imagery classes, three bipolar channels.
-Download the 45 `.gdf` files (`B0101T.gdf` … `B0905E.gdf`) from
-<https://www.bbci.de/competition/iv/#dataset2>:
-
-```
-$BSPC_DATA/BCICIV-2b/B0101T.gdf
-...
-```
-
-### Session structure of 2b, read from the files
-
-The event codes matter and are worth stating, because the dataset is often described as having
-"three screening sessions". It does not:
-
-| Session | Trials | Labels (769/770) | Feedback marker 781 |
-|---|---|---|---|
-| 01T | 120 | 60 / 60 | 0 |
-| 02T | 120 | 60 / 60 | 0 |
-| **03T** | **160** | **80 / 80** | **160** |
-| 04E, 05E | 160 | withheld | 160 |
-
-So 01T and 02T are screening sessions, **03T is a feedback session**, and only 04E/05E lack
-labels. Of the 27 ordered cross-day pairs, nine (01T→02T) differ only in recording date and
-eighteen (01T→03T, 02T→03T) also cross the introduction of feedback. The paper reports them
-separately; the residual against the within-session reference is +0.009 for the first group and
--0.028 for the second.
-
----
-
-## Running it
-
-Python 3.7 was used; nothing newer is required.
-
-```
-numpy==1.21.6  scipy==1.7.3  scikit-learn==1.0.2  matplotlib==3.5.3  mne==1.3.1
-```
-
-`mne` is needed only to read the GDF headers in the optional Step 1.
-
-**Step 0 — point the scripts at your data.** Three optional environment variables:
-
-| Variable | Default | Meaning |
+| claim | code | output |
 |---|---|---|
-| `BSPC_DATA` | `E:\data` | directory containing `BCICIV-2a-mat/` and `BCICIV-2b/` |
-| `BSPC_CACHE` | `<repo>/features/cache_2b` | where the 2b feature cache lives |
-| `BSPC_OUT` | `<repo>/results` | where outputs are written |
+| transductive table, five development benchmarks | `origin_equivariance/src/pv8_final.py`, `pv8_master.py` | `results/master_stats.md` |
+| causal estimator comparison on a common test set | `origin_equivariance/src/pv8_final_compare.py`, `pv8_causal.py` | `results/final_compare.txt` |
+| variance-ratio weighting (Eq. 9) and its ablation | `pv8_lambda_control.py`, `pv8_final_compare.py` | `results/final_compare.txt` |
+| correction-strength and estimator surface (Tables 9-10) | `pv8_master.py` | `results/master_stats.md` |
+| trend diagnostic (Table 11, Fig. 5) | `pv8_trend_test.py` | `results/trend_test.txt` |
+| external cross-day cohort (Lee2019-MI) | `openbmi/lee2019_direct.py`, `lee2019_parallel.py`, `lee2019_secondary.py`, `lee2019_sensitivity.py`, `lee2019_variantC.py` | `results/openbmi_all.json`, `lee2019_sensitivity.json`, `lee2019_variantC.json` |
+| protocol-consistent sleep-EDF replication | `sleep_edf/sleep_edf_frozen.py` | `sleep_edf/results/sleep_edf_frozen_cells.json` |
+| first sleep-EDF implementation, superseded (kept for the deviation record) | `sleep_edf/sleep_edf_test.py`, `sleep_edf_run.py` | `sleep_edf/results/sleep_edf_cells.json` |
+| grasp-and-lift composition audit | `sleep_edf/gal_composition_confound.py` | text in `sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md` |
 
-**Step 1 — the 2b feature cache is already here.** `features/cache_2b/` contains the 27
-session-level `.npz` files (26 MB) that Step 2 reads, so you can skip this step. To rebuild them:
+The frozen protocol and its deviation record are in `sleep_edf/INDEPENDENT_TEST_PROTOCOL.md` and
+`sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md`. The latter lists every difference between the frozen text
+and the executed analysis, together with both result sets.
 
-```bash
-python src/make_features_2b.py
-```
+## Data (public; not included)
 
-**Step 2 — compute every number in the paper:**
+| dataset | where | layout expected |
+|---|---|---|
+| BCI Competition IV 2a | <https://www.bbci.de/competition/iv/#dataset1> | `$BSPC_DATA/BCICIV-2a-mat/A0?T.mat`, `A0?E.mat` |
+| BCI Competition IV 2b | <https://www.bbci.de/competition/iv/#dataset2> | `$BSPC_DATA/BCICIV-2b/B0?0?T.gdf`, `B0?0?E.gdf` |
+| Lee2019-MI (OpenBMI) | GigaDB, `pub/10.5524/100001_101000/100542` | `D:\data\mne_data\...\session{1,2}\s{N}\sess0{1,2}_subj{N:02d}_EEG_MI.mat` |
+| sleep-EDF cassette | PhysioNet, `sleep-cassette` | `E:\data\sleep-edf\sleep-cassette\*PSG.edf` + `*EC-Hypnogram.edf` |
 
-```bash
-python src/paper_numbers.py          # ~1 min
-```
+`BSPC_DATA` defaults to `E:\data`. The paths in the Lee2019 and sleep-EDF scripts are absolute and must
+be pointed at your copies.
 
-**Step 3 — reproduce independently:**
+## Environment
 
-```bash
-python src/reproduce.py              # ~2 min, four seeds
-```
+Python 3.7, numpy 1.21.6, scipy 1.7.3, scikit-learn 0.23.2, mne 0.23.4, matplotlib 3.5.3.
 
-**Step 4 — regenerate both figures:**
-
-```bash
-python src/make_figures.py
-```
-
-All scripts write plain text; nothing is hidden behind a plotting call. Compare your output
-against `results/`.
-
----
-
-## Repository layout
+## Running
 
 ```
-src/paper_numbers.py       main pipeline: features, tables, figures, all reported numbers
-src/reproduce.py           independent re-implementation + six pre-registered claims
-src/make_features_2b.py    GDF -> feature cache
-src/make_figures.py        figure assembly
-features/cache_2b/         27 session-level .npz files for BCI-IV-2b
-results/                   raw text output, one file per script
-figures/                   Figure 1 and Figure 2 as submitted
+python src/paper_numbers.py       # alignment paper: every reported number
+python src/reproduce.py           # alignment paper: independent re-implementation
+python openbmi/lee2019_parallel.py    # external cohort, downloads what is missing
+python openbmi/lee2019_secondary.py   # estimator x strength surface
+python sleep_edf/sleep_edf_frozen.py  # protocol-consistent replication (~4 min)
 ```
 
----
+## A record of defects, kept deliberately
 
-## Independent replication: sleep-EDF
-
-`sleep_edf/` contains the replication reported in Section 4.7 of the paper. It took no part in the
-development of the analysis, and its protocol was frozen before the run.
-
-| File | Content |
-|---|---|
-| `sleep_edf_test.py` | one night -> consecutive 30-min series -> cells; features, LDA, causal correction |
-| `sleep_edf_run.py` | runs every night, aggregates at the subject level, bootstrap and sign test |
-| `gal_composition_confound.py` | the label-level composition audit of grasp-and-lift (Section 4.6) |
-| `results/sleep_edf_cells.json` | 5,537 cells: 45 recordings, 32 subjects, mean difference -0.1084 |
-
-Data: the public sleep-EDF cassette, read from `E:\data\sleep-edf\sleep-cassette` (set `S.ROOT` to your
-copy). No raw data are shipped.
-
-The unit of inference is the **subject**: the files are named `SC4<subject><recording>E0-PSG.edf`, so the
-subject is the first five characters and the sixth is the recording index. With that key, 45 recordings
-collapse to 32 subjects, 13 of which contribute two recordings; the mean difference is -0.1084 (bootstrap
-[-0.121, -0.096]), negative in 32 of 32 subjects (sign test p = 4.7e-10), and the recording-level result is
--0.109, negative in 45 of 45 (p = 5.7e-14).
-
----
+- The alignment pipeline once estimated `tr(Sigma)` as `mean(dd**2) * h / 4`, which is wrong by a factor
+  `2D`; the correct form is `sum(dd**2) * h / 2`. A section of the alignment paper was withdrawn because of
+  it. See the alignment paper's notes.
+- `lee2019_secondary.py` counted a subject as negative against the group mean instead of the subject's own
+  baseline; fixed in commit `e05e3af`.
+- The first sleep-EDF aggregation keyed subjects on four characters instead of five; fixed, and the
+  corrected aggregation reproduces the reported numbers. Both runs are in `sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md`.
 
 ## License
 

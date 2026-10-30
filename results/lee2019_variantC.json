@@ -1,0 +1,220 @@
+{
+ "rows": [
+  {
+   "subject": 1,
+   "C_dev_pipeline": 0.014673311184939086
+  },
+  {
+   "subject": 2,
+   "C_dev_pipeline": 0.006367663344407526
+  },
+  {
+   "subject": 3,
+   "C_dev_pipeline": 0.03737541528239208
+  },
+  {
+   "subject": 4,
+   "C_dev_pipeline": 0.019102990033222578
+  },
+  {
+   "subject": 5,
+   "C_dev_pipeline": -0.07475083056478404
+  },
+  {
+   "subject": 6,
+   "C_dev_pipeline": -0.022148394241417513
+  },
+  {
+   "subject": 7,
+   "C_dev_pipeline": 0.022978959025470702
+  },
+  {
+   "subject": 8,
+   "C_dev_pipeline": 0.026024363233665526
+  },
+  {
+   "subject": 9,
+   "C_dev_pipeline": -0.013012181616832819
+  },
+  {
+   "subject": 10,
+   "C_dev_pipeline": -0.026301218161683404
+  },
+  {
+   "subject": 11,
+   "C_dev_pipeline": 0.026854928017718716
+  },
+  {
+   "subject": 12,
+   "C_dev_pipeline": -0.058693244739756345
+  },
+  {
+   "subject": 13,
+   "C_dev_pipeline": 0.0852713178294573
+  },
+  {
+   "subject": 14,
+   "C_dev_pipeline": 0.0005537098560354226
+  },
+  {
+   "subject": 15,
+   "C_dev_pipeline": 0.041251384274640035
+  },
+  {
+   "subject": 16,
+   "C_dev_pipeline": 0.0
+  },
+  {
+   "subject": 17,
+   "C_dev_pipeline": -0.032115171650055396
+  },
+  {
+   "subject": 18,
+   "C_dev_pipeline": 0.0379291251384275
+  },
+  {
+   "subject": 19,
+   "C_dev_pipeline": -0.008859357696566983
+  },
+  {
+   "subject": 20,
+   "C_dev_pipeline": 0.07641196013289042
+  },
+  {
+   "subject": 21,
+   "C_dev_pipeline": -0.012735326688815052
+  },
+  {
+   "subject": 22,
+   "C_dev_pipeline": 0.009413067552602405
+  },
+  {
+   "subject": 23,
+   "C_dev_pipeline": -0.0002768549280177668
+  },
+  {
+   "subject": 24,
+   "C_dev_pipeline": 0.03460686600221485
+  },
+  {
+   "subject": 25,
+   "C_dev_pipeline": 0.05398671096345509
+  },
+  {
+   "subject": 26,
+   "C_dev_pipeline": -0.05454042081949062
+  },
+  {
+   "subject": 27,
+   "C_dev_pipeline": -0.046234772978959005
+  },
+  {
+   "subject": 28,
+   "C_dev_pipeline": 0.029900332225913595
+  },
+  {
+   "subject": 29,
+   "C_dev_pipeline": 0.0002768549280177668
+  },
+  {
+   "subject": 30,
+   "C_dev_pipeline": -0.03460686600221485
+  },
+  {
+   "subject": 31,
+   "C_dev_pipeline": -0.011627906976744207
+  },
+  {
+   "subject": 32,
+   "C_dev_pipeline": 0.03709856035437431
+  },
+  {
+   "subject": 33,
+   "C_dev_pipeline": 0.00913621262458475
+  },
+  {
+   "subject": 34,
+   "C_dev_pipeline": -0.04761904761904767
+  },
+  {
+   "subject": 35,
+   "C_dev_pipeline": 0.024640088593577025
+  },
+  {
+   "subject": 36,
+   "C_dev_pipeline": -0.0002768549280177668
+  },
+  {
+   "subject": 37,
+   "C_dev_pipeline": 0.06063122923588038
+  },
+  {
+   "subject": 38,
+   "C_dev_pipeline": 0.00027716186252768615
+  },
+  {
+   "subject": 39,
+   "C_dev_pipeline": -0.023255813953488302
+  },
+  {
+   "subject": 40,
+   "C_dev_pipeline": 0.031561461794019974
+  },
+  {
+   "subject": 41,
+   "C_dev_pipeline": -0.01218161683277974
+  },
+  {
+   "subject": 42,
+   "C_dev_pipeline": 0.014673311184939086
+  },
+  {
+   "subject": 43,
+   "C_dev_pipeline": 0.11018826135105209
+  },
+  {
+   "subject": 44,
+   "C_dev_pipeline": 0.06118493909191591
+  },
+  {
+   "subject": 45,
+   "C_dev_pipeline": 0.034606866002214964
+  },
+  {
+   "subject": 46,
+   "C_dev_pipeline": 0.00027685492801765577
+  },
+  {
+   "subject": 47,
+   "C_dev_pipeline": -0.03848283499446292
+  },
+  {
+   "subject": 48,
+   "C_dev_pipeline": 0.022148394241417457
+  },
+  {
+   "subject": 49,
+   "C_dev_pipeline": 0.08582502768549283
+  },
+  {
+   "subject": 50,
+   "C_dev_pipeline": 0.03239202657807305
+  },
+  {
+   "subject": 51,
+   "C_dev_pipeline": -0.023809523809523836
+  },
+  {
+   "subject": 52,
+   "C_dev_pipeline": 0.022425249169435224
+  },
+  {
+   "subject": 53,
+   "C_dev_pipeline": -0.025193798449612337
+  },
+  {
+   "subject": 54,
+   "C_dev_pipeline": 0.030730897009966784
+  }
+ ]
+}
