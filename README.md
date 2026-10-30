@@ -24,8 +24,10 @@ tables; the first is the current submission.
 | variance-ratio weighting (Eq. 9) and its ablation | `pv8_lambda_control.py`, `pv8_final_compare.py` | `results/final_compare.txt` |
 | correction-strength and estimator surface (Tables 9-10) | `pv8_master.py` | `results/master_stats.md` |
 | trend diagnostic (Table 11, Fig. 5) | `pv8_trend_test.py` | `results/trend_test.txt` |
+| synthetic failure regimes (Table 7, Fig. 3), 30 paired seeds per cell | `pv8_phase30.py`, figure: `pv8_fig_regimes.py` | `results/phase30.txt` |
 | external cross-day cohort (Lee2019-MI) | `openbmi/lee2019_direct.py`, `lee2019_parallel.py`, `lee2019_secondary.py`, `lee2019_sensitivity.py`, `lee2019_variantC.py` | `results/openbmi_all.json`, `lee2019_sensitivity.json`, `lee2019_variantC.json` |
 | protocol-consistent sleep-EDF replication | `sleep_edf/sleep_edf_frozen.py` | `sleep_edf/results/sleep_edf_frozen_cells.json` |
+| sensitivity to the single-stage-target rule (adds the excluded pairs) | `sleep_edf/sleep_edf_frozen_sens.py --incl` | `sleep_edf/results/sleep_edf_frozen_incl.json` |
 | first sleep-EDF implementation, superseded (kept for the deviation record) | `sleep_edf/sleep_edf_test.py`, `sleep_edf_run.py` | `sleep_edf/results/sleep_edf_cells.json` |
 | grasp-and-lift composition audit | `sleep_edf/gal_composition_confound.py` | text in `sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md` |
 

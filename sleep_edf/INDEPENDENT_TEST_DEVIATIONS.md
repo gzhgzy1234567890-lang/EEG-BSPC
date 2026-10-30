@@ -43,11 +43,36 @@ the manuscript). Both use the same frozen endpoint, classifier, block length, wa
   are present.
 - **First implementation:** nights were dropped only when fewer than two series remained; no night-level
   stage test was applied; pairs additionally required at least two classes in both the source and the
-  target series.
+  target series, and the two reasons were not separated.
 - **Protocol-consistent re-run:** the two frozen night-level rules are applied, and the pairwise
-  two-class requirement is retained (LDA cannot be fitted to a single-class source and balanced accuracy
-  is undefined for a single-class target). The pairwise rule is therefore recorded here as a deviation
-  that is unavoidable rather than discretionary.
+  conditions are now kept apart, because they are not the same kind of rule:
+
+  | pairwise condition | why | candidate pairs excluded (of 42,616) |
+  |---|---|---|
+  | source series has a single stage | **training necessity**: LDA cannot be fitted to one class | **28,124** |
+  | target series has a single stage | **evaluation-set criterion**: balanced accuracy is computable but degenerates to the recall of that one stage, so it is no longer a balanced multi-class measure | **9,509** |
+
+  42,616 candidate pairs give 28,124 + 9,509 exclusions and **4,983 evaluated cells**.
+
+The earlier text in this record said that balanced accuracy "is undefined for a single-class target". That
+was inaccurate: the metric is defined there and equals the recall of the single stage. The target-side
+exclusion is a choice about what the endpoint means, not a computational necessity, and the paragraph
+above now says so.
+
+### D4a. Sensitivity to the target-side rule
+
+The target-side exclusion was removed and nothing else changed (`sleep_edf_frozen_sens.py --incl`):
+
+| aggregation | cells | mean difference | 95 per cent interval | negative | sign test |
+|---|---|---|---|---|---|
+| subject, equal-weight nights (primary) | 14,492 | **-0.1517** | [-0.180, -0.124] | **32 of 32** | p = 4.7e-10 |
+| subject, pooled cells | 14,492 | -0.1530 | [-0.181, -0.126] | 32 of 32 | p = 4.7e-10 |
+| recording | 14,492 | -0.1401 | [-0.164, -0.116] | 42 of 45 | p = 8.7e-10 |
+
+The sign and the subject-level unanimity do not depend on how single-stage targets are handled; the
+magnitude is larger when they are included, because a one-stage target can only be scored by recall and
+the correction moves many of those predictions away from the majority stage. The primary analysis keeps
+the balanced measure and therefore excludes them, with the count reported above.
 
 ## D5. Series construction
 
