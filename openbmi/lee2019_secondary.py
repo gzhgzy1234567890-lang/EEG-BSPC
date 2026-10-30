@@ -98,8 +98,9 @@ def main():
     for k in keys:
         v = np.array([r["ba"][k] for r in ok])
         name = k.split("|")[0]
-        d = v.mean() - base[name]
-        print("%-16s %8.4f %+8.4f %8d" % (k, v.mean(), d, int((v - base[name] < 0).sum())))
+        own0 = np.array([r["ba"][name + "|0.00"] for r in ok])   # each subject's own baseline
+        d = v - own0
+        print("%-16s %8.4f %+8.4f %8d" % (k, v.mean(), d.mean(), int((d < 0).sum())))
     print("n subjects", len(ok))
 
 
