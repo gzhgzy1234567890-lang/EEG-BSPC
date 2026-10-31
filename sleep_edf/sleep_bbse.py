@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Label-free prior-shift (BBSE) correction on sleep-EDF: can the prior term be removed without labels?"""
+"""BBSE v2: restricted to cells whose target class set is contained in the source class set, with the same
+normalisation for the estimated and the oracle prior, and a proper TV error on the full class space."""
 import glob, json, os, re, sys, warnings
 import numpy as np
 import mne
@@ -11,7 +12,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import balanced_accuracy_score as bas
 from sklearn.model_selection import StratifiedKFold
 BLOCK = F.BLOCK
-OUT = os.path.join(os.environ.get('BSPC_RESULTS', r'G:\Work_work\math\EEG\paper_v8\results'), 'sleep_bbse.json')
+OUT = os.path.join(os.environ.get('BSPC_RESULTS', r'G:\Work_work\math\EEG\paper_v8\results'), 'sleep_bbse2.json')
 
 
 def confusion(Fa, ya, classes):
@@ -24,30 +25,15 @@ def confusion(Fa, ya, classes):
             if len(np.unique(ya[tr])) < 2:
                 continue
             clf = LDA(solver='lsqr', shrinkage='auto').fit(Fa[tr], ya[tr])
-            pred = clf.predict(Fa[te])
-            for t, p in zip(ya[te], pred):
+            for t, p in zip(ya[te], clf.predict(Fa[te])):
                 C[classes.index(t), classes.index(p)] += 1
     else:
         clf = LDA(solver='lsqr', shrinkage='auto').fit(Fa, ya)
-        pred = clf.predict(Fa)
-        for t, p in zip(ya, pred):
+        for t, p in zip(ya, clf.predict(Fa)):
             C[classes.index(t), classes.index(p)] += 1
-    if (C.sum(1) == 0).any():
-        C = C + 0.5 * np.eye(K)
+    C = C + 0.5 * np.eye(K)
     C /= C.sum(1, keepdims=True)
     return 0.95 * C + 0.05 * np.eye(K)
-
-
-def bbse(pred, C, classes):
-    K = len(classes)
-    phat = np.array([np.mean(pred == c) for c in classes])
-    try:
-        q = np.linalg.solve(C.T, phat)
-    except np.linalg.LinAlgError:
-        q = np.linalg.lstsq(C.T, phat, rcond=None)[0]
-    q = np.clip(q, 0, None)
-    s = q.sum()
-    return q / s if s > 0 else phat
 
 
 def cell(Fa, ya, Fb, yb):
@@ -62,22 +48,31 @@ def cell(Fa, ya, Fb, yb):
         S = np.column_stack([-S, S])
     pred = clf.classes_[np.argmax(S, 1)]
     keep = slice(BLOCK, len(yb))
-    base = bas(yb[keep], pred[keep])
+    out = {'none': float(bas(yb[keep], pred[keep]))}
+    unseen = np.array([y not in classes for y in yb])
+    out['u'] = float(unseen.mean())
+    out['support_valid'] = bool(out['u'] == 0.0)
     muA_c = np.array([Fa[ya == c].mean(0) for c in classes])
     pa = np.array([np.mean(ya == c) for c in classes])
     C = confusion(Fa, ya, classes)
-    q = bbse(pred, C, classes)
-    out = {'none': float(base)}
-    # estimate the displacement of the target mean from the source mean using estimated proportions only
-    d_hat = (q - pa) @ muA_c
-    corr_hat = Fm @ (W @ d_hat)
-    out['bbse'] = float(bas(yb[keep], clf.classes_[np.argmax(S - corr_hat, 1)][keep]))
-    # oracle version: true target proportions (uses labels; diagnostic only)
-    pb = np.array([np.mean(yb == c) for c in classes])
-    d_true = (pb - pa) @ muA_c
-    corr_true = Fm @ (W @ d_true)
-    out['oracle_prior'] = float(bas(yb[keep], clf.classes_[np.argmax(S - corr_true, 1)][keep]))
-    out['q_err'] = float(np.abs(q - pb).sum() / 2)
+    out['cond'] = float(np.linalg.cond(C))
+    phat = np.array([np.mean(pred == c) for c in classes])
+    try:
+        q = np.linalg.solve(C.T, phat)
+    except np.linalg.LinAlgError:
+        q = np.linalg.lstsq(C.T, phat, rcond=None)[0]
+    q = np.clip(q, 0, None)
+    q = q / q.sum() if q.sum() > 0 else phat
+    pb_raw = np.array([np.mean(yb == c) for c in classes])
+    if out['u'] > 0:
+        out['tv_full'] = float(0.5 * np.abs(q - pb_raw).sum() + out['u'] / 2)
+    else:
+        out['tv_full'] = float(0.5 * np.abs(q - pb_raw).sum())
+    if not out['support_valid']:
+        return out
+    corr = lambda v: Fm @ (W @ ((v - pa) @ muA_c))
+    out['bbse'] = float(bas(yb[keep], clf.classes_[np.argmax(S - corr(q), 1)][keep]))
+    out['oracle_same_norm'] = float(bas(yb[keep], clf.classes_[np.argmax(S - corr(pb_raw), 1)][keep]))
     return out
 
 

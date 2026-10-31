@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Structure-matched analysis: compare error change across concentration strata, holding the number of
-classes, block size and history length fixed (exact matching on the discrete factors)."""
+"""Within-subject, within-stratum matched comparison of the concentration effect."""
 import json, os, sys
 import numpy as np
 from scipy.stats import binomtest
@@ -9,33 +8,26 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 rows = json.load(open(os.path.join(HERE, 'results', 'sleep_blocks_all.json')))
 for r in rows:
     r['net'] = (r['err1'] - r['err0']) / float(r['n'])
-    r['stratum'] = 'hi' if r['maxfrac'] >= 0.8 else ('lo' if r['maxfrac'] < 0.6 else 'mid')
-keys = {}
+    r['arm'] = 'hi' if r['maxfrac'] >= 0.8 else ('lo' if r['maxfrac'] < 0.6 else None)
+MIN_CELLS = 2
+cells = {}
 for r in rows:
-    k = (r['ncls_block'], r['ncls_hist'], r['hist_len'])
-    keys.setdefault(k, {'lo': [], 'hi': []})
-    if r['stratum'] in ('lo', 'hi'):
-        keys[k][r['stratum']].append(r['net'])
-usable = {k: v for k, v in keys.items() if v['lo'] and v['hi']}
-print('strata with both arms:', len(usable), 'of', len(keys))
-tot_lo = sum(len(v['lo']) for v in usable.values())
-tot_hi = sum(len(v['hi']) for v in usable.values())
-print('blocks in matched strata: lo %d hi %d' % (tot_lo, tot_hi))
-diffs = []
-subs = {}
-for r in rows:
-    k = (r['ncls_block'], r['ncls_hist'], r['hist_len'])
-    if k in usable:
-        subs.setdefault(r['subj'], []).append(r)
-for s, rs in subs.items():
-    lo = [r['net'] for r in rs if r['stratum'] == 'lo']
-    hi = [r['net'] for r in rs if r['stratum'] == 'hi']
-    if lo and hi:
-        diffs.append(np.mean(hi) - np.mean(lo))
-d = np.array(diffs)
-k_pos = int((d > 0).sum())
-print('subject-level matched difference: n=%d mean %+0.4f positive %d/%d two-sided p=%.3g'
-      % (len(d), d.mean(), k_pos, len(d), binomtest(k_pos, len(d), 0.5).pvalue))
+    if r['arm'] is None:
+        continue
+    key = (r['subj'], r['ncls_block'], r['ncls_hist'], r['hist_len'])
+    cells.setdefault(key, {'lo': [], 'hi': []})[r['arm']].append(r['net'])
+complete = {k: v for k, v in cells.items() if len(v['lo']) >= MIN_CELLS and len(v['hi']) >= MIN_CELLS}
+print('subject x stratum cells with both arms (>= %d blocks each): %d of %d' % (MIN_CELLS, len(complete), len(cells)))
+per_subj = {}
+for (subj, a, b, c), v in complete.items():
+    per_subj.setdefault(subj, []).append(np.mean(v['hi']) - np.mean(v['lo']))
+d = np.array([np.mean(x) for x in per_subj.values()])
+k = int((d > 0).sum())
+print('subjects with at least one complete cell: %d' % len(d))
+print('subject-level matched difference: mean %+0.4f median %+0.4f positive %d/%d two-sided p=%.3g'
+      % (d.mean(), np.median(d), k, len(d), binomtest(k, len(d), 0.5).pvalue))
 rng = np.random.default_rng(20261101)
 boot = [rng.choice(d, len(d), replace=True).mean() for _ in range(10000)]
 print('95%% interval [%+0.4f, %+0.4f]' % tuple(np.percentile(boot, [2.5, 97.5])))
+# stratum-level balanced aggregation: weight each subject equally over its cells
+print('cells used per subject: median %d range %d-%d' % (int(np.median([len(v) for v in per_subj.values()])), min(len(v) for v in per_subj.values()), max(len(v) for v in per_subj.values())))
