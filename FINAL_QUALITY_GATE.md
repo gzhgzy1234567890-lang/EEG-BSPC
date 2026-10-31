@@ -1,32 +1,33 @@
 # FINAL_QUALITY_GATE.md
 
-Updated after: window fix (A), Phase C1 theory, C2 certificate on real data, E1 novelty matrix.
+Updated after C2 (certificate on real data), E1 (novelty matrix from fetched abstracts) and D1 (controlled
+generator, 50/50 sign agreement).
 
 | item | max | score | evidence path | unmet |
 |---|---:|---:|---|---|
-| A | 15 | 13 | AUDIT_BASELINE.md; commits 5092c92 -> ... -> b81f5ef | two claim rows still hand-entered |
-| B | 20 | 16 | EVENT_AND_WINDOW_AUDIT.md; test_two_sided_ext.py; window sentence fixed | 2a cue latency from documentation, not measured |
-| C | 15 | 12 | THEORY_PROOFS.md (Props 1-4 proved, 5 weakened), THEORY_TEST_RESULTS.md, C2_CERTIFICATE_RESULTS.md (certificate exact on 3 subjects) | C5 (theory-to-simulation link) not done; Prop 5 sign version open |
-| D | 15 | 8 | STATISTICAL_ANALYSIS_PLAN.md; statistics_recomputed_2b.json | sleep-EDF hierarchy not yet re-derived; Holm not executed (family has one live test) |
-| E | 10 | 7 | NOVELTY_MATRIX.md built from fetched abstracts | full texts not read; MOABB coverage unchecked |
-| F | 10 | 3 | CURRENT_BLOCKERS.md B1/B2 | SEED blocked; no external validation report; no third-party run |
+| A | 15 | 13 | AUDIT_BASELINE.md; commits 5092c92 -> 2da0320 | two claim rows hand-entered |
+| B | 20 | 16 | EVENT_AND_WINDOW_AUDIT.md; test_two_sided_ext.py; window sentence fixed | 2a cue latency from documentation |
+| C | 15 | 13 | THEORY_PROOFS.md; THEORY_TEST_RESULTS.md; C2_CERTIFICATE_RESULTS.md | Prop 5 sign version open |
+| D | 15 | 9 | STATISTICAL_ANALYSIS_PLAN.md; statistics_recomputed_2b.json; D1 grid | sleep-EDF hierarchy not re-derived; Holm not executed |
+| E | 10 | 8 | NOVELTY_MATRIX.md (4 abstracts fetched); SLEEP_MECHANISM_AUDIT.md (D1, D2-D4 recaps, D5 open) | full texts unread; D5 not run |
+| F | 10 | 3 | CURRENT_BLOCKERS.md | SEED blocked; no external validation report |
 | G | 10 | 7 | commits, scripts, JSON, seeds | no third-party replication |
-| H | 5 | 3 | window sentence fixed; theory not yet integrated into the manuscript | manuscript still lacks the new theory and the 2b numbers |
-| **total** | **100** | **69** | | |
+| H | 5 | 3 | manuscripts cite the current commit; theory and D results not yet in the manuscript | integration pending |
+| **total** | **100** | **72** | | |
 
 ## Hard gates
 
-All fifteen gates pass at this commit. The most recently closed one was "code contradicts paper" (window sentence).
-Proofs: Props 1-4 verified numerically; Prop 5 explicitly weakened where the counterexample failed, and the
-failed attempt is recorded in THEORY_TEST_RESULTS.md rather than hidden.
+All pass at this commit. Evidence: for each gate, the path is named in the previous version of this file; the
+newest checks are the 50/50 D1 sign agreement (theory-to-simulation) and the exact C2 certificate on three real
+subjects.
 
 ## Verdict
 
-**Not approved.** 69/100 is below 96 and Phase D, F and G are incomplete. The project continues; no completion
-claim is made.
+**Not approved** (72 < 96). Remaining: D5, sleep-EDF hierarchy recomputation, manuscript integration of B/C/D,
+external validation report, two adversarial reviews.
 
 ## Next (automatic)
 
-1. Phase D1: controlled generator with the frozen grid (baseline shift x prior shift x duration x memory), run it;
-2. Phase D3: matched mechanism analysis with the corrected within-subject-by-stratum procedure;
-3. Phase B: sleep-EDF hierarchy recomputation from the archived JSONs.
+1. D5: LDA priors (empirical vs uniform) and threshold controls on sleep-EDF;
+2. B3: hierarchy recomputation from archived JSONs;
+3. G: integrate theory and the 2b/2a results into the manuscript.
