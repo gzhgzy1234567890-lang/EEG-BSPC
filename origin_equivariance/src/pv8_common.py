@@ -24,12 +24,15 @@ from sklearn.svm import LinearSVC
 from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold
 from scipy.stats import norm
 
-D = r"G:\Work_work\math\EEG\local_analysis"
+# Paths are configurable. Set BSPC_CACHE_ROOT to the directory that holds the caches
+# (cache_2a, cache_2b, cache_seed, cache_ner_feat, cache_gal, ...), and BSPC_OUT to the
+# directory where the text outputs should be written. The defaults are the author's layout.
+D = os.environ.get("BSPC_CACHE_ROOT", r"G:\Work_work\math\EEG\local_analysis")
 if D not in sys.path:
     sys.path.insert(0, D)
 import bspc_feat as B  # noqa: E402
 
-OUT = r"G:\Work_work\math\EEG\paper_v8\results"
+OUT = os.environ.get("BSPC_OUT", os.path.join(os.path.dirname(D), "paper_v8", "results"))
 if not os.path.isdir(OUT):
     os.makedirs(OUT)
 

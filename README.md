@@ -61,6 +61,27 @@ python openbmi/lee2019_secondary.py   # estimator x strength surface
 python sleep_edf/sleep_edf_frozen.py  # protocol-consistent replication (~4 min)
 ```
 
+## Environment and paths
+
+Python 3.7, numpy 1.21.6, scipy 1.7.3, scikit-learn 0.23.2, mne 0.23.4, matplotlib 3.5.3. Paths are read
+from the environment where possible: `BSPC_DATA` (raw data), `BSPC_CACHE_ROOT` (the directory holding
+`cache_*`), `BSPC_OUT` (text outputs). The defaults reproduce the author's layout.
+
+## End-to-end reproduction of the grasp-and-lift result
+
+This chain starts from the public Kaggle CSVs and ends in the paper's figures, with no cached feature table
+in between:
+
+```
+python grasp_and_lift_order/build_gal_time.py 'subj*'   # raw CSV + events -> features in acquisition order
+python grasp_and_lift_order/gal_order_test.py           # three-way comparison (published / control / time)
+python grasp_and_lift_order/gal_estimators_time.py      # the six causal estimators on the time-ordered cache
+python grasp_and_lift_order/fig4_corrected.py           # Figure 4
+```
+
+The audit of the published cache and the three orderings are in `grasp_and_lift_order/AUDIT.md`; the same
+folder holds `sleep_class_overlap.py`, which produces the class-set stratification of the sleep replication.
+
 ## A record of defects, kept deliberately
 
 - The alignment pipeline once estimated `tr(Sigma)` as `mean(dd**2) * h / 4`, which is wrong by a factor
@@ -70,6 +91,9 @@ python sleep_edf/sleep_edf_frozen.py  # protocol-consistent replication (~4 min)
   baseline; fixed in commit `e05e3af`.
 - The first sleep-EDF aggregation keyed subjects on four characters instead of five; fixed, and the
   corrected aggregation reproduces the reported numbers. Both runs are in `sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md`.
+- **The grasp-and-lift feature cache was stored sorted by class**, not in acquisition order. The sorted
+  storage manufactures a loss of 0.108 (12 of 12 subjects negative); the same features in acquisition order
+  give +0.001. The rebuild, the control and the per-subject values are in `grasp_and_lift_order/`.
 
 ## License
 
