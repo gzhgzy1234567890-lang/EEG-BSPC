@@ -9,7 +9,7 @@ CACHE = os.environ.get('BSPC_CACHE_SEED', r'G:\Work_work\math\EEG\local_analysis
 BLOCK = 15
 WINDOWS = (5, 10, 25, 50, 100, 200, 400)
 ALPHAS = (0.2, 0.1, 0.05, 0.02, 0.01)
-OUT = os.path.join(os.environ.get('BSPC_RESULTS', r'G:\Work_work\math\EEG\paper_v8\results'), 'seed_memory_scale.json')
+OUT = os.path.join(os.environ.get('BSPC_RESULTS', r'G:\Work_work\math\EEG\paper_v8\results'), 'seed_memory_scale_coldstart.json')
 
 
 def load():
@@ -54,11 +54,11 @@ def main():
                     pred = clf.classes_[np.argmax(S - m, 1)]
                     rec['w%d' % w] = float(bas(yB[keep], pred[keep]) - base_ba)
                 for a in ALPHAS:
-                    m = np.zeros((n, K)); run = np.zeros(K)
-                    for t in range(n):
-                        if t >= BLOCK:
-                            m[t] = run.copy()
-                            run = (1 - a) * run + a * d_t[t]
+                    m = np.zeros((n, K))
+                    run = d_t[:BLOCK].mean(0)          # prime with the warm-up block, as the windows do
+                    for t in range(BLOCK, n):
+                        m[t] = run.copy()
+                        run = (1 - a) * run + a * d_t[t]
                     pred = clf.classes_[np.argmax(S - m, 1)]
                     rec['a%.2f' % a] = float(bas(yB[keep], pred[keep]) - base_ba)
                 rows.append(rec)

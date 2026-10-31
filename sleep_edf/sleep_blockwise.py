@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Block-wise decomposition keeping the causal time boundary: full vs mix-only vs conditional-only correction."""
+"""Block-wise decomposition, v2: class union over source and target, per-block reconstruction check,"""
+"""and class composition of the historical window actually used."""
 import glob, json, os, re, sys, warnings
 import numpy as np
 import mne
@@ -10,28 +11,35 @@ import sleep_edf_frozen as F
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import balanced_accuracy_score as bas
 BLOCK = F.BLOCK
-OUT = os.path.join(os.environ.get('BSPC_RESULTS', r'G:\Work_work\math\EEG\paper_v8\results'), 'sleep_blockwise.json')
+OUT = os.path.join(os.environ.get('BSPC_RESULTS', r'G:\Work_work\math\EEG\paper_v8\results'), 'sleep_blockwise2.json')
 
 
-def split_terms(Fa, ya, Fb, yb, W, Fm, muA, classes):
-    muB = Fb.mean(0)
+def terms(Fa, ya, Fb, yb, W, Fm, muA, classes):
     src = [c for c in classes if np.any(ya == c)]
-    tgt = [c for c in classes if np.any(yb == c)]
+    tgt = list(np.unique(yb))
+    shared = [c for c in src if c in tgt]
     prior = np.zeros_like(muA); cond = np.zeros_like(muA); rest = np.zeros_like(muA)
-    for c in src:
-        a_c = ya == c
-        b_c = yb == c
+    for c in shared:
+        a_c = ya == c; b_c = yb == c
         ma = Fa[a_c].mean(0)
-        if c in tgt:
-            prior += (b_c.mean() - a_c.mean()) * ma
-            cond += b_c.mean() * (Fb[b_c].mean(0) - ma)
-        else:
-            prior += (0.0 - a_c.mean()) * ma
+        prior += (b_c.mean() - a_c.mean()) * ma
+        cond += b_c.mean() * (Fb[b_c].mean(0) - ma)
+    for c in src:
+        if c not in tgt:
+            a_c = ya == c
+            prior += (0.0 - a_c.mean()) * Fa[a_c].mean(0)
     for c in tgt:
         if c not in src:
             b_c = yb == c
             rest += b_c.mean() * Fb[b_c].mean(0)
-    return prior + rest, cond
+    mix = prior + rest
+    return mix, cond
+
+
+def entropy(counts):
+    p = counts / counts.sum()
+    p = p[p > 0]
+    return float(-(p * np.log(p)).sum())
 
 
 def cell(Fa, ya, Fb, yb):
@@ -46,12 +54,14 @@ def cell(Fa, ya, Fb, yb):
     n = len(yb)
     blocks = [(a, min(a + BLOCK, n)) for a in range(0, n, BLOCK)]
     mix, cnd, full = [], [], []
+    errs = []
     for (a, b) in blocks:
-        m, c = split_terms(Fa, ya, Fb[a:b], yb[a:b], W, Fm, muA, clf.classes_)
-        mix.append(Fm @ (W @ m)); cnd.append(Fm @ (W @ c))
-        full.append(Fm @ (W @ (Fb[a:b].mean(0) - muA)))
+        m, c = terms(Fa, ya, Fb[a:b], yb[a:b], W, Fm, muA, clf.classes_)
+        d = Fb[a:b].mean(0) - muA
+        mix.append(Fm @ (W @ m)); cnd.append(Fm @ (W @ c)); full.append(Fm @ (W @ d))
+        errs.append(float(np.linalg.norm((m + c) - d) / max(np.linalg.norm(d), 1e-12)))
     mix, cnd, full = np.array(mix), np.array(cnd), np.array(full)
-    out = {}
+    out = {'recon_err_max': float(np.max(errs)), 'recon_err_med': float(np.median(errs))}
     for name, arr in (('full', full), ('mix', mix), ('cond', cnd)):
         corr = np.zeros((n, K))
         for k, (a, b) in enumerate(blocks):
@@ -61,6 +71,12 @@ def cell(Fa, ya, Fb, yb):
         out[name] = float(bas(yb[BLOCK:], pred[BLOCK:]))
     pred0 = clf.classes_[np.argmax(S, 1)]
     out['none'] = float(bas(yb[BLOCK:], pred0[BLOCK:]))
+    # composition of the historical window actually used for the scored part
+    hist = yb[:len(yb) - BLOCK]
+    counts = np.array([np.sum(hist == c) for c in np.unique(hist)], dtype=float)
+    out['hist_entropy'] = entropy(counts) if len(counts) > 1 else 0.0
+    out['hist_maxfrac'] = float(counts.max() / counts.sum())
+    out['hist_k'] = int(len(counts))
     return out
 
 
