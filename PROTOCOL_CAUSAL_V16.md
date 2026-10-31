@@ -1,72 +1,66 @@
-# Frozen protocol: unified source-only, past-only main experiment (v16, revision B)
+# Frozen protocol: unified source-only, past-only main experiment (v16, revision C)
 
-Frozen 31 October 2026. Revision B completes the 2x2 design on BCI-2a, withdraws the retrospective
-pre-specification of euc_ea on that dataset, fixes the CSP description, and rewrites the SEED plan after
-checking what data are actually available.
+Frozen 31 October 2026. Revision C records the BCI-2b run, corrects the statistical reading of the 2x2 on
+BCI-2a, fixes the CSP rationale, and states what the SEED data would and would not license.
 
 ## Estimator
 
-Unchanged from revision A: for a trial in completed block b, the estimate uses blocks 1..b-1 only, and the
-two-sided correction removes d_b = P(s̄_{1..b-1} - s̄_A). Unit test `test_two_sided.py` passes (K = 2 and K = 4).
+Unchanged: d_b = P(s-bar_{1..b-1} - s-bar_A), blocks of 15, first block unscored, lambda = 1. Unit test
+`test_two_sided.py` passes.
 
-## BCI-2a: 2x2 factorial
-
-Four conditions, all on the same trials and the same classifier:
+## BCI-2a: 2x2 factorial, statistical reading corrected
 
 | | source-only EA | both-session EA |
 |---|---|---|
-| causal filter | causal_so | causal_arch |
-| non-causal filter | noncausal_so | noncausal |
+| causal | +0.0705 | +0.0620 |
+| non-causal | +0.0805 | +0.0738 |
 
-Effects (euc_ea, 9 subjects): alignment +0.008 [-0.006, +0.022]; filter -0.011 [-0.020, -0.002];
-interaction +0.002 [-0.010, +0.014]. The near-zero total protocol effect reported in the earlier version is the
-sum of these two opposing changes, not evidence that causality does not matter; it is reported as such.
+- alignment +0.0077 [-0.0057, +0.0224], Wilcoxon p = 0.65
+- filter -0.0109 [-0.0197, -0.0021], **Wilcoxon p = 0.13**
+- interaction +0.0017, p = 0.91
 
-## Pre-specification, corrected
+The bootstrap interval for the filter effect excludes zero while the signed-rank test does not, because the two
+target different quantities. The protocol fixes Wilcoxon as the confirmatory test, so the correct statement is:
+the causal filter is associated with a 0.011 lower gain, the bootstrap interval supports a negative value, but
+the signed-rank test does not reach 0.05, and the result is reported as exploratory, not as established.
 
-The primary endpoint for BCI-2a is **not** pre-specified: euc_ea was chosen after seeing the first run, so its
-+0.071 is an exploratory result. For the datasets not yet run the primary endpoint is fixed now, before any
-result is seen:
+**What the filter contrast identifies.** `lfilter` and `filtfilt` differ in amplitude response, phase and edge
+behaviour, not only in whether future samples are read. The -0.011 is therefore the effect of this specific
+filter pair under this protocol, and is not attributed to future-information access alone. Effective magnitude
+and phase responses of both filters are reported as supplementary material.
 
-- BCI-2b: **csp**, the only representation that is source-only by construction in both filter conditions;
-- SEED: the released DE representation (the only one available), with the causal processing applied on top of it.
+## BCI-2b: pre-specified primary endpoint, result
 
-Holm adjustment covers these pre-specified primary tests only. Secondary representations are reported
-uncorrected and labelled exploratory.
+Three forward pairs (01T->02T, 01T->03T, 02T->03T), 9 subjects, csp fixed in advance as the primary endpoint.
+The choice is justified because csp is fitted on the training session only by construction, not because it is
+the only source-only representation: euc is source-only as well, and euc_ea and tan have source-only variants
+in this protocol. BCI-2b has three EEG channels, so the CSP step yields **two** generalized eigenfilters, not
+six as in 2a; the implementation derives the number from the channel count.
 
-## CSP description, corrected
+| representation | causal + source-only EA | subjects positive | Wilcoxon p |
+|---|---|---|---|
+| **csp (primary)** | **+0.0341 [+0.0104, +0.0585]** | 8/9 | 0.039 |
+| euc | +0.0317 [+0.0167, +0.0472] | 9/9 | 0.0039 |
+| euc_ea | +0.0350 [+0.0198, +0.0506] | 8/9 | 0.0078 |
+| tan | +0.0483 [+0.0219, +0.0738] | 8/9 | 0.020 |
 
-What the code computes is **six generalized eigenfilters from a first-class-versus-average contrast**: the
-generalized eigenproblem between the first class's average covariance and the across-class average covariance,
-with the three smallest and three largest eigenvalues retained. This is not a multi-class one-vs-rest CSP with
-three filters per class. The manuscript sentence now says exactly this, and the archived pipeline used the same
-code, so this is a description fix rather than a protocol change.
+Filter effects per representation: csp -0.0058 (p = 0.25), euc +0.0071 (p = 0.25), euc_ea +0.0061 (p = 0.30),
+tan +0.0079 (p = 0.055). The alignment factor is identically zero for all four, so it has no Wilcoxon p value.
 
-## SEED: data availability first
+Because the development work had already used BCI-2b, this is a prospective test on a familiar dataset, not an
+independent confirmation.
 
-Checked on this machine before writing the plan:
+## SEED: what the data would and would not license
 
-| item | finding |
-|---|---|
-| local SEED copy | `E:\\data\\SEED-all\\seed` contains `ExtractedFeatures_1s` and `ExtractedFeatures_4s` and the stimulation tables |
-| raw recordings | **not present**: no `Preprocessed_EEG` directory, no `.cnt` files |
-| consequence | a raw-to-feature causal rerun for SEED cannot be executed here |
-
-Therefore the SEED plan is stated in two parts, and the paper must say which one it reports:
-
-1. **What can be run here**: causal processing *on top of the released DE features* - the DE values are treated
-   as a given, and the mean estimator is past-only. This cannot be described as a strictly causal raw-to-feature
-   pipeline, because the released DE features were computed with the official preprocessing (200 Hz resampling,
-   0-75 Hz filtering, smoothing variants) that sees the whole segment.
-2. **What a strict rerun would require**: the `Preprocessed_EEG` waveforms (or the SEED_Multimodal `.cnt`
-   files, which cover 12 of the 15 subjects), five frequency bands (delta 1-4, theta 4-8, alpha 8-14, beta
-   14-30, gamma 30-50 Hz), a causal filter per band, and a filter state **reset at every film boundary** with the
-   first and last segment of each film discarded. Only then could the result be compared with the archived
-   +0.214 as a filter-only difference.
-
-Until part 2 is available, the SEED causal claim in the paper is restricted to part 1 and labelled accordingly.
+Local data contain only the released DE features; no waveform data are present. Beyond that, obtaining
+`Preprocessed_EEG` would still not license attributing a difference from the archived +0.214 to the filter,
+because that release is already filtered (0-75 Hz), downsampled to 200 Hz and split by film, and any
+re-extraction would also change the smoothing, the band edges and the scored samples. A filter-only comparison
+would need identical inputs, identical feature rules and identical scored trials, with only the filter changed.
+Until then SEED is reported as a past-only mean-estimation experiment on the official cached features, and the
+paper does not describe it as an end-to-end causal pipeline.
 
 ## Statistics
 
-Subject-level paired values; 95 per cent bootstrap (10,000 resamples, seed 20261101); two-sided Wilcoxon;
-Holm across the pre-specified primary tests.
+Subject-level paired values; 95 per cent bootstrap (10,000 resamples, seed 20261101); two-sided Wilcoxon as the
+confirmatory test; Holm across the pre-specified primary tests (BCI-2b csp and, if run, the SEED primary).
