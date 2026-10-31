@@ -5,11 +5,14 @@ import numpy as np
 import mne
 warnings.filterwarnings('ignore')
 mne.set_log_level('ERROR')
-sys.path.insert(0, r'G:\Work_work\math\EEG\paper_v8')
+# Paths come from the environment; the defaults are the author's layout.
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.environ.get('BSPC_CODE', os.path.join(HERE, '..')))
+sys.path.insert(0, os.environ.get('BSPC_SLEEP_CODE', HERE))
 import sleep_edf_frozen as F
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import balanced_accuracy_score as bas
-OUT = r'G:\Work_work\math\EEG\paper_v8\results\sleep_decomposition_fixed2.json'
+OUT = os.environ.get('BSPC_DECOMP_OUT', os.path.join(HERE, 'results', 'sleep_decomposition.json'))
 BLOCK = F.BLOCK
 
 
