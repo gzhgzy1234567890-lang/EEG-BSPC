@@ -104,9 +104,13 @@ def run_cell(A, ya, B, yb):
     if S.ndim == 1:
         S = np.column_stack([-S, S])
     Fm = np.eye(K) - np.ones((K, K)) / K
+    SA = clf.decision_function(A)
+    if SA.ndim == 1:
+        SA = np.column_stack([-SA, SA])
+    source_score_mean = SA.mean(0)
     n = len(yb)
     blocks = [(a, min(a + BLOCK, n)) for a in range(0, n, BLOCK)]
-    d_b = np.array([Fm @ (S[a:b].mean(0)) for a, b in blocks])
+    d_b = np.array([Fm @ (S[a:b].mean(0) - source_score_mean) for a, b in blocks])
     corr = np.zeros_like(S)
     for k, (a, b) in enumerate(blocks):
         if k > 0:
