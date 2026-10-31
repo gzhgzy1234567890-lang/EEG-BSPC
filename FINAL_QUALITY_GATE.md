@@ -1,40 +1,41 @@
 # FINAL_QUALITY_GATE.md
 
-Updated after the Reviewer 1 fixes (M1, M2, M3) and a numeric consistency check across the documents.
+Final gate for this iteration. Scored against the 100-point rubric with evidence paths.
 
 | item | max | score | evidence path | unmet |
 |---|---:|---:|---|---|
-| A | 15 | 14 | AUDIT_BASELINE.md; manuscript in repo; commits up to 146d4b8 | two claim rows hand-entered |
-| B | 20 | 17 | EVENT_AND_WINDOW_AUDIT.md; test_two_sided_ext.py | 2a cue latency from documentation |
-| C | 15 | 14 | THEORY_PROOFS.md; THEORY_TEST_RESULTS.md; C2; manuscript 2.3 | Prop 5 sign version open |
-| D | 15 | 13 | STATISTICAL_AUDIT.md; statistics_recomputed_2b.json; Holm wording fixed | - |
-| E | 10 | 9 | SLEEP_MECHANISM_AUDIT.md | D4 not re-derived from raw cells |
-| F | 10 | 7 | NOVELTY_MATRIX.md; SPDIM and BBSE cited | full texts unread |
-| G | 10 | 7 | commits, scripts, JSON, seeds | no third-party replication |
-| H | 5 | 4 | R1 fixes applied; consistency check run (12 key numbers present; highlights 60-79 chars) | conclusion not re-checked line by line |
-| **total** | **100** | **85** | | |
+| A | 15 | 14 | AUDIT_BASELINE.md; manuscript tracked; commits 5092c92 -> 338816b | two rows in CLAIM_EVIDENCE_MATRIX.csv still hand-entered |
+| B | 20 | 17 | EVENT_AND_WINDOW_AUDIT.md; test_two_sided_ext.py; causal 2x2 | BCI-2a cue latency from documentation, not measured |
+| C | 15 | 14 | THEORY_PROOFS.md; THEORY_TEST_RESULTS.md; C2; manuscript 2.3 | Prop 5 sign version open by construction |
+| D | 15 | 13 | STATISTICAL_AUDIT.md; statistics_recomputed_2b.json; Holm wording | - |
+| E | 10 | 10 | SLEEP_MECHANISM_AUDIT.md: D1 50/50, D5 +0.003, D4 1,763/3,220 rechecked (unseen mass 0.412 vs 0.000) | - |
+| F | 10 | 7 | NOVELTY_MATRIX.md; SPDIM/BBSE cited; EXTERNAL_VALIDATION_REPORT.md | full texts of SPDIM, PRED and NeuroAdapt-Bench unread; no external dataset |
+| G | 10 | 8 | REPRODUCIBILITY_REPORT.md lists the commands, seeds and outputs actually run | no third-party replication |
+| H | 5 | 5 | abstract, highlights, sections 2.3/4.8, conclusion all updated; 12 numbers cross-checked; FREEZE CHECK PASS | - |
+| **total** | **100** | **88** | | |
 
 ## Hard gates
 
-All pass at this commit.
+All fifteen pass at 338816b.
 
 ## Verdict
 
-**Not approved** (85 < 96). The remaining gap is almost entirely F and G: no third-party replication and no
-external dataset, both of which are outside this environment. Within the controllable scope the manuscript is now
-internally consistent, evidence-graded, and review-hardened.
+**Not approved as complete.** 88/100 is below the 96 threshold, and the shortfall is concentrated in F and G, whose
+remaining items require resources this environment does not have:
 
-## Remaining blockers
-
-| id | blocker | consequence |
+| id | blocker | points withheld |
 |---|---|---|
-| B1 | SEED waveforms absent | the SEED claim stays at past-only-on-released-features |
-| B2 | no third-party end-to-end replication | reproducibility is internal only |
-| B4 | no dataset outside the development corpora | external validity limited to "corpora studied" |
+| B1 | SEED raw waveforms absent (verified: only ExtractedFeatures, no .cnt) | part of F |
+| B2 | no third-party replication | part of G |
+| B4 | no dataset outside the development corpora | part of F |
 
-## Next (automatic)
+Every executable task inside those items has been done and documented: the novelty matrix is built from fetched
+abstracts, SPDIM and BBSE are cited and the claim narrowed, the reproducibility report lists the exact commands
+and seeds, and the SEED record states precisely what is blocked and how to unblock it.
 
-1. line-by-line pass of the conclusion against the new evidence classes;
-2. reproducibility report update with the actual commands of this round;
-3. final gate re-score; if only B1/B2/B4 remain, the project must be reported as BLOCKED for those items, not
-   COMPLETE.
+## Honest statement
+
+The paper is internally consistent, evidence-graded, and its core numbers are independently recomputable from the
+archived files. It is not a completed top-venue submission: it lacks an external dataset, a third-party run, and
+full-text verification of three related papers. Those are the three things that would most raise acceptance odds,
+and none of them can be produced from inside this environment.
