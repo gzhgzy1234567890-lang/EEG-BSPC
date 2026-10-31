@@ -40,3 +40,5 @@ as family-corrected.
 
 The paper reports many analyses. Only F1 is a pre-specified test; everything else is labelled EXPLORATORY or
 CONFIRMATORY from an earlier protocol and is not combined into a single corrected family.
+
+With one live test in the family, Holm is the identity and no adjusted p-value is reported; the 2b p of 0.039 is quoted as uncorrected and is never described as family-corrected.
