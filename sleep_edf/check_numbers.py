@@ -97,6 +97,36 @@ def models():
     return {k: subj_means(rows, k).mean() for k in ('lda', 'svm', 'mlp')}
 
 
+
+GAL = os.environ.get('BSPC_GAL_RESULTS', os.path.join(HERE, '..', 'grasp_and_lift_order', 'results'))
+
+
+def gal():
+    p = os.path.join(GAL, 'gal_order_curves.json')
+    if not os.path.exists(p):
+        return None
+    d = json.load(open(p))
+    out = {}
+    for key in ('published', 'sorted_control', 'time'):
+        cells = d[key]['cells']
+        per_subj = {}
+        for row in cells:
+            subj, lam0, lam1 = row[0], row[3], row[-1]
+            per_subj.setdefault(subj, []).append(lam1 - lam0)
+        v = np.array([np.mean(x) for x in per_subj.values()])
+        out[key] = (v.mean(), int((v < 0).sum()), len(v))
+    return out
+
+
+def seed_film():
+    p = os.path.join(GAL, 'seed_film_disjoint_rot.json')
+    if not os.path.exists(p):
+        return None
+    d = json.load(open(p))
+    v = np.array(d['per_subject'])
+    return v.mean(), int((v > 0).sum()), len(v)
+
+
 EXPECT = {
     'main': (-0.1023, 0.010),
     'cumulative': (-0.107, 0.006),
@@ -111,6 +141,10 @@ EXPECT = {
     'telemetry': (-0.048, 0.006),
     'svm': (-0.064, 0.008),
     'mlp': (-0.061, 0.008),
+    'published': (-0.1075, 0.008),
+    'sorted_control': (-0.090, 0.008),
+    'time': (0.0014, 0.006),
+    'seed_rot': (0.200, 0.010),
 }
 
 
@@ -144,6 +178,15 @@ def report():
         print('models: lda %+0.4f  svm %+0.4f  mlp %+0.4f' % (md['lda'], md['svm'], md['mlp']))
         ok &= abs(md['svm'] - EXPECT['svm'][0]) < EXPECT['svm'][1]
         ok &= abs(md['mlp'] - EXPECT['mlp'][0]) < EXPECT['mlp'][1]
+    g = gal()
+    if g:
+        for k, (v, n, m) in g.items():
+            print('%-14s %+0.4f  %d/%d negative' % (k, v, n, m))
+            ok &= abs(v - EXPECT[k][0]) < EXPECT[k][1]
+    sf = seed_film()
+    if sf:
+        print('SEED film-disjoint (3 rotations) %+0.4f  %d/%d positive' % sf)
+        ok &= abs(sf[0] - EXPECT['seed_rot'][0]) < EXPECT['seed_rot'][1]
     print()
     print('CHECK', 'PASS' if ok else 'FAIL')
     return 0 if ok else 1
