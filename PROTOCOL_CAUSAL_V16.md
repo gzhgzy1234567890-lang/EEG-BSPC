@@ -64,3 +64,36 @@ paper does not describe it as an end-to-end causal pipeline.
 
 Subject-level paired values; 95 per cent bootstrap (10,000 resamples, seed 20261101); two-sided Wilcoxon as the
 confirmatory test; Holm across the pre-specified primary tests (BCI-2b csp and, if run, the SEED primary).
+
+## Revision D — the alignment factor on BCI-2b (after the A2 audit)
+
+The 2b run reported in Revision C gave an alignment effect of exactly zero for every representation. That was
+wrong for euc_ea: `msqrt_inv` clipped eigenvalues at an absolute floor of 1e-8, while 2b covariances have
+eigenvalues around 1e-11 (the GDF files are in volts), so the whitening matrix was constant and the alignment
+matrix was always the identity up to scale. See AUDIT_BCI2B_EA.md for the measurements.
+
+After replacing the absolute floor with a relative one (`1e-8 * max eigenvalue`) and re-running:
+
+| representation | causal + source-only EA | subjects positive | Wilcoxon p |
+|---|---|---|---|
+| **csp (primary)** | **+0.0341 [+0.0104, +0.0585]** | 8/9 | 0.039 |
+| euc | +0.0317 [+0.0167, +0.0472] | 9/9 | 0.0039 |
+| euc_ea | +0.0358 [+0.0182, +0.0570] | 9/9 | 0.0039 |
+| tan | +0.0486 [+0.0247, +0.0721] | 8/9 | 0.012 |
+
+Filter effects: csp -0.0058 (p=0.25), euc +0.0071 (p=0.25), euc_ea +0.0020 (p=0.57), tan +0.0043 (p=0.43).
+Alignment effect: euc_ea -0.0012 [-0.0037, +0.0011] (p=0.40); exactly zero for euc, tan and csp **by
+construction**, because those representations do not use the alignment matrix.
+
+The pre-specified primary result is unchanged in sign and significance.
+
+## Revision D — statistical family, fixed here
+
+| test | dataset | endpoint | class |
+|---|---|---|---|
+| 1 | BCI-2b | csp | PROSPECTIVE-IN-EXPLORED-DATA (p = 0.039 uncorrected) |
+| 2 | SEED | DE, past-only on released features | BLOCKED for the causal raw pipeline; past-only result is EXPLORATORY |
+
+Holm applies across tests 1 and 2 only when both exist. With test 2 BLOCKED, no corrected family p-value is
+reported, and the paper must not describe the 2b p as family-corrected. BCI-2a euc_ea and all secondary
+representations are EXPLORATORY and are not part of any confirmatory family.

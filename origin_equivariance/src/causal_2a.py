@@ -56,7 +56,8 @@ def msqrt_inv(C, eps=1e-8):
     if C.ndim == 3:
         C = C.mean(0)
     w, V = np.linalg.eigh(C)
-    w = np.maximum(w, eps)
+    floor = eps * max(float(w.max()), 1e-30) if np.all(np.isfinite(w)) else eps
+    w = np.maximum(w, floor)
     return V @ np.diag(w ** -0.5) @ V.T
 
 
