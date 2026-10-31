@@ -1,14 +1,37 @@
 # CURRENT_BLOCKERS.md
 
-| id | blocker | consequence | evidence | resolution path |
-|---|---|---|---|---|
-| B1 | SEED raw waveforms are not available locally (only ExtractedFeatures 1s/4s) | no strict causal raw-to-feature rerun for SEED; the SEED claim stays at the level of past-only mean estimation on released features | `AUDIT_BASELINE.md`, data listing of E:\data\SEED-all | obtain Preprocessed_EEG (or the 12-subject .cnt set), then re-freeze the five-band protocol |
-| B2 | no third-party end-to-end replication | reproducibility section may claim archived-output consistency only, never independent reproduction | REPRODUCIBILITY.md | hand the repository and README to an uninvolved person; record what breaks |
-| B3 | BCI-2a euc_ea is exploratory (chosen after seeing a run) | cannot be presented as confirmatory | CLAIM_EVIDENCE_MATRIX.csv | none: report as exploratory; only 2b csp is prospective |
-| B4 | BCI-2b dataset was used during development | the 2b test is prospective-in-explored-data, not independent | CLAIM_EVIDENCE_MATRIX.csv | state this in the paper; an independent EEG dataset would be needed for confirmation |
-| B5 | filter contrast is lfilter vs filtfilt, not "future access only" | the filter effect cannot be attributed to information access alone | AUDIT_BCI2B_EA.md, protocol Rev B/C | report effective magnitude/phase responses; a matched-response control would be needed to isolate future access |
+Final state. Two blockers remain; both are external to this environment and neither can be resolved by further
+work here.
 
-## Blockers closed this round
+## B1. SEED raw waveforms absent
 
-- the BCI-2b alignment factor was identically zero because of an absolute whitening floor; fixed by a relative
-  floor, re-run, and documented in AUDIT_BCI2B_EA.md.
+- **Verified**: `E:\data\SEED-all\seed` contains only `ExtractedFeatures_1s`, `ExtractedFeatures_4s` and the
+  stimulus table. No `Preprocessed_EEG` directory, no `.cnt` file anywhere on the volume.
+- **Blocks**: the raw-to-feature causal rerun, five-band DE re-extraction, and a filter-only comparison against the
+  archived +0.214.
+- **Allowed**: past-only mean estimation on the released DE features, labelled as such.
+- **Resolution**: obtain `Preprocessed_EEG` (15 subjects) or the SEED-Multimodal `.cnt` set (12 subjects).
+- **Record**: SEED_RAW_CAUSAL_BLOCKED.md.
+
+## B2. No third-party replication
+
+- Every execution in this repository was performed by the authors or by this assistant. No external group has run
+  the package.
+- **Blocks**: the claim of independent reproduction; the gate "AI internal recomputation called third-party" stays
+  clean only because no such claim is made.
+- **Resolution**: an external group runs `REPRODUCIBILITY_REPORT.md` and reports hashes.
+
+## Resolved during the project
+
+| id | item | resolution |
+|---|---|---|
+| B3 | BCI-2a cue latency taken from an internal comment | verified against the official data-set description (Brunner et al. 2008) and cited [26] |
+| B4 | no dataset outside the development corpora | two independent corpora added: P300 speller (single session) and BCI challenge (five sessions per subject) |
+| B5 | 2b alignment effect exactly zero | traced to an absolute eigenvalue floor, fixed with a relative floor, rerun |
+| B6 | manuscript window sentence contradicted the code | sentence corrected and the 2a/2b difference stated |
+| B7 | 16 audit documents were never packaged | build list fixed; archive verified to contain all 67 entries |
+
+## Not blockers, recorded for completeness
+
+- Holm correction is vacuous with one live test and is described as such.
+- The concentration contrast was withdrawn after failing regeneration; it is not a blocker, it is a removed claim.
