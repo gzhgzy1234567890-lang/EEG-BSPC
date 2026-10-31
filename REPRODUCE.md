@@ -37,3 +37,28 @@ BSPC_CODE        the repository root (default: the directory of the script)
 The scripts assume the feature caches exist. `build_gal_time.py` is the only one that starts from raw CSVs;
 for sleep-EDF the features are rebuilt from the EDF files inside each script. A single end-to-end entry point
 that fetches the data, builds every cache and regenerates every table does not exist yet, and the paper says so.
+## One command that checks the paper's numbers
+
+```
+python sleep_edf/check_numbers.py
+```
+
+It recomputes every sleep-EDF number from the archived result files (no raw data needed) and asserts each
+against the value printed in the paper, then prints PASS or FAIL:
+
+```
+main          -0.1023 [-0.1149, -0.0899]  32/32 negative  4983 cells
+cumulative    -0.1070  32/32 negative
+...
+decomposition: none 0.4415  full -0.0980  prior -0.1199  cond +0.0340
+identical class sets (693 cells): full -0.0512  prior -0.0487  cond +0.0314
+gate: always -0.1023  online +0.0001  (10% of blocks corrected)
+telemetry     -0.0483 [-0.0588, -0.0369]  21/22 negative  3945 cells
+models: lda -0.1047  svm -0.0638  mlp -0.0610
+
+CHECK PASS
+```
+
+This is the closest thing to the third-party check the review asks for that can live in the repository: it
+verifies the numbers, not the pipeline that produced them. Rebuilding the numbers from raw EDF files is the
+stage scripts above.
