@@ -1,0 +1,13 @@
+{
+ "n_cells": 4983,
+ "n_subjects": 32,
+ "n_recordings": 45,
+ "subject_mean": -0.10231805204356395,
+ "subject_sd": 0.036021692835238484,
+ "negative_subjects": 32,
+ "wilcoxon_p": 7.952884142692727e-07,
+ "ci_low": -0.11454741725894588,
+ "ci_high": -0.0900088651238627,
+ "recording_mean": -0.10180975173959299,
+ "negative_recordings": 45
+}

@@ -54,8 +54,25 @@ cells costs -0.110 [-0.127, -0.092]. Transductive, not online.
 
 ## D5. Classifier priors and thresholds
 
-**Not yet run.** The comparison (empirical LDA priors vs uniform priors vs fixed threshold) is the next
-mechanism experiment; it is listed here so that the gap is not hidden.
+Script `sleep_edf/d5_priors.py`, same cells, same features, same scored trials, same block structure. The uniform-prior
+condition is obtained exactly: sklearn's LDA adds log(prior_k) to each class score, so the uniform-prior scores are
+the empirical-prior scores plus log(1/K) - log(prior_k); no refit is needed and no other quantity changes.
+
+| condition | BA uncorrected | BA corrected | delta | subjects negative | Wilcoxon p |
+|---|---|---|---|---|---|
+| empirical LDA priors | 0.4415 | 0.3391 | **-0.1023** | 32/32 | 8e-07 |
+| uniform LDA priors | 0.4428 | 0.3436 | **-0.0992** | 32/32 | 8e-07 |
+
+Priors effect on the correction: **+0.0031 [+0.0001, +0.0062]** (uniform minus empirical). Mean per-class recall
+after correction: 0.483 (empirical) vs 0.492 (uniform).
+
+Reading. Changing the decision threshold by switching the training priors moves the loss by 0.003, three per cent
+of its size. **The sleep loss is therefore not an artefact of the LDA threshold or of the training priors**; it is
+carried by the mean displacement, as the decomposition says. This is the control the mechanism claim needed.
+
+Limits. A fixed threshold that is optimal for balanced accuracy (chosen with target labels) is a different
+quantity and is not evaluated here; it would be a label-dependent diagnostic, not a deployable rule, and the paper
+must not present it as one.
 
 ## D6. Evidence grading of the mechanism claims
 
