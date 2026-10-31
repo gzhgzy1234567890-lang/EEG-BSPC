@@ -1,27 +1,34 @@
 # RELATED_WORK_VERIFICATION.md
 
-Verification level for every work cited in NOVELTY_MATRIX.md. "Abstract" means the official proceedings abstract
-page was fetched and read on 1 November 2026; "full text" means the PDF was read.
+Verification level for every work cited in NOVELTY_MATRIX.md. Updated after full texts were obtained for three
+papers (1 November 2026).
 
-| work | venue | verification | what was checked |
+| work | venue | verification | key statement read |
 |---|---|---|---|
-| SPDIM (Li, Kawanabe et al.) | ICLR 2025 | **abstract**, proceedings page fetched (HTTP 200) | task (SFUDA for EEG), the claim that Riemannian alignment hurts under label shift, the proposed manifold parameter, the datasets |
-| PRED | IJCAI 2026 | **abstract**, proceedings page fetched (HTTP 200) | online EEG decoding, unsupervised subject-shift detection, prototype adaptation |
-| NeuroAdapt-Bench | MLHC 2026 (PMLR v340) | **abstract**, page fetched (HTTP 200) | TTA benchmark for EEG foundation models; TTA effectiveness "largely underexplored" |
-| Lipton et al., BBSE | ICML 2018 (PMLR v80) | abstract page fetched; the estimator is standard and our use is textbook | confusion-matrix label-shift estimator |
-| EEG data leakage (2024) | PMC | page exists; not re-read this round | leakage channels in EEG decoding |
-| Widmann et al. (2015) | J. Neurosci. Methods | publisher page is paywalled; not fetched | filter artefacts |
-| MOABB | online docs | not fetched this round | benchmark harness |
+| **SPDIM** (Li, Kawanabe, Kobler) | ICLR 2025 | **full text** (25 pages, arXiv 2411.07249 / ICLR camera-ready) | "Under label shift, aligning the moments of the marginal feature distributions **can increase the generalization error** (Bakas et al., 2023)"; Riemannian alignment "can compensate for the conditional distribution shifts ... but **hurt generalization under additional label shifts**"; remedy is a single SPD-manifold parameter optimised with information maximisation |
+| **PRED** (Zhang et al.) | IJCAI 2026 | **full text** (9 pages) | Subject Shift Detector based on policy stability plus Prototype-guided Shift Correction with a multi-granular memory; evaluated on three public datasets; claims plasticity and stability |
+| **NeuroAdapt-Bench** (Lee et al.) | MLHC 2026 | **full text** (37 pages) | "the evaluated TTA methods yield **inconsistent gains and often degrade performance** under distribution shift"; optimization-free methods more stable; T3A the only method with a positive mean BA change, largest +18.9 points on CHB-MIT |
+| Lipton et al., BBSE | ICML 2018 | abstract + standard content | confusion-matrix label-shift estimator |
+| Bakas et al. (2023) | cited inside SPDIM | **second-hand** | label-shift alignment can increase generalisation error; not read directly |
+| EEG data leakage (2024) | PMC | not re-read this round | leakage channels |
+| Widmann et al. (2015) | J. Neurosci. Methods | paywalled | filter artefacts |
+| MOABB | docs | not fetched | benchmark harness |
 
-## Attempted and failed
+## Consequence for this paper's claims
 
-- ICLR full-text PDF: the fetch tool rejects `application/pdf` ("unsupported content type"), so the full text
-  could not be read through it.
-- PMLR PDF for NeuroAdapt-Bench: the constructed URL returned 404; the correct PDF path was not resolved.
+1. The qualitative claim "alignment can hurt under label shift" is **published twice over** (Bakas et al. 2023 via
+   SPDIM; SPDIM's own analysis). The paper must not present it as new, and does not: the related-work paragraph
+   attributes it to SPDIM [23].
+2. NeuroAdapt-Bench independently documents that TTA gains on EEG are inconsistent and often negative. This is
+   **corroboration**, not a threat: our contribution is the mechanism (first-order displacement) rather than the
+   observation of instability.
+3. What remains ours after the full-text check: the decision-space decomposition for a **mean correction** with the
+   optimal-weight formula, the per-sample stability certificate, and the protocol audit (filter vs alignment
+   factorial, cache-order artefact).
 
-## Consequence
+## What changed versus the abstract-only reading
 
-The novelty claims rest on abstracts plus the standard content of the BBSE estimator. **Full-text verification of
-SPDIM, PRED and NeuroAdapt-Bench remains undone** and is recorded as an open item. If SPDIM's full text contains a
-decision-space analysis of mean correction, contribution B of this paper would have to be downgraded further; that
-risk is stated in NOVELTY_RISK_REPORT.md.
+The abstract-only reading could not tell whether SPDIM analysed mean correction specifically. The full text shows
+it analyses **second-order (SPD) alignment** and cites the first-order/label-shift warning to others; it does not
+derive a decision-space displacement formula. Contribution B therefore stands, and contribution A is explicitly a
+corollary of prior label-shift theory.
