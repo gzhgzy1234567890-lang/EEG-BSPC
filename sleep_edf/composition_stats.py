@@ -1,29 +1,45 @@
 # -*- coding: utf-8 -*-
 import json, sys
 import numpy as np
+from scipy.stats import spearmanr
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-rows = json.load(open(r'G:\Work_work\math\EEG\paper_v8\results\sleep_block_composition.json'))
-print('block rows', len(rows), '| cells', len({(r['subj'], r['night'], r['hist_len']) for r in rows}))
-d = np.array([r['dba'] for r in rows])
-mf = np.array([r['maxfrac'] for r in rows])
-en = np.array([r['entropy'] for r in rows])
-print('block-level dBA mean %+0.4f  median %+0.4f  harmful fraction %.2f' % (d.mean(), np.median(d), np.mean(d < 0)))
-print('maxfrac median %.2f | entropy median %.2f' % (np.median(mf), np.median(en)))
-def rank(a):
-    return np.argsort(np.argsort(a)).astype(float)
-print('rank corr(maxfrac, dba) %+0.3f | rank corr(entropy, dba) %+0.3f' % (np.corrcoef(rank(mf), rank(d))[0,1], np.corrcoef(rank(en), rank(d))[0,1]))
-for lo, hi in ((0, 0.5), (0.5, 0.7), (0.7, 0.85), (0.85, 1.01)):
-    m = (mf >= lo) & (mf < hi)
-    if m.sum():
-        print('maxfrac %.2f-%.2f: n=%4d  mean dBA %+0.4f  harmful %.2f' % (lo, hi, m.sum(), d[m].mean(), np.mean(d[m] < 0)))
-# subject-level: mean dBA in the two extreme strata
+R = lambda p: json.load(open(p))
+ba = R(r'G:\Work_work\math\EEG\paper_v8\results\sleep_block_composition.json')
+al = R(r'G:\Work_work\math\EEG\paper_v8\results\sleep_blocks_all.json')
+print('BA rows %d | all-block rows %d' % (len(ba), len(al)))
+def sign_p(k, m):
+    from math import factorial as f
+    return sum(f(m) / (f(i) * f(m - i)) for i in range(k, m + 1)) / 2.0 ** m
+def paired(rows, key, lo_thr=0.6, hi_thr=0.8):
+    subs = {}
+    for r in rows:
+        subs.setdefault(r['subj'], []).append(r)
+    d = []
+    for s, rs in subs.items():
+        lo = [r[key] for r in rs if r['maxfrac'] < lo_thr]
+        hi = [r[key] for r in rs if r['maxfrac'] >= hi_thr]
+        if lo and hi:
+            d.append(np.mean(hi) - np.mean(lo))
+    return np.array(d)
+d_ba = paired(ba, 'dba')
+rng = np.random.default_rng(20261101)
+b = [rng.choice(d_ba, len(d_ba), replace=True).mean() for _ in range(10000)]
+lo_, hi_ = np.percentile(b, [2.5, 97.5])
+print('BA paired: n=%d mean %+0.4f [%+0.4f, %+0.4f] positive %d/%d sign p=%.2g' % (len(d_ba), d_ba.mean(), lo_, hi_, int((d_ba > 0).sum()), len(d_ba), sign_p(int((d_ba > 0).sum()), len(d_ba))))
 subs = {}
-for r in rows:
+for r in al:
     subs.setdefault(r['subj'], []).append(r)
-lo_s, hi_s = [], []
+d_e = []
 for s, rs in subs.items():
-    l = [r['dba'] for r in rs if r['maxfrac'] < 0.6]
-    h = [r['dba'] for r in rs if r['maxfrac'] >= 0.8]
-    if l: lo_s.append(np.mean(l))
-    if h: hi_s.append(np.mean(h))
-print('subjects with both strata: %d | low-concentration %+0.4f | high-concentration %+0.4f' % (min(len(lo_s), len(hi_s)), np.mean(lo_s), np.mean(hi_s)))
+    lo = [r for r in rs if r['maxfrac'] < 0.6]
+    hi = [r for r in rs if r['maxfrac'] >= 0.8]
+    if lo and hi:
+        f = lambda xs: np.sum([x['err1'] - x['err0'] for x in xs]) / np.sum([x['n'] for x in xs])
+        d_e.append(f(hi) - f(lo))
+d_e = np.array(d_e)
+b2 = [rng.choice(d_e, len(d_e), replace=True).mean() for _ in range(10000)]
+lo2, hi2 = np.percentile(b2, [2.5, 97.5])
+print('error paired: n=%d mean %+0.4f [%+0.4f, %+0.4f] positive %d/%d sign p=%.2g' % (len(d_e), d_e.mean(), lo2, hi2, int((d_e > 0).sum()), len(d_e), sign_p(int((d_e > 0).sum()), len(d_e))))
+ncl = np.array([r['ncls_block'] for r in al])
+print('single-class scored blocks: %d of %d (%.1f%%)' % (int((ncl < 2).sum()), len(ncl), 100.0 * (ncl < 2).mean()))
+print('multi-class retained: %d' % int((ncl >= 2).sum()))
