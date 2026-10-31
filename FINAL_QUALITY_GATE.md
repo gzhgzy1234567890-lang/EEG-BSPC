@@ -1,35 +1,32 @@
 # FINAL_QUALITY_GATE.md
 
-Updated after the missing G5 deliverables were created and a **package-completeness defect** was found and fixed.
+Updated after the independent P300 test (pre-registered, prediction failed, diagnosed and reported).
 
 | item | max | score | evidence path | unmet |
 |---|---:|---:|---|---|
-| A | 15 | 15 | AUDIT_BASELINE.md; FILE_PROVENANCE.csv (14 artefact hashes); MANUSCRIPT_CHANGELOG.md from the git log | - |
+| A | 15 | 15 | FILE_PROVENANCE.csv; MANUSCRIPT_CHANGELOG.md; PREREGISTRATION_P300 committed before the run | - |
 | B | 20 | 17 | EVENT_AND_WINDOW_AUDIT.md; test_two_sided_ext.py | 2a cue latency from documentation |
-| C | 15 | 15 | THEORY_PROOFS.md; THEORY_COUNTEREXAMPLES.md (eight probes, two failed constructions); THEORY_TEST_RESULTS.md; C2 | - |
-| D | 15 | 13 | STATISTICAL_AUDIT.md; statistics_recomputed_2b.json | - |
-| E | 10 | 10 | SLEEP_MECHANISM_AUDIT.md; MECHANISM_LIMITATIONS.md; D3 and concentration regenerations | - |
-| F | 10 | 10 | NOVELTY_MATRIX.md on full texts; RELATED_WORK_VERIFICATION.md; NOVELTY_RISK_REPORT.md | - |
-| G | 10 | 9 | REPRODUCIBILITY_REPORT.md; every claimed number regenerated or withdrawn | no third-party replication |
-| H | 5 | 4 | all documents consistent; **package now contains all 16 audit documents it previously omitted** | the omission defect itself is a consistency failure that cost a point |
+| C | 15 | 15 | THEORY_PROOFS.md; THEORY_COUNTEREXAMPLES.md; THEORY_TEST_RESULTS.md | - |
+| D | 15 | 13 | STATISTICAL_AUDIT.md; preamble + results for P300 | - |
+| E | 10 | 10 | SLEEP_MECHANISM_AUDIT.md; MECHANISM_LIMITATIONS.md; three regenerations | - |
+| F | 10 | 10 | NOVELTY_MATRIX.md on full texts; an **independent dataset** now used as a negative control | - |
+| G | 10 | 9 | REPRODUCIBILITY_REPORT.md; every claimed number regenerated, withdrawn, or newly produced | no third-party replication |
+| H | 5 | 4 | P300 result is in the Discussion; the counts were briefly wrong (10297 vs 10798) and are fixed | the count slip is a real consistency failure, so not a full mark |
 | **total** | **100** | **93** | | |
 
-## The defect found this round
+## What the P300 test changed
 
-The package build script used a hand-written file list. Every earlier build silently omitted the newer audit
-documents: NOVELTY_MATRIX, SLEEP_MECHANISM_AUDIT, STATISTICAL_AUDIT, EXTERNAL_VALIDATION_REPORT,
-LIMITATIONS_AND_BLOCKERS, REPRODUCIBILITY_REPORT, THEORY_COUNTEREXAMPLES, D3_MATCHED_REGENERATION,
-CONCENTRATION_RECONCILIATION, C2_CERTIFICATE_RESULTS, SEED_RAW_CAUSAL_BLOCKED, RELATED_WORK_VERIFICATION,
-NOVELTY_RISK_REPORT, MECHANISM_LIMITATIONS, MANUSCRIPT_CHANGELOG and FILE_PROVENANCE. The archive reported
-"51 entries" for several rounds while these files existed only in the working directory. The list is now explicit
-and the archive has **67 entries, all 16 present**, verified by listing the zip.
+It **added an independent dataset** (B4 partially addressed) and it **failed its own pre-registered prediction**.
+The failure is diagnosed: source and target halves share their class composition, so the displacement is
+approximately zero and the correction is inert (-0.0005, 7 of 16 positive). The paper now reports this as a
+negative control and says the prediction was wrong.
 
 ## Hard gates
 
-All pass at this commit. The omission was a packaging failure, not a scientific one, but it is exactly the kind of
-"document says one thing, package contains another" defect a reproducibility reviewer would flag.
+All pass. The relevant one here: "unfinished experiment reported as done" — the P300 test is finished and its
+negative outcome is reported, not converted into a success.
 
 ## Verdict
 
-**Not approved as complete** (93 < 96). Remaining: third-party replication (B2), SEED waveforms (B1), independent
-dataset (B4).
+**Not approved as complete** (93 < 96). Remaining: third-party replication (B2), SEED waveforms (B1), and a
+**cross-session** independent dataset (the P300 data are single-session, so they cannot test cross-session transfer).
