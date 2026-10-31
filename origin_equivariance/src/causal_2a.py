@@ -147,7 +147,7 @@ def main():
         if not (os.path.exists(pT) and os.path.exists(pE)):
             continue
         rec = {'subj': i}
-        for mode, causal, ea in (('causal_so', True, 'source'), ('causal_arch', True, 'archived'), ('noncausal', False, 'archived')):
+        for mode, causal, ea in (('causal_so', True, 'source'), ('causal_arch', True, 'archived'), ('noncausal_so', False, 'source'), ('noncausal', False, 'archived')):
             XT, yT = load_bci(pT, causal)
             XE, yE = load_bci(pE, causal)
             F = features(XT, yT, XE, ea)

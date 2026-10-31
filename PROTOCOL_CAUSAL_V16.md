@@ -1,63 +1,72 @@
-# Frozen protocol: unified source-only, past-only main experiment (v16, revision A)
+# Frozen protocol: unified source-only, past-only main experiment (v16, revision B)
 
-Frozen 31 October 2026, revised before the BCI-2b and SEED runs. Revision A fixes the estimator (the first
-version centred on a zero score instead of the source mean), states the feature definitions as implemented,
-fixes the BCI-2b pairing list, pre-specifies the primary endpoint, and fixes the SEED film-boundary rule.
+Frozen 31 October 2026. Revision B completes the 2x2 design on BCI-2a, withdraws the retrospective
+pre-specification of euc_ea on that dataset, fixes the CSP description, and rewrites the SEED plan after
+checking what data are actually available.
 
-## Estimator (the correction)
+## Estimator
 
-For a trial t in completed block b, the estimate is the mean of the completed blocks 1..b-1 only. The
-two-sided correction removes the displacement of that estimate from the source mean:
+Unchanged from revision A: for a trial in completed block b, the estimate uses blocks 1..b-1 only, and the
+two-sided correction removes d_b = P(s̄_{1..b-1} - s̄_A). Unit test `test_two_sided.py` passes (K = 2 and K = 4).
 
-    d_b = P W (mu_hat_b - mu_A)   computed as   d_b = P (mean score of blocks 1..b-1 - mean score of A)
+## BCI-2a: 2x2 factorial
 
-and the correction applied is x_t - d_b (equivalently, scores s_t - d_b). The first block is unscored.
-Unit test: score-space and feature-space implementations must give identical predictions; asserted in
-`test_two_sided.py`, which passes for K = 2 and K = 4.
+Four conditions, all on the same trials and the same classifier:
 
-## Data and pairing
+| | source-only EA | both-session EA |
+|---|---|---|
+| causal filter | causal_so | causal_arch |
+| non-causal filter | noncausal_so | noncausal |
 
-| dataset | pairing |
+Effects (euc_ea, 9 subjects): alignment +0.008 [-0.006, +0.022]; filter -0.011 [-0.020, -0.002];
+interaction +0.002 [-0.010, +0.014]. The near-zero total protocol effect reported in the earlier version is the
+sum of these two opposing changes, not evidence that causality does not matter; it is reported as such.
+
+## Pre-specification, corrected
+
+The primary endpoint for BCI-2a is **not** pre-specified: euc_ea was chosen after seeing the first run, so its
++0.071 is an exploratory result. For the datasets not yet run the primary endpoint is fixed now, before any
+result is seen:
+
+- BCI-2b: **csp**, the only representation that is source-only by construction in both filter conditions;
+- SEED: the released DE representation (the only one available), with the causal processing applied on top of it.
+
+Holm adjustment covers these pre-specified primary tests only. Secondary representations are reported
+uncorrected and labelled exploratory.
+
+## CSP description, corrected
+
+What the code computes is **six generalized eigenfilters from a first-class-versus-average contrast**: the
+generalized eigenproblem between the first class's average covariance and the across-class average covariance,
+with the three smallest and three largest eigenvalues retained. This is not a multi-class one-vs-rest CSP with
+three filters per class. The manuscript sentence now says exactly this, and the archived pipeline used the same
+code, so this is a description fix rather than a protocol change.
+
+## SEED: data availability first
+
+Checked on this machine before writing the plan:
+
+| item | finding |
 |---|---|
-| BCI-IV-2a | T -> E, 9 subjects |
-| BCI-IV-2b | the three forward pairs 01T->02T, 01T->03T and 02T->03T, 9 subjects, matching the archived main comparison |
-| SEED | the three ordered session pairs per subject (1->2, 1->3, 2->3), 15 subjects |
+| local SEED copy | `E:\\data\\SEED-all\\seed` contains `ExtractedFeatures_1s` and `ExtractedFeatures_4s` and the stimulation tables |
+| raw recordings | **not present**: no `Preprocessed_EEG` directory, no `.cnt` files |
+| consequence | a raw-to-feature causal rerun for SEED cannot be executed here |
 
-## Signal processing
+Therefore the SEED plan is stated in two parts, and the paper must say which one it reports:
 
-Band-pass 8-30 Hz, fourth-order Butterworth. Causal: `lfilter`, forward only, filter state carried along the
-continuous recording. Reference: `filtfilt` on the same signal (the archived pipeline). Epochs: BCI cue + 2.0
-to 6.0 s. SEED: 1 s segments from the released raw recordings; the filter runs continuously across a session and
-**no state reset is made at film boundaries**, but the first and last segment of each film are discarded from
-scoring so that no scored segment sits within one filter transient of a film boundary.
+1. **What can be run here**: causal processing *on top of the released DE features* - the DE values are treated
+   as a given, and the mean estimator is past-only. This cannot be described as a strictly causal raw-to-feature
+   pipeline, because the released DE features were computed with the official preprocessing (200 Hz resampling,
+   0-75 Hz filtering, smoothing variants) that sees the whole segment.
+2. **What a strict rerun would require**: the `Preprocessed_EEG` waveforms (or the SEED_Multimodal `.cnt`
+   files, which cover 12 of the 15 subjects), five frequency bands (delta 1-4, theta 4-8, alpha 8-14, beta
+   14-30, gamma 30-50 Hz), a causal filter per band, and a filter state **reset at every film boundary** with the
+   first and last segment of each film discarded. Only then could the result be compared with the archived
+   +0.214 as a filter-only difference.
 
-## Features (as implemented, not as previously described)
-
-| name | implementation |
-|---|---|
-| euc | log variance in four consecutive **time windows** of the trial (not four frequency bands; the earlier protocol text was wrong and the manuscript sentence is corrected to match the code) |
-| euc_ea | euc after division by an alignment matrix; **source-only** version uses the training-session covariance, the archived version used the mean of both sessions' covariances |
-| tan | tangent space of the source-referenced covariance |
-| csp | generalised eigenvectors of the first class covariance against the average covariance, three filters per class (six total), fitted on the training session only |
-
-Note: the archived euc_ea and tan are target-informed by construction (they use the target session covariance).
-The source-only versions are therefore a protocol change in addition to the filter change, and the two are
-reported separately as filter effect and alignment effect.
-
-## Primary endpoint, fixed in advance
-
-The primary confirmatory endpoint is **euc_ea**, the representation used for the paper's headline comparison.
-The other three representations are secondary and reported without multiplicity correction. Holm adjustment is
-applied across the three datasets for the primary endpoint only.
-
-## Outcomes
-
-- Delta_causal = BA(causal, euc_ea, lambda=1) - BA(causal, euc_ea, lambda=0);
-- Delta_noncausal = the archived value for the same dataset and representation;
-- Delta_protocol = Delta_causal - Delta_noncausal, with a subject-level bootstrap interval, reported as a
-  protocol-sensitivity statistic of this study.
+Until part 2 is available, the SEED causal claim in the paper is restricted to part 1 and labelled accordingly.
 
 ## Statistics
 
-Subject-level paired values; 95 per cent bootstrap over subjects (10,000 resamples, seed 20261101); two-sided
-Wilcoxon signed-rank; Holm across datasets for the primary endpoint.
+Subject-level paired values; 95 per cent bootstrap (10,000 resamples, seed 20261101); two-sided Wilcoxon;
+Holm across the pre-specified primary tests.
