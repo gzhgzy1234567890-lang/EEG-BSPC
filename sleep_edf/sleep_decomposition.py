@@ -5,14 +5,11 @@ import numpy as np
 import mne
 warnings.filterwarnings('ignore')
 mne.set_log_level('ERROR')
-# Paths come from the environment; the defaults are the author's layout.
-HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.environ.get('BSPC_CODE', os.path.join(HERE, '..')))
-sys.path.insert(0, os.environ.get('BSPC_SLEEP_CODE', HERE))
+sys.path.insert(0, r'G:\Work_work\math\EEG\paper_v8')
 import sleep_edf_frozen as F
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import balanced_accuracy_score as bas
-OUT = os.environ.get('BSPC_DECOMP_OUT', os.path.join(HERE, 'results', 'sleep_decomposition.json'))
+OUT = r'G:\Work_work\math\EEG\paper_v8\results\sleep_decomposition_fixed3.json'
 BLOCK = F.BLOCK
 
 
@@ -50,7 +47,7 @@ def cell(Fa, ya, Fb, yb):
            'rest_norm': float(np.linalg.norm(Fm @ (W @ rest))),
            'total_norm': float(np.linalg.norm(Fm @ (W @ (muB - muA)))),
            'n_only_a': len(only_a), 'n_only_b': len(only_b)}
-    for name, shift in (('full', muB - muA), ('prior', prior), ('cond', cond)):
+    for name, shift in (('full', muB - muA), ('prior', prior), ('cond', cond), ('mixture', prior + rest)):
         pred = clf.classes_[np.argmax(S - (Fm @ (W @ shift)), 1)]
         out[name] = float(bas(yb[keep], pred[keep]))
     return out

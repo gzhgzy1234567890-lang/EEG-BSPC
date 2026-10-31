@@ -59,7 +59,7 @@ def decomposition():
         return None
     base = subj_means(rows, 'none')
     out = {'none': base.mean()}
-    for k in ('full', 'prior', 'cond'):
+    for k in ('full', 'prior', 'cond', 'mixture'):
         d = subj_means(rows, k) - base
         out[k] = (d.mean(), int((d < 0).sum()))
     err = max(r['recon_err'] for r in rows)
@@ -137,6 +137,7 @@ EXPECT = {
     'full': (-0.098, 0.006),
     'prior': (-0.120, 0.008),
     'cond': (0.034, 0.008),
+    'mixture': (-0.091, 0.008),
     'gate': (0.000, 0.004),
     'telemetry': (-0.048, 0.006),
     'svm': (-0.064, 0.008),
@@ -144,7 +145,7 @@ EXPECT = {
     'published': (-0.1075, 0.008),
     'sorted_control': (-0.090, 0.008),
     'time': (0.0014, 0.006),
-    'seed_rot': (0.200, 0.010),
+    'seed_rot': (0.189, 0.010),
 }
 
 
@@ -162,7 +163,7 @@ def report():
     dc = decomposition()
     if dc:
         print('decomposition: none %.4f  full %+0.4f  prior %+0.4f  cond %+0.4f' % (dc['none'], dc['full'][0], dc['prior'][0], dc['cond'][0]))
-        for k in ('full', 'prior', 'cond'):
+        for k in ('full', 'prior', 'cond', 'mixture'):
             ok &= abs(dc[k][0] - EXPECT[k][0]) < EXPECT[k][1]
         print('identical class sets (%d cells): full %+0.4f  prior %+0.4f  cond %+0.4f' % (dc['n_same'], dc['same']['full'], dc['same']['prior'], dc['same']['cond']))
     g = gate()

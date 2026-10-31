@@ -28,7 +28,7 @@ BSPC_CODE        the repository root (default: the directory of the script)
 | acquisition-order rebuild | `grasp_and_lift_order/build_gal_time.py` |
 | three orderings (Table 8) | `grasp_and_lift_order/gal_order_test.py` |
 | matched scored trials | `grasp_and_lift_order/matched_samples.py` |
-| SEED film-disjoint, three rotations | `grasp_and_lift_order/seed_film_disjoint_rotations.py` |
+| SEED film-disjoint, five rotations | `grasp_and_lift_order/seed_film_disjoint_rotations.py` |
 | SEED film-level recall | `grasp_and_lift_order/seed_film_level.py` |
 | SEED online gate | `grasp_and_lift_order/seed_gate_online.py` |
 

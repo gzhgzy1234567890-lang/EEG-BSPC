@@ -7,7 +7,7 @@ from sklearn.metrics import balanced_accuracy_score as bas
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 D = r'G:\Work_work\math\EEG\local_analysis\cache_seed'
 BLOCK = 15
-OUT = r'G:\Work_work\math\EEG\paper_v8\results\seed_film_disjoint_rot.json'
+OUT = r'G:\Work_work\math\EEG\paper_v8\results\seed_film_disjoint_rot5.json'
 
 
 def load():
@@ -41,7 +41,7 @@ def main():
                 if len(fc) < 3:
                     continue
                 rot_deltas = []
-                for r in range(3):
+                for r in range(5):
                     test_f, train_f = [], []
                     ok = True
                     for k, fs in fc.items():
@@ -80,7 +80,7 @@ def main():
     rng = np.random.default_rng(20261031)
     boot = [rng.choice(vals, len(vals), replace=True).mean() for _ in range(10000)]
     lo, hi = np.percentile(boot, [2.5, 97.5])
-    print('rotations=3, subjects %d, mean %+0.4f CI [%+0.4f, %+0.4f], positive %d/%d'
+    print('rotations=5, subjects %d, mean %+0.4f CI [%+0.4f, %+0.4f], positive %d/%d'
           % (len(vals), vals.mean(), lo, hi, int((vals > 0).sum()), len(vals)))
     print('per subject:', np.round(vals, 3))
     json.dump({'per_subject': vals.tolist()}, open(OUT, 'w'))
