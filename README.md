@@ -1,17 +1,21 @@
-# EEG-BSPC — code, features and result files
+# EEG-BSPC — code, result files and manuscript sources
 
-This repository holds the analysis code and the result files for the two manuscripts below. The second
-(alignment) paper's pipeline is kept because the first paper reuses its feature caches and comparison
-tables; the first is the current submission.
+This repository holds the analysis code and result files for one current submission and for the earlier
+alignment study whose feature caches and benchmark definitions the current paper reuses. The alignment paper's
+pipeline is kept so that the reuse can be checked.
 
 **Current submission (BSPC):**
 
-> When online mean correction harms EEG decoding: a reproducible negative transfer within recording
-> series, and where it helps instead
+> When does causal mean correction help or harm EEG decoding? Evidence from cross-recording benchmarks and a
+> trial-order audit
 
-**Earlier paper (alignment):**
+**Earlier paper (alignment), whose caches are reused:**
 
 > Align, don't zero: consistent feature centring for cross-session EEG decoding
+
+The current manuscript states the reuse in its Data availability and overlap paragraph; whether the alignment
+paper has been submitted, is under review, or has appeared is a question for the authors and is not asserted
+here.
 
 ---
 
@@ -19,82 +23,47 @@ tables; the first is the current submission.
 
 | claim | code | output |
 |---|---|---|
-| transductive table, five development benchmarks | `origin_equivariance/src/pv8_final.py`, `pv8_master.py` | `results/master_stats.md` |
-| causal estimator comparison on a common test set | `origin_equivariance/src/pv8_final_compare.py`, `pv8_causal.py` | `results/final_compare.txt` |
-| variance-ratio weighting (Eq. 9) and its ablation | `pv8_lambda_control.py`, `pv8_final_compare.py` | `results/final_compare.txt` |
-| correction-strength and estimator surface (Tables 9-10) | `pv8_master.py` | `results/master_stats.md` |
-| trend diagnostic (Table 11, Fig. 5) | `pv8_trend_test.py` | `results/trend_test.txt` |
-| synthetic failure regimes (Table 7, Fig. 3), 30 paired seeds per cell | `pv8_phase30.py`, figure: `pv8_fig_regimes.py` | `results/phase30.txt` |
-| external cross-day cohort (Lee2019-MI) | `openbmi/lee2019_direct.py`, `lee2019_parallel.py`, `lee2019_secondary.py`, `lee2019_sensitivity.py`, `lee2019_variantC.py` | `results/openbmi_all.json`, `lee2019_sensitivity.json`, `lee2019_variantC.json` |
-| protocol-consistent sleep-EDF replication | `sleep_edf/sleep_edf_frozen.py` | `sleep_edf/results/sleep_edf_frozen_cells.json` |
-| sensitivity to the single-stage-target rule (adds the excluded pairs) | `sleep_edf/sleep_edf_frozen_sens.py --incl` | `sleep_edf/results/sleep_edf_frozen_incl.json` |
-| first sleep-EDF implementation, superseded (kept for the deviation record) | `sleep_edf/sleep_edf_test.py`, `sleep_edf_run.py` | `sleep_edf/results/sleep_edf_cells.json` |
-| grasp-and-lift composition audit | `sleep_edf/gal_composition_confound.py` | text in `sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md` |
+| SEED, full-strength correction | `grasp_and_lift_order/seed_gate_online.py`, `seed_models.py` | `grasp_and_lift_order/results/*.json` |
+| SEED, film-disjoint over five rotations | `grasp_and_lift_order/seed_film_disjoint_rotations.py` | `grasp_and_lift_order/results/seed_film_disjoint*.json` |
+| SEED, estimator comparison (S30) | `grasp_and_lift_order/seed_estimators.py` | `grasp_and_lift_order/results/seed_estimators.json` |
+| SEED, memory sweep and its subject-level statistics (S31) | `grasp_and_lift_order/seed_memory_scale.py`, `seed_memory_scale_stats.py` | `grasp_and_lift_order/results/seed_memory_scale.json` |
+| sleep-EDF, completed-block correction | `sleep_edf/sleep_edf_frozen.py` | `sleep_edf/results/sleep_edf_frozen_cells.json` |
+| sleep-EDF, five-estimator matrix | `sleep_edf/sleep_estimator_matrix.py` | `sleep_edf/results/*.json` |
+| sleep-EDF, global decomposition (S27) | `sleep_edf/sleep_decomposition.py` | `sleep_edf/results/sleep_decomposition*.json` |
+| sleep-EDF, block-wise decomposition over the class union (S31) | `sleep_edf/sleep_blockwise.py` | `sleep_edf/results/sleep_blockwise.json` |
+| sleep-EDF, per-block composition and all-block error change (S31) | `sleep_edf/sleep_blocks_all.py`, `sleep_block_composition.py`, `composition_stats.py` | `sleep_edf/results/sleep_blocks_all.json`, `sleep_block_composition.json` |
+| sleep-EDF, telemetry protocol | `sleep_edf/sleep_telemetry.py` | `sleep_edf/results/sleep_telemetry*.json` |
+| sleep-EDF, online label-free gate | `sleep_edf/sleep_gate_online.py` | `sleep_edf/results/*.json` |
+| grasp-and-lift, acquisition-order audit | `grasp_and_lift_order/gal_order_test.py`, `build_gal_time.py` | `grasp_and_lift_order/results/gal_order*.json` |
+| grasp-and-lift, matched scored trials | `grasp_and_lift_order/matched_samples.py` | `grasp_and_lift_order/results/matched*.json` |
+| non-linear decoders | `sleep_edf/sleep_models.py` | `sleep_edf/results/sleep_models*.json` |
 
-The frozen protocol and its deviation record are in `sleep_edf/INDEPENDENT_TEST_PROTOCOL.md` and
-`sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md`. The latter lists every difference between the frozen text
-and the executed analysis, together with both result sets.
+## Numbers check
+
+```
+python sleep_edf/check_numbers.py    # every number in the manuscript and supplement, from the archived results
+python sleep_edf/check_s31.py        # the S31 block-wise and memory-sweep values
+```
+
+Both print `CHECK PASS` when the archived results reproduce the reported values. This is a check on the
+archived result files, not a re-run of the EEG processing.
 
 ## Data (public; not included)
 
 | dataset | where | layout expected |
 |---|---|---|
-| BCI Competition IV 2a | <https://www.bbci.de/competition/iv/#dataset1> | `$BSPC_DATA/BCICIV-2a-mat/A0?T.mat`, `A0?E.mat` |
-| BCI Competition IV 2b | <https://www.bbci.de/competition/iv/#dataset2> | `$BSPC_DATA/BCICIV-2b/B0?0?T.gdf`, `B0?0?E.gdf` |
-| Lee2019-MI (OpenBMI) | GigaDB, `pub/10.5524/100001_101000/100542` | `D:\data\mne_data\...\session{1,2}\s{N}\sess0{1,2}_subj{N:02d}_EEG_MI.mat` |
+| SEED | BCMI, <https://bcmi.sjtu.edu.cn/home/seed/> | `$BSPC_CACHE_SEED/*.npz` (per-session features) |
 | sleep-EDF cassette | PhysioNet, `sleep-cassette` | `E:\data\sleep-edf\sleep-cassette\*PSG.edf` + `*EC-Hypnogram.edf` |
-
-`BSPC_DATA` defaults to `E:\data`. The paths in the Lee2019 and sleep-EDF scripts are absolute and must
-be pointed at your copies.
+| grasp-and-lift | Kaggle, `grasp-and-lift-eeg-detection` | `E:\data\grasp-and-lift-eeg-detection\train\*.csv` |
+| BCI Competition IV 2a / 2b | <https://www.bbci.de/competition/iv/> | `$BSPC_DATA/BCICIV-2a-mat`, `BCICIV-2b` |
+| Lee2019-MI (OpenBMI) | GigaDB 100542 | `D:\data\mne_data\...` |
 
 ## Environment
 
 Python 3.7, numpy 1.21.6, scipy 1.7.3, scikit-learn 0.23.2, mne 0.23.4, matplotlib 3.5.3.
 
-## Running
+## Reproducing the figures
 
 ```
-python src/paper_numbers.py       # alignment paper: every reported number
-python src/reproduce.py           # alignment paper: independent re-implementation
-python openbmi/lee2019_parallel.py    # external cohort, downloads what is missing
-python openbmi/lee2019_secondary.py   # estimator x strength surface
-python sleep_edf/sleep_edf_frozen.py  # protocol-consistent replication (~4 min)
+python figures/ga_corrected.py     # graphical abstract
 ```
-
-## Environment and paths
-
-Python 3.7, numpy 1.21.6, scipy 1.7.3, scikit-learn 0.23.2, mne 0.23.4, matplotlib 3.5.3. Paths are read
-from the environment where possible: `BSPC_DATA` (raw data), `BSPC_CACHE_ROOT` (the directory holding
-`cache_*`), `BSPC_OUT` (text outputs). The defaults reproduce the author's layout.
-
-## End-to-end reproduction of the grasp-and-lift result
-
-This chain starts from the public Kaggle CSVs and ends in the paper's figures, with no cached feature table
-in between:
-
-```
-python grasp_and_lift_order/build_gal_time.py 'subj*'   # raw CSV + events -> features in acquisition order
-python grasp_and_lift_order/gal_order_test.py           # three-way comparison (published / control / time)
-python grasp_and_lift_order/gal_estimators_time.py      # the six causal estimators on the time-ordered cache
-python grasp_and_lift_order/fig4_corrected.py           # Figure 4
-```
-
-The audit of the published cache and the three orderings are in `grasp_and_lift_order/AUDIT.md`; the same
-folder holds `sleep_class_overlap.py`, which produces the class-set stratification of the sleep replication.
-
-## A record of defects, kept deliberately
-
-- The alignment pipeline once estimated `tr(Sigma)` as `mean(dd**2) * h / 4`, which is wrong by a factor
-  `2D`; the correct form is `sum(dd**2) * h / 2`. A section of the alignment paper was withdrawn because of
-  it. See the alignment paper's notes.
-- `lee2019_secondary.py` counted a subject as negative against the group mean instead of the subject's own
-  baseline; fixed in commit `e05e3af`.
-- The first sleep-EDF aggregation keyed subjects on four characters instead of five; fixed, and the
-  corrected aggregation reproduces the reported numbers. Both runs are in `sleep_edf/INDEPENDENT_TEST_DEVIATIONS.md`.
-- **The grasp-and-lift feature cache was stored sorted by class**, not in acquisition order. The sorted
-  storage manufactures a loss of 0.108 (12 of 12 subjects negative); the same features in acquisition order
-  give +0.001. The rebuild, the control and the per-subject values are in `grasp_and_lift_order/`.
-
-## License
-
-MIT. See `LICENSE`.
