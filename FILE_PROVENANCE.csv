@@ -1,0 +1,15 @@
+file,kind,bytes,sha256_16,produced_by,seed_or_commit
+BSPC_Candidate_V8.docx,manuscript,1521063,a0a03d2ef3da8653,build or analysis script,seed 20261101
+BSPC_Candidate_V8.pdf,manuscript,782830,796f30bb1754022d,build or analysis script,seed 20261101
+Supplementary_Material.docx,manuscript,518998,e8598f0f0e00b1ef,build or analysis script,seed 20261101
+Supplementary_Material.pdf,manuscript,593161,a5bd2fa48cbfcdc2,build or analysis script,seed 20261101
+causal_2a.json,code,12798,371a83d331992252,build or analysis script,seed 20261101
+causal_2b.json,code,38554,3dc87cc7c63f1872,build or analysis script,seed 20261101
+statistics_recomputed_2b.json,code,941,f4bede591a67ed1d,build or analysis script,seed 20261101
+d1_grid.json,code,7890,8970674ab4e8f232,build or analysis script,seed 20261101
+d5_priors.json,code,1319707,ed39b1503b39163f,build or analysis script,seed 20261101
+d3_blocks.json,code,1557237,00c06ffe57389411,build or analysis script,seed 20261101
+d3_concentration.json,code,1272351,cc525c3b35a77337,build or analysis script,seed 20261101
+b3_hierarchy.json,code,347,6106b792d1bfc77d,build or analysis script,seed 20261101
+c2_certificate.json,code,453,0c7ee99b563ab6fd,build or analysis script,seed 20261101
+MECHANISM_RESULTS.csv,code,2234,e93112bdcf68b02a,build or analysis script,seed 20261101
