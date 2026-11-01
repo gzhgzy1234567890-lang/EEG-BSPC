@@ -1,37 +1,38 @@
 # Submission checklist — BSPC (current state)
 
-## Files to upload
+Final state for the first submission to Biomedical Signal Processing and Control.
 
-| System field | File | Status |
+## Files and the item type to select in Editorial Manager
+
+Upload the five content files individually rather than the zip, so each item type can be set:
+
+| Editorial Manager item type | file to upload | notes |
 |---|---|---|
-| Manuscript | BSPC_Candidate_V8.docx / .pdf | 20 pages, **11593 words (Word count, references included)**, 9 tables, 4 figures; abstract, keywords, CRediT, competing interests, data availability, AI-use declaration |
-| Supplementary material | Supplementary_Material.docx / .pdf | 27 pages, **S1-S33** |
-| Highlights | BSPC_Highlights_V8.docx / .pdf | five items, each under 85 characters |
-| Graphical abstract | Figures/Graphical_Abstract_BSPC.png / .pdf | 3279 x 1239 px |
-| Cover letter | Cover_Letter_BSPC.docx / .pdf | title, case, declarations |
+| Manuscript | `BSPC_Candidate_V8.docx` | 20 pages, 9 tables, 4 embedded figures |
+| Supplementary Material | `Supplementary_Material.pdf` | 27 pages, S1-S33; the .docx is supplied too if the system asks for an editable version |
+| Highlights | `BSPC_Highlights_V8.docx` | 5 items, 60-79 characters each |
+| Cover Letter | `Cover_Letter_BSPC.docx` | 1 page, first-submission wording |
+| Graphical Abstract | `Graphical_Abstract_BSPC.pdf` | 3279 x 1239 px, PNG also supplied |
 
-No reviewer-response letter is included: this is a first submission.
+Do not mark both the DOCX and the PDF as "Manuscript": that produces a duplicate in the merged PDF.
 
-## Archive used in the same run
+If the system requires the four main figures as separate files, they are embedded in the manuscript only and must be
+exported separately; the graphical abstract is already a separate file.
 
-The full audit archive (BSPC_Submission_Package_final.zip, 38 entries) keeps the protocols, the deviations and
-the superseded records, each labelled as such. Only the files above are for the journal.
+## Before pressing submit
 
-## Checks that pass
+- [ ] open the merged PDF the system generates and check that Tables 1-9, the four figures and the equations render;
+- [ ] approve the PDF; Elsevier treats the submission as complete only after that step;
+- [ ] confirm the cited commit `871546b` is reachable (it holds all analysis code and results).
 
-- numbers: `python sleep_edf/check_numbers.py` -> CHECK PASS;
-- documents: FREEZE_RECORD.md lists ten files with sizes and SHA-256; FREEZE CHECK PASS;
-- commit: every current document cites `871546b`;
-- archives: submission 12 entries, audit 38 entries, 0 hash mismatches.
+## Consistency evidence
 
-## Decisions for the authors
+```
+FREEZE CHECK PASS   (12 files, sha256 verified)
+CONSISTENCY PASS    (abstract numbers present in body; claim locations resolve; freeze rows match)
+```
 
-1. **Article type and length.** 11593 words (Word count, references included) against the ~5,000 that third-party summaries mention; the official
-   Guide could not be retrieved from this environment. If a limit is enforced, cut Section 4.2.1 and the
-   estimator table rather than results.
-2. **Graphical abstract format.** TIFF or EPS if the system demands it; the figure regenerates from
-   `figures/ga_corrected.py`.
-3. **Relation to the earlier alignment manuscript.** The paragraph is written in neutral terms; its submission
-   status is an author fact and must be confirmed before upload.
-4. **Suggested reviewers.** Three to five names outside the authors' institutions, not prepared here.
-5. **ORCID and funding.** Acknowledgements state that no specific grant was received.
+## Word count
+
+The manuscript is 11,593 words including references. No hard limit was verified from the BSPC guide for authors in
+this environment, so the length is reported rather than declared compliant.
