@@ -1,0 +1,12 @@
+claim_id,claim,evidence_file,evidence_type,status
+A1,full past-only correction costs -0.1023 [-0.1141 -0.0898] 32/32,results/online_decomposition.json,confirmatory,active
+A2,mix-only correction costs -0.1257; within-only gains +0.0202,results/online_decomposition.json,oracle diagnostic,active
+A3,decomposition reconstructs the estimator displacement to 2.6e-14,results/online_decomposition.json,mathematical identity,active
+A4,shared-class subset keeps the pattern (full -0.1639),results/online_decomposition_blocks.json,sensitivity,active
+B1,class-proportion change alone costs -0.0097 against a -0.0034 floor,results/factorial_2x2_rich.json,controlled intervention,active
+B2,drift alone gains +0.0172 at 0.5 sd and +0.0601 at 1.0 sd,results/factorial_2x2_rich.json,controlled intervention,active
+B3,sign is predicted by |drift| > |composition| (+0.0398 vs -0.0057),results/factorial_2x2_rich.json,controlled intervention,active
+C1,SEED sign crosses between 50 and 100 s of memory,results/seed_memory_scale.json,archived sweep,active
+C2,no-drift floor falls from -0.0234 to -0.0033 as memory grows 1 to 16 blocks,results/temporal_memory.json,controlled intervention,active
+C3,25-epoch class runs cost -0.2749 at one block of memory,results/temporal_memory.json,controlled intervention,active
+C4,sleep stage runs median 1.5 min and majority class 68 per cent,results/sleep_runs.txt,descriptive,active
