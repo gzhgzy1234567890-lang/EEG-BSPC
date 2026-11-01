@@ -47,3 +47,20 @@ now impossible: the regression test uses (a, s) = (2, 1), (0.5, 2) and (2, 0.7).
 The first quality gate reported "theory verified" while the coefficient was wrong. Numerical checks that only probe
 signs and optima cannot catch a coefficient error; the gate was therefore not a substitute for independent
 review, and this document now records that explicitly.
+## Monte Carlo validation of the corrected coefficient (added after the referee report)
+
+A 3 x 3 x 3 grid over a in {0.5, 1, 2}, sigma in {0.7, 1, 1.5} and d in {0.1, 0.2, 0.4}, 400,000 samples per cell,
+classifier threshold at 0, displacement applied to every sample. Script `origin_equivariance/src/second_order_mc.py`,
+seed 20261101.
+
+| comparison | result |
+|---|---|
+| Monte Carlo against the exact loss | max absolute difference 0.0009 over the 27 cells |
+| second-order formula against the exact loss at d = 0.1 | max relative error 0.9 per cent |
+| at d = 0.2 | max relative error 3.4 per cent |
+| at d = 0.4 | up to 12 per cent, i.e. outside the asymptotic regime, as expected |
+
+The coefficient being validated is the corrected one, a d^2 phi(a/s) / (2 s^3). The old coefficient would disagree
+with the Monte Carlo by a factor of s^2 / a^2 in every cell where a != s, which is the majority of this grid.
+
+All 27 values are archived in `results/second_order_mc.json`.
