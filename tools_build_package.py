@@ -7,10 +7,10 @@ pkg = 'G:/Work_work/math/EEG/submit_package'
 zip_path = 'G:/Work_work/math/EEG/BSPC_Submission_Package_final.zip'
 arch = 'G:/Work_work/math/EEG/archive'
 docs = ['BSPC_Candidate_V8.docx','BSPC_Candidate_V8.pdf','BSPC_Highlights_V8.docx','BSPC_Highlights_V8.pdf',
-        'COMPOSITION_CONFOUND.md','Cover_Letter_BSPC.docx','Cover_Letter_BSPC.pdf','EXECUTION_TIMELINE.md','GRASP_AND_LIFT_ORDER_AUDIT.md',
+        'COMPOSITION_CONFOUND.md','Cover_Letter_BSPC.docx','Cover_Letter_BSPC.pdf','Response_to_Reviewers.docx','Response_to_Reviewers.pdf','EXECUTION_TIMELINE.md','GRASP_AND_LIFT_ORDER_AUDIT.md',
         'FINAL_RESULTS_SUMMARY.md','FREEZE_RECORD.md','INDEPENDENT_TEST_DEVIATIONS.md','INDEPENDENT_TEST_PROTOCOL.md',
         'INDEPENDENT_TEST_RESULT.md','OPENBMI_FROZEN_PROTOCOL.md','PAGE_CHECK_LIST.md',
-        'PAGE_VISUAL_CHECK.md','PRESUBMISSION_AUDIT.md','PROTOCOL_DEVIATIONS.md','PROTOCOL_SLEEP_TELEMETRY.md','AUDIT_BASELINE.md','AUDIT_BCI2B_EA.md','CLAIM_EVIDENCE_MATRIX.csv','EVENT_AND_WINDOW_AUDIT.md','STATISTICAL_ANALYSIS_PLAN.md','GOAL_ROUND_LOG.md','THEORY_PROOFS.md','THEORY_TEST_RESULTS.md','FINAL_QUALITY_GATE.md','REVIEWER_1_REPORT.md','REVIEWER_2_REPORT.md','CURRENT_BLOCKERS.md','PROTOCOL_CAUSAL_V16.md','REPRODUCIBILITY.md','RESEARCH_PLAN_FOR_ACCEPTANCE.md','REVISION_V9_DRAFT.md','SUBMISSION_CHECKLIST.md',
+        'PAGE_VISUAL_CHECK.md','PRESUBMISSION_AUDIT.md','PROTOCOL_DEVIATIONS.md','PROTOCOL_SLEEP_TELEMETRY.md','AUDIT_BASELINE.md','AUDIT_BCI2B_EA.md','CLAIM_EVIDENCE_MATRIX.csv','CODE_MAP.md','RESPONSE_TO_REFEREE.md','BLOCK_SENSITIVITY_2B.md','TABLE_TRACEABILITY.md','EVENT_AND_WINDOW_AUDIT.md','STATISTICAL_ANALYSIS_PLAN.md','GOAL_ROUND_LOG.md','THEORY_PROOFS.md','THEORY_TEST_RESULTS.md','FINAL_QUALITY_GATE.md','REVIEWER_1_REPORT.md','REVIEWER_2_REPORT.md','CURRENT_BLOCKERS.md','PROTOCOL_CAUSAL_V16.md','REPRODUCIBILITY.md','RESEARCH_PLAN_FOR_ACCEPTANCE.md','REVISION_V9_DRAFT.md','SUBMISSION_CHECKLIST.md',
         'SENSITIVITY_ANALYSIS.md','STATS_VERIFICATION.md',
         'NOVELTY_MATRIX.md','RELATED_WORK_VERIFICATION.md','NOVELTY_RISK_REPORT.md','SLEEP_MECHANISM_AUDIT.md','MECHANISM_LIMITATIONS.md','STATISTICAL_AUDIT.md','EXTERNAL_VALIDATION_REPORT.md','LIMITATIONS_AND_BLOCKERS.md','REPRODUCIBILITY_REPORT.md','MANUSCRIPT_CHANGELOG.md','FILE_PROVENANCE.csv','THEORY_COUNTEREXAMPLES.md','D3_MATCHED_REGENERATION.md','CONCENTRATION_RECONCILIATION.md','C2_CERTIFICATE_RESULTS.md','SEED_RAW_CAUSAL_BLOCKED.md','Supplementary_Material.docx','Supplementary_Material.pdf']
 figs = ['Fig_1.png','Fig_2.png','Fig_3.png','Fig_4.png','Fig_S1.png','Fig_S2.png','Fig_S3.png',
@@ -54,12 +54,12 @@ for root, dirs, names in os.walk(pkg):
 files.sort()
 rows = ['| %s | %d bytes | %s%s%s |' % (rel, os.path.getsize(full), BT, sha(full), BT) for rel, full in files]
 head = ['# BSPC submission package', '',
-        'Assembled 1 November 2026 (revision 2). Manuscript 20 pages, 11,069 words, 8 tables, 4 figures; supplement 27 pages,',
+        'Assembled 1 November 2026 (revision 2). Manuscript 20 pages, 11,593 words, 9 tables, 4 figures; supplement 27 pages,',
         'sections S1-S32. The grasp-and-lift negative transfer of',
         'earlier drafts was an artefact of a class-sorted feature cache; Section 4.2 and S32 record the withdrawal.', '',
         '## Manuscript', '',
-        '- 11,069 words (Word count; about 10,300 excluding references), 20 pages',
-        '- abstract 262 words; 8 tables, 4 figures; supplement 27 pages, sections S1-S33', '',
+        '- 11152 words (Word count; about 10,300 excluding references), 20 pages',
+        '- abstract 219 words; 9 tables, 4 figures; supplement 27 pages, sections S1-S33', '',
         '## The independent replication', '',
         '- protocol-consistent run: 45 recordings, 32 subjects, 4,983 cells, -0.102 ([-0.114, -0.090]),',
         '- strict-causality re-run (forward-only filters, state carried): -0.102 ([-0.114, -0.089]), 32 of 32 negative',
@@ -75,7 +75,7 @@ head = ['# BSPC submission package', '',
 notes = ['', '## Notes', '',
          '- PRESUBMISSION_AUDIT.md records all four audit rounds, including the frozen-protocol comparison',
          '  (six differences found and corrected), the target-side sensitivity and this consistency pass.',
-         '- Data availability names the public repository and the current commit (8660894); a6c696a is an earlier commit in the same history.',
+         '- Data availability names the public repository and the current commit (9c39cee); a6c696a is an earlier commit in the same history.',
          '- 0001_fix_secondary_analysis.patch is retired: e05e3af, f5220f9, 98f3238, d426c14 and 1eca5be are on origin/main.',
          '- Raw data remain at D:/data/mne_data and E:/data; nothing was deleted.', '',
          '## Archived', '',
