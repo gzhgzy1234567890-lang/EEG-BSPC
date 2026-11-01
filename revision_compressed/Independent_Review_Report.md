@@ -94,7 +94,7 @@ other content error exists, and the independent review is the only check that ha
 | Section 2.3 wrote the displacement as two terms without qualification | now qualifies the split to the case where source and target share their class support, names the third term, and points to Section 4.6 |
 | Section 4.4 inferred what a longer memory would do from Section 4.7 | the inference is withdrawn: the grid varies correction strength, not memory |
 | the Discussion said both protocols estimate the target mean from the whole target session | now separates the transductive batch comparison of Section 4.1 from the block-wise past-only estimator of Sections 4.4 to 4.9 |
-| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,105 body words |
+| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,209 body words |
 | supplement DOCX and PDF metadata kept the old title | core properties of both files updated |
 | Elsevier AI disclosure for the annotated panels | Fig. 1 and Fig. 2 captions now name the tool and version and state that no image content was model-generated |
 
@@ -108,3 +108,11 @@ other content error exists, and the independent review is the only check that ha
 | the two S35 tables sat at the end of the supplement after S37 | moved back under their captions in S35 and renumbered Table S9 and S10 to avoid clashing with the main text |
 | five datasets announced, six listed | now states five development datasets supplying all 845 cells and a sixth (SEED-IV) used only for the implementation audit |
 | Table 8 described the memory mechanism as stationarity | reworded to stability of the displacement over the window plus coverage of the class runs, which is what the sweep tests |
+
+## Part H. After the fourth review
+
+| finding | fix |
+|---|---|
+| S37's Setting still defined mean as fit on X_A - mu_A, apply to X_B - mu_B + mu_A, which is a third pipeline | the Setting now lists all five pipelines exactly as Table 1 does: none, mean (fit on X_A), dbl (fit on X_A - mu_A), zero, train-only |
+| Table 4's fourth method column was headed Eq. (9), an equation that no longer exists | renamed to variance-ratio (Eq. 4) in the main table, and the two supplement tables that used the same header were renamed the same way |
+| the AI declaration pointed at an Implementation and AI assistance section that did not exist | a Methods paragraph with that name now sits at the end of Section 3 and states the tool, version, the division of labour and the authors' responsibility; the declaration cites that paragraph by section |

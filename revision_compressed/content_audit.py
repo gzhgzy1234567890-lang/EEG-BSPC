@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Extend the content audit with the new checks and run everything."""
+"""Add the three new checks and run the audit."""
 import docx, os, sys
 import numpy as np
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -16,7 +16,9 @@ if M is None or S is None:
     sys.exit(2)
 m = docx.Document(M); s = docx.Document(S)
 text = ' '.join(p.text for p in m.paragraphs)
+text += ' ' + ' '.join(c.text for t in m.tables for r in t.rows for c in r.cells)
 stext = ' '.join(p.text for p in s.paragraphs)
+stext += ' ' + ' '.join(c.text for t in s.tables for r in t.rows for c in r.cells)
 checks = []
 checks.append(('no "Tables 4 and 5" misreference', 'Tables 4 and 5' not in text))
 checks.append(('no duplicate "never adds them"', text.count('never adds them') <= 1))
@@ -31,14 +33,19 @@ checks.append(('4.4 does not infer memory from the strength grid',
 checks.append(('Discussion separates transductive from past-only',
                'uses only completed blocks' in text and 'centres the target on the whole target session' in text))
 checks.append(('S37 holds the four proofs', 'S37. Proofs of Propositions 1-4' in stext))
+checks.append(('S37 setting matches Table 1', 'mean (fit on X_A, apply to X_B - mu_B + mu_A)' in stext and
+               'dbl (fit on X_A - mu_A, apply to X_B - mu_B)' in stext))
 checks.append(('S37 P1 states the shifted correction correctly',
                'the extra +c is again removed by the shifted intercepts' in stext))
 checks.append(('within-session reference not called an upper bound', 'upper bound' not in text))
 checks.append(('dataset count clarified', 'A sixth, SEED-IV, is used only' in text))
 checks.append(('main equations numbered 1-4', all(('(%d)' % i) in text for i in (1, 2, 3, 4))))
-checks.append(('no dangling (7)-(9) in the manuscript', not any(('(%d)' % i) in text for i in (7, 8, 9))))
+checks.append(('no dangling (7)-(9) anywhere', not any(('(%d)' % i) in text or ('(%d)' % i) in stext for i in (7, 8, 9))))
 checks.append(('supplement has no dangling Equation (n)', not any(('Equation (%d)' % i) in stext for i in (2, 3, 4, 5))))
 checks.append(('supplement tables renumbered', 'Table S9.' in stext and 'Table S10.' in stext))
+checks.append(('Table 4 header cites Eq. 4 not Eq. 9', 'variance-ratio (Eq. 4)' in text))
+checks.append(('Methods AI paragraph exists', 'Implementation and AI assistance.' in text))
+checks.append(('declaration points at Section 3', 'paragraph of Section 3' in text))
 s_arr = np.array([0.0, 1.0]); d = np.array([0.0, 2.0])
 kstar = int(np.argmax(s_arr))
 correct = [s_arr[kstar] - s_arr[j] - (d[kstar] - d[j]) for j in range(2) if j != kstar]
