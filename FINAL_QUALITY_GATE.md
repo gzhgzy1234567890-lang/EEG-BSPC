@@ -1,38 +1,29 @@
 # FINAL_QUALITY_GATE.md
 
-Revision 3, after the referee's P0 and P1 items.
+Revision 4, after the referee's P2 item (certificate scope) was addressed.
 
 | item | max | score | evidence path | unmet |
 |---|---:|---:|---|---|
-| A | 15 | 14 | claim matrix; provenance; response document | the gate certified wrong proofs before external review |
-| B | 20 | 18 | event and window audit with the official 2a description | - |
-| C | 15 | 13 | THEORY_PROOFS rev 2 (coefficient, residual, threshold, constrained weight, finite-sample sign flip); theory_test_rev2.py passes | three errors had to be corrected; correct now, wrong when shipped |
-| D | 15 | 14 | statistical audit; both independent tests now carry bootstrap intervals and an equivalence margin | - |
-| E | 10 | 10 | mechanism audit and limitations; wording limited to locating the component | - |
+| A | 15 | 14 | claim matrix; provenance; response document | previous gate certified wrong proofs before external review |
+| B | 20 | 18 | event and window audit | - |
+| C | 15 | 14 | THEORY_PROOFS rev 2; theory_test_rev2.py; certificate now on all nine subjects (793 trials, agreement 1.000) | three errors had to be corrected |
+| D | 15 | 14 | statistical audit; external tests with intervals and an equivalence margin | - |
+| E | 10 | 10 | mechanism audit; wording limited to locating the component | - |
 | F | 10 | 10 | novelty matrix on full texts | - |
 | G | 10 | 9 | reproducibility report | no third-party replication |
-| H | 5 | 4 | MANIFEST, freeze and gate regenerated; abstract 219 words; consistency check PASS | the archive had been stale before this round |
-| **total** | **100** | **92** | | |
+| H | 5 | 4 | MANIFEST/freeze/gate synced; abstract 219 words; consistency check PASS | archive had been stale earlier |
+| **total** | **100** | **93** | | |
 
-## What changed in this round
+## P2 progress this round
 
-| item | change |
+| item | state |
 |---|---|
-| MC5 | the five-test family is now described as pre-specified but **not** as five independent confirmations; SEED's uncontrolled preprocessing, the development use of 2a/2b and the two failing datasets are stated in the same paragraph |
-| MC6 | "inert" removed everywhere; P300 now reports -0.0005 [-0.0024, +0.0012] and ERRp -0.0044 [-0.0166, +0.0075] against a 0.02 equivalence margin, with the explicit statement that the intervals lie inside the margin but the decoders are too weak to support equivalence |
-| MC7 | mechanism wording limited to locating the class-mix component under an oracle diagnostic |
-| minor 1 | pair counting corrected to "three per subject, 27 in total" |
-| minor 3 | references 23 and 25 carry venue and year |
-| minor 4 | abstract compressed from 262 to 219 words and relieved of secondary numbers |
-| minor 5 | the practical paragraph no longer implies that partial strength is a validated safe setting |
+| widen the certificate demonstration | **done**: all nine BCI-2b subjects, 793 scored trials, agreement 1.000 in every subject, flip rates 0.027-0.361 |
+| SEED waveform-level causal rerun | blocked, documented |
+| independent end-to-end replication | blocked, documented |
 
-## Hard gates
+## Remaining before a second-round submission
 
-All pass at this revision. The wrong-proof failure of the previous revision is recorded in the history rather than
-overwritten.
-
-## Not claimed
-
-- that a third-party replication exists;
-- that the paper would now be accepted: the referee's second-round conditions include full-text verification of the
-  remaining claims and a further check of the evidence tiers, which this round addresses but does not discharge.
+Nothing that this environment can do for the two blocked items. Everything else the referee listed as P0 and P1 is
+closed, with one deliberate exception recorded honestly: the theory was wrong when shipped, and the gate that
+passed it has been regraded rather than restored.
