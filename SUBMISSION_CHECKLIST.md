@@ -21,7 +21,7 @@ the superseded records, each labelled as such. Only the files above are for the 
 
 - numbers: `python sleep_edf/check_numbers.py` -> CHECK PASS;
 - documents: FREEZE_RECORD.md lists ten files with sizes and SHA-256; FREEZE CHECK PASS;
-- commit: every current document cites `9c39cee`;
+- commit: every current document cites `871546b`;
 - archives: submission 12 entries, audit 38 entries, 0 hash mismatches.
 
 ## Decisions for the authors

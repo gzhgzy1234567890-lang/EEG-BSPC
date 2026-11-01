@@ -43,7 +43,7 @@ readme_path = os.path.join(SUB, '_submit_readme', 'README.md')
 open(readme_path, 'w', encoding='utf-8').write(README)
 rows = []
 with zipfile.ZipFile(OUT, 'w', zipfile.ZIP_DEFLATED) as z:
-    z.write(readme_path, 'README.md')
+    pass  # first submission: no README inside the archive
     for f in FILES:
         p = os.path.join(SUB, f.replace('/', '\\'))
         z.write(p, f)
@@ -52,7 +52,7 @@ with zipfile.ZipFile(OUT, 'w', zipfile.ZIP_DEFLATED) as z:
     man = ['# Manifest', '', '| file | bytes | sha256 (first 16) |', '|---|---|---|']
     for f, n, h in rows:
         man.append('| %s | %d | %s |' % (f, n, h))
-    z.writestr('MANIFEST.md', '\n'.join(man) + '\n')
+    pass  # manifest stays in the audit archive only
 digest = hashlib.sha256(open(OUT, 'rb').read()).hexdigest()
 print('entries', len(rows) + 2)
 print('zip', OUT)
