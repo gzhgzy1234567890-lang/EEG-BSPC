@@ -1,6 +1,6 @@
 # Round 2 review — second compression pass and the readiness gate
 
-Version: `Revised_Manuscript.docx`, **16 pages, 6,818 body words** (excluding references, tables, captions and
+Version: `Revised_Manuscript.docx`, **16 pages, 6,846 body words** (excluding references, tables, captions and
 declarations), 8 tables, 5 figures; supplement 33 pages.
 
 ## Executed this round
@@ -25,7 +25,7 @@ declarations), 8 tables, 5 figures; supplement 33 pages.
 | five highlights, each <= 85 characters | pass, 60-77 |
 | cover-letter numbers present in the manuscript | pass |
 | cover letter carries the current title | pass |
-| body within the 6,500-7,500 window | pass, 6,818 |
+| body within the 6,500-7,500 window | pass, 6,846 |
 | experiment arithmetic stated | pass, 1,440 streams and 2,880 rows |
 | commit `ef8c890` cited | pass |
 
@@ -43,7 +43,7 @@ declarations), 8 tables, 5 figures; supplement 33 pages.
 | structure | 8 | 6.5 | 7.5 | **8.0** |
 | **total** | **100** | **91.5** | **93.0** | **93.5** |
 
-Structure reaches the maximum because the manuscript now has the six-section form the goal asked for, 6,818 body
+Structure reaches the maximum because the manuscript now has the six-section form the goal asked for, 6,846 body
 words, a mechanism matrix, and no duplicated section.
 
 ## Why not 96
