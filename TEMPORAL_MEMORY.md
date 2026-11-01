@@ -38,6 +38,23 @@ film: the correction helps only once its memory spans a whole film.
 The main experiment blocks 15 epochs of 30 s, so its memory is 7.5 min at the second block and at most 22.5 min
 over a 60-epoch series: **one to three blocks, in a corpus whose majority class occupies 68 per cent of the night.**
 
+## Part 2b. sleep-EDF: memory sweep on the real corpus
+
+The same 4,983 cells were re-scored with the correction limited to the last one, two or three blocks of history (a
+series has four blocks, so three is the maximum and equals the full-history case).
+
+| memory | delta | 95 per cent interval | subjects negative |
+|---|---|---|---|
+| 1 block (7.5 min) | -0.1138 | [-0.1262, -0.1012] | 32/32 |
+| 2 blocks (15 min) | -0.1057 | [-0.1178, -0.0931] | 32/32 |
+| 3 blocks, = all (22.5 min) | -0.1023 | [-0.1144, -0.0902] | 32/32 |
+
+**The loss shrinks by 0.012 as the memory triples and never changes sign.** That is a real limit on the memory
+account: in this corpus the available memory is too short to escape the harmful regime, and a longer memory would
+require series longer than the 60 epochs available. The controlled grid predicts a much steeper dependence
+(-0.2749 to -0.0276 as memory grows from one to sixteen blocks); the real corpus sits at the bottom of that curve
+and cannot be pushed up it.
+
 ## Part 3. Controlled experiment: memory x class duration x drift
 
 Same generator as Task B (real class-conditional means and pooled covariance from 12 subjects), 12 subjects,
