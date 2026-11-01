@@ -5,7 +5,7 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 SUB = r'G:\Work_work\math\EEG\submit'
 OUT = r'G:\Work_work\math\EEG\BSPC_Submission_Package_submit.zip'
 FILES = ['BSPC_Candidate_V8.docx', 'BSPC_Candidate_V8.pdf', 'Supplementary_Material.docx', 'Supplementary_Material.pdf',
-         'BSPC_Highlights_V8.docx', 'BSPC_Highlights_V8.pdf', 'Cover_Letter_BSPC.docx', 'Cover_Letter_BSPC.pdf','Response_to_Reviewers.docx','Response_to_Reviewers.pdf',
+         'BSPC_Highlights_V8.docx', 'BSPC_Highlights_V8.pdf', 'Cover_Letter_BSPC.docx', 'Cover_Letter_BSPC.pdf',
          'Figures/Graphical_Abstract_BSPC.png', 'Figures/Graphical_Abstract_BSPC.pdf']
 README = '''# BSPC submission package (files to upload)
 
