@@ -1,0 +1,11 @@
+{
+ "check": "table9 traceability",
+ "status": "PASS",
+ "checks": [
+  "2b mean/lo/hi vs statistics_recomputed_2b.json",
+  "sleep mean/lo/hi vs b3_hierarchy.json",
+  "errp mean vs errp_external.json",
+  "p300 mean vs p300_external_meanamp.json"
+ ],
+ "script": "table_trace.py"
+}
