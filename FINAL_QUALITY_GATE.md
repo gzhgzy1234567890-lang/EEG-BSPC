@@ -1,38 +1,43 @@
 # FINAL_QUALITY_GATE.md
 
-Final gate of this iteration, after the claim matrix was rebuilt and an automated cross-document consistency check
-was run.
+Revision after the independent referee report. **The previous gate was wrong**: it reported "theory verified, all
+hard gates pass" while Proposition 3's second-order coefficient and Proposition 3b's residual sign were incorrect.
+That is a hard-gate event ("an explicitly wrong proof"), it was found by external review rather than by this gate,
+and it is now repaired.
 
 | item | max | score | evidence path | unmet |
 |---|---:|---:|---|---|
-| A | 15 | 15 | CLAIM_EVIDENCE_MATRIX.csv rebuilt (16 rows, one WITHDRAWN); FILE_PROVENANCE.csv; MANUSCRIPT_CHANGELOG.md | - |
-| B | 20 | 18 | EVENT_AND_WINDOW_AUDIT.md with the official 2a description cited [26] | 2a timing verified from the published description rather than from local raw annotations |
-| C | 15 | 15 | THEORY_PROOFS.md; THEORY_COUNTEREXAMPLES.md; THEORY_TEST_RESULTS.md | - |
-| D | 15 | 13 | STATISTICAL_AUDIT.md; two pre-registered independent tests | - |
-| E | 10 | 10 | SLEEP_MECHANISM_AUDIT.md; MECHANISM_LIMITATIONS.md; three regenerations | - |
-| F | 10 | 10 | NOVELTY_MATRIX.md on full texts; two independent corpora | - |
-| G | 10 | 9 | REPRODUCIBILITY_REPORT.md; every claim regenerable or withdrawn | **no third-party replication** |
-| H | 5 | 5 | `consistency_check.py`: all 10 abstract numbers appear in the body, all 16 claim locations resolve, all 10 freeze hashes match | - |
-| **total** | **100** | **95** | | |
+| A | 15 | 14 | claim matrix rebuilt; provenance; changelog | the gate itself certified wrong proofs before external review, which is an A failure |
+| B | 20 | 18 | window and event audit with the official 2a description cited | - |
+| C | 15 | 12 | THEORY_PROOFS rev 2; THEORY_TEST_RESULTS rev 2; theory_test_rev2.py passes at a != sigma | three errors had to be corrected (coefficient, residual sign, threshold dimension); the proofs are now right but the first version was not |
+| D | 15 | 13 | statistical audit; two pre-registered tests | - |
+| E | 10 | 10 | mechanism audit; limitations | - |
+| F | 10 | 10 | novelty matrix on full texts | - |
+| G | 10 | 9 | reproducibility report | no third-party replication |
+| H | 5 | 3 | MANIFEST and freeze regenerated; **MANIFEST had been stale (18 pages, 9,345 words) against a 20-page manuscript** | archive inconsistency found by the referee |
+| **total** | **100** | **89** | | |
 
 ## Hard gates
 
-All fifteen pass.
+| gate | status |
+|---|---|
+| wrong proof | **FAILED in the shipped version** (second-order coefficient, residual sign), repaired in revision 2 |
+| unrecomputable core result | pass: the referee's four counterexamples were reproduced locally before any edit |
+| code contradicts paper | pass |
+| incorrect multiplicity | pass |
+| others | pass |
 
-## Verdict
+## What this costs
 
-**Not complete.** 95/100 with one point withheld for the absence of third-party replication; the SEED waveform gap
-is documented and does not enter the score because no claim depends on it.
+The score drops from 95 to 89 not because new work failed but because the earlier certification was too generous.
+A gate that passes a document with a wrong coefficient is not a gate. The correction is verified: the coefficient
+is now (a d^2 / (2 s^3)) phi(a/s), the residual is (1 - lambda) b - lambda c, the threshold is defined in feature
+space, the weight is clipped to [0, 1], and the finite-sample sign flip is proved. Every one of these is covered by
+a test that fails if the error returns.
 
-The remaining gap cannot be closed from inside this environment: it requires an external group to execute the
-package. The project is therefore **BLOCKED** on that item, not complete.
+## Not claimed
 
-## Automated evidence for the consistency score
-
-```
-abstract numbers: 0.001 0.003 0.008 0.011 0.034 0.071 0.091 0.102 0.108 0.214
-numbers in abstract but not in body: []
-claims whose manuscript location is not a known section: []
-freeze rows 10 mismatches []
-CONSISTENCY PASS
-```
+- that the paper is now correct in every respect: this round repaired the theory and the archive consistency; the
+  evidence grading (MC5), the equivalence framing of the two null external results (MC6) and the mechanism wording
+  (MC7) are next;
+- that the gate is trustworthy without external review: it demonstrably is not.

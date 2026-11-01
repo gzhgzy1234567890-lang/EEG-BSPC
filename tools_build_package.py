@@ -54,12 +54,12 @@ for root, dirs, names in os.walk(pkg):
 files.sort()
 rows = ['| %s | %d bytes | %s%s%s |' % (rel, os.path.getsize(full), BT, sha(full), BT) for rel, full in files]
 head = ['# BSPC submission package', '',
-        'Assembled 31 October 2026. Manuscript 18 pages, 9,345 words, 8 tables, 4 figures; supplement 26 pages,',
+        'Assembled 1 November 2026 (revision 2). Manuscript 20 pages, 11,069 words, 8 tables, 4 figures; supplement 27 pages,',
         'sections S1-S32. The grasp-and-lift negative transfer of',
         'earlier drafts was an artefact of a class-sorted feature cache; Section 4.2 and S32 record the withdrawal.', '',
         '## Manuscript', '',
-        '- 9,345 words (Word count; about 8,600 excluding references), 18 pages',
-        '- abstract 250 words; 8 tables, 4 figures; supplement 27 pages, sections S1-S33', '',
+        '- 11,069 words (Word count; about 10,300 excluding references), 20 pages',
+        '- abstract 262 words; 8 tables, 4 figures; supplement 27 pages, sections S1-S33', '',
         '## The independent replication', '',
         '- protocol-consistent run: 45 recordings, 32 subjects, 4,983 cells, -0.102 ([-0.114, -0.090]),',
         '- strict-causality re-run (forward-only filters, state carried): -0.102 ([-0.114, -0.089]), 32 of 32 negative',
