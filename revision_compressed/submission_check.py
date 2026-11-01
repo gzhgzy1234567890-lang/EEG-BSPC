@@ -21,7 +21,15 @@ def check(name, ok, detail=''):
     if not ok:
         fails.append(name)
 m = docx.Document(M); s = docx.Document(S); h = docx.Document(H); c = docx.Document(C)
-body = ' '.join(p.text for p in m.paragraphs)
+# body = title through declarations, excluding the reference list (the definition used in Before_After_Word_Count.csv)
+body_parts, ref_stop = [], False
+for _p in m.paragraphs:
+    _t = _p.text.strip()
+    if _p.style.name == 'BSPC Heading 1' and _t.startswith('References'):
+        ref_stop = True
+    if not ref_stop:
+        body_parts.append(_p.text)
+body = ' '.join(body_parts)
 abstract = m.paragraphs[8].text
 check('abstract numbers in body', not [n for n in re.findall(r'\d+\.\d+', abstract) if n not in body])
 caps = [p.text.strip() for p in m.paragraphs if re.match(r'^(Table|Fig\.)', p.text.strip())]

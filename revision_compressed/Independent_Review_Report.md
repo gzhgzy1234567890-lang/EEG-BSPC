@@ -60,3 +60,28 @@ artefacts two and a half.
 
 **Submission-ready at 94.5/100 after these corrections.** No new experiment was run and none is required for
 submission; the four open items are stated rather than scored away.
+## Part D. Final targeted revision after the second independent review
+
+| finding | fix |
+|---|---|
+| the stability certificate mixed corrected and uncorrected scores in one inequality | rewritten with s_k(x) uncorrected on both sides, the corrected form stated separately, and the equivalence spelled out. The archived code already used the correct expression, so the empirical claim in the BCI-2b paragraph stands unchanged |
+| "even when the displacement is not in the span" | corrected to "not in the null space of F W" |
+| S37's Proposition 4 proof argued from within-class ordering | rewritten as [s_c(x+) + a] - [s_c(x-) + a] = s_c(x+) - s_c(x-), which is the one-vs-rest comparison an AUC actually uses |
+| abstract described a two-term decomposition | now names all three terms, composition, within-class and unmatched-class, and states the anchoring |
+| §4.5 pointed at "Tables 4 and 5" for the acquisition-order values | now points at Table 6, which is the grasp ordering table |
+| "never adds them" appeared twice in one paragraph | the duplicate clause is removed |
+| Table 8 said a composition-only correction must hurt without a model condition | now reads "must hurt in the symmetric two-class model" |
+| cover letter named one AI-assisted panel, the manuscript names two | both now name Fig. 1(a) and Fig. 2(a) |
+| checklist still said 16 pages, 33-page supplement, S1-S36 | updated to 17 pages, 34 pages, S1-S37 |
+| DOCX core properties carried the old title | updated |
+
+Two audits now run on the final files: the 16-check submission checker (file and numbering level) and a content
+audit that tests the things the checker cannot see - the certificate wording, the null-space term, the abstract's
+three components, the table cross-reference and the absence of absolute claims. Both pass.
+
+## Part E. What the automated checker cannot see
+
+The 16 checks verify file presence, figure and table numbering, highlight lengths, CSV shape and specific strings.
+They cannot tell whether a cross-reference points at the *right* table, which is how "Tables 4 and 5" survived the
+earlier round. The content audit above covers the cases that were found; it does not constitute a proof that no
+other content error exists, and the independent review is the only check that has caught such errors so far.

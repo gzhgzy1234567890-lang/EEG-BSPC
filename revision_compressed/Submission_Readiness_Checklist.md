@@ -4,10 +4,10 @@
 
 | item type | file | note |
 |---|---|---|
-| Manuscript | `Revised_Manuscript.docx` / `.pdf` | 16 pages, 6,846 body words, 5 figures, 8 tables |
-| Supplementary Material | `Revised_Supplementary.pdf` | 33 pages, S1-S36 |
+| Manuscript | `Revised_Manuscript.docx` / `.pdf` | 17 pages, 6,853 body words, 5 figures, 8 tables |
+| Supplementary Material | `Revised_Supplementary.pdf` | 34 pages, S1-S37 (S37 holds the four proofs) |
 | Highlights | `Revised_Highlights.docx` | 5 items, 60-77 characters |
-| Cover Letter | `Revised_Cover_Letter.pdf` | 1 page, 444 words |
+| Cover Letter | `Revised_Cover_Letter.pdf` | 1 page |
 | Graphical Abstract | `Figures/Graphical_Abstract_BSPC.pdf` | unchanged |
 
 ## Before pressing submit
