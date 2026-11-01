@@ -1,54 +1,49 @@
 # THEORY_TEST_RESULTS.md
 
-Script: `origin_equivariance/src/theory_test.py`, seed 20261101, Python 3.7 / scipy 1.7.3.
-Command: `python theory_test.py` -> `THEORY TEST PASS`.
+Revision 2. Revision 1's tests passed while the document contained three errors; this revision records what
+changed, what the referee found, and the regression tests that now fail if the errors return.
 
-## Proposition 2 and 3: the closed form and the optimum
+## What revision 1 got wrong
 
-| a | sigma | pi_B | d=(2pi-1)a | BA formula | BA Monte Carlo (200k) | abs diff |
-|---|---|---|---|---|---|---|
-| 1.0 | 1.0 | 0.50 | 0.000 | 0.8413 | 0.8405 | 0.0009 |
-| 1.0 | 1.0 | 0.30 | -0.400 | 0.8225 | 0.8227 | 0.0002 |
-| 1.0 | 1.0 | 0.90 | +0.800 | 0.7717 | 0.7707 | 0.0010 |
-| 0.5 | 2.0 | 0.15 | -0.350 | 0.5972 | 0.5965 | 0.0008 |
-| 2.0 | 0.7 | 0.60 | +0.400 | 0.9943 | 0.9942 | 0.0000 |
+| item | revision 1 | correct | caught by |
+|---|---|---|---|
+| second-order coefficient | (d^2 / (2 s^2)) phi(a/s) | (a d^2 / (2 s^3)) phi(a/s) | independent referee, MC1 |
+| BA''(0) | "−phi'(a/s)/s^2 < 0" | phi'(a/s)/s^2 = −a phi(a/s)/s^3 < 0 | numeric second difference |
+| residual threshold | (1−lambda) b + lambda c | (1−lambda) b − lambda c | direct evaluation |
+| optimal weight | b/(b+c) unconstrained | clip_{[0,1]}(b/(b+c)), undefined if b+c = 0 | the case (b,c) = (0.5,−0.4) gives 5 |
+| threshold t | feature space in Prop 2, score space in the model | feature space throughout, score threshold = w t | the case a=2, s=1, w=4, t=1: 0.9200 vs 0.9739 |
+| Proposition 5 | sign flip "open" | proved by a two-labelling counterexample | referee's construction |
 
-Numerical maximiser of BA(t): t* = 0.000000, matching Proposition 3.
+The coefficient error survived revision 1 because every numerical check used a = s, where a/s^3 = 1/s^2. That is
+now impossible: the regression test uses (a, s) = (2, 1), (0.5, 2) and (2, 0.7).
 
-## The harm of a composition-only correction
+## Regression tests (revision 2), all passing
 
-| pi_B | BA(0) - BA(d) |
+| test | result |
 |---|---|
-| 0.50 | 0.00000 |
-| 0.60 | 0.00481 |
-| 0.80 | 0.04103 |
-| 0.95 | 0.08579 |
+| second-order coefficient at a != s | relative error 8e-8, 7e-8, 9e-7 at the three parameter pairs |
+| BA''(0) = −a phi(a/s)/s^3 | numeric −0.107982 against formula −0.107982 (a=2, s=1); −0.241971 (1,1); −0.024167 (0.5, 2) |
+| threshold rescaling | feature threshold 0.25 gives 0.9739; misreading the score threshold as a feature threshold gives 0.9200 |
+| constrained weight | (0.5,−0.4) -> 1.00; (0.8,0.2) -> 0.80; (0,0.5) -> 0.00; (0.5,−0.5) -> undefined |
+| residual convention | 0.800 / 0.250 / −0.300 at lambda = 0 / 0.5 / 1 |
+| numerical optimum of lambda | grid 0.533 against formula 0.533 |
+| finite-sample sign flip | −0.250 and +0.167 on the same features |
+| certificate tie convention | strict condition holds when no tie; a tie can only relax it |
 
-Monotone in |2 pi_B - 1|, as the corollary states.
+`THEORY TEST PASS`.
 
-## Proposition 3b: the optimal correction weight
+## Earlier results retained
 
-With drift b = 0.8, pi_B = 0.7, a = 1: theory lambda* = 0.6667; grid optimum over 101 values of lambda = 0.67.
+- closed form BA(t) against Monte Carlo within 1e-3 at five settings (unchanged, the formula was right);
+- numerical maximiser t* = 0.000000 (unchanged);
+- harm monotone in |2 pi_B − 1| (unchanged);
+- the D1 50-cell simulation reproduced the predicted sign in 50 of 50 cells (unchanged, it uses the sign of the
+  effect, not the second-order coefficient);
+- the certificate matched the observed flip pattern for 400 of 400 simulated samples and for all scored trials on
+  three BCI-2b subjects (unchanged).
 
-## Proposition 4: the certificate
+## What this episode says about the first gate
 
-K = 4, D = 6, n = 400 samples, random W, b and displacement d. The certificate (margin condition, no labels)
-predicted the observed flip pattern for **400/400** samples.
-
-## Proposition 5: the same features, two labelings
-
-| labeling | pi_B | d | BA before | BA after | change |
-|---|---|---|---|---|---|
-| (1, 1, -1, -1) | 0.50 | +0.5 | 1.000 | 0.750 | -0.250 |
-| (1, -1, -1, -1) | 0.25 | +0.5 | 0.833 | 0.333 | -0.500 |
-
-Same features, same classifier, same displacement; different labels; different gain.
-
-## What failed and what is not claimed
-
-- The first version of Proposition 5 tried to show a sign change with fixed features; the model does not allow a
-  positive gain without drift, so the claim was weakened to "the gain is not a function of the unlabeled data".
-  The sign-change version is recorded as open in THEORY_PROOFS.md.
-- The first extended unit test asserted translation invariance of predictions under a constant feature shift.
-  That assertion was wrong (a constant shift changes per-class scores), it failed, and it was replaced by the
-  correct displacement-equivalence assertion.
+The first quality gate reported "theory verified" while the coefficient was wrong. Numerical checks that only probe
+signs and optima cannot catch a coefficient error; the gate was therefore not a substitute for independent
+review, and this document now records that explicitly.
