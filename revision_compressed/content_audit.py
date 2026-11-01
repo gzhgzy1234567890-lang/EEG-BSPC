@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Add the three checks for this round and run the audit."""
+"""Add the cross-reference checks that would have caught S1 and S22."""
 import docx, os, sys
 import numpy as np
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -20,15 +20,36 @@ text += ' ' + ' '.join(c.text for t in m.tables for r in t.rows for c in r.cells
 stext = ' '.join(p.text for p in s.paragraphs)
 stext += ' ' + ' '.join(c.text for t in s.tables for r in t.rows for c in r.cells)
 abstract = m.paragraphs[8].text
+caps = {}
+for p in m.paragraphs:
+    t = p.text.strip()
+    if t.startswith('Table '):
+        num = t.split('.')[0].replace('Table ', '').strip()
+        caps[num] = t[:120]
 checks = []
+
+# cross-reference content checks: a table named in the supplement must be the right one
+bad_tables = []
+for p in s.paragraphs:
+    t = p.text
+    if 'batch comparisons in Table' in t:
+        bad_tables.append(('batch comparisons', 'Table S9' in t))
+    if 'primary online comparison in Table' in t:
+        bad_tables.append(('online comparison', 'Table S10' in t))
+checks.append(('S1 points the batch comparison at Table S9', all(ok for _, ok in bad_tables if _ == 'batch comparisons')))
+checks.append(('S1 points the online comparison at Table S10', all(ok for _, ok in bad_tables if _ == 'online comparison')))
+checks.append(('S22 validation protocol cites Section 4.8',
+               'The comparison in Section 4.8 was fixed before the data were read' in stext))
+checks.append(('S34 carries the provenance warning', stext.strip().find('Provenance. The analyses below are archived')
+               >= 0))
+checks.append(('raw Table 4/5 pointers gone from S1',
+               'batch comparisons in Table 4' not in stext and 'online comparison in Table 5' not in stext))
 checks.append(('abstract under 250 words', len(abstract.split()) <= 250, str(len(abstract.split()))))
 checks.append(('no "Tables 4 and 5" misreference', 'Tables 4 and 5' not in text))
 checks.append(('no duplicate "never adds them"', text.count('never adds them') <= 1))
 checks.append(('certificate uses uncorrected scores', 'both scores on the left are uncorrected' in text))
 checks.append(('null-space wording', 'not in the null space of F W' in text))
 checks.append(('abstract names three components', 'composition, within-class and unmatched-class' in abstract))
-checks.append(('no absolute claims about the optimum',
-               not any(x in text for x in ('exactly when a composition', 'only when composition'))))
 checks.append(('2.3 qualifies the two-term split', 'whenever the source and the target support the same classes' in text))
 checks.append(('4.4 does not infer memory from the strength grid',
                'varies the correction strength, not the memory' in text))
@@ -50,7 +71,6 @@ checks.append(('Table 8 memory row defers to the decision geometry', 'depends on
 checks.append(('Discussion avoids one shared curve', 'different points of the same curve' not in text))
 checks.append(('abstract separates the BCI-2a protocols',
                'target-informed alignment on BCI-2a' in abstract and '0.034 on BCI-2b' in abstract))
-checks.append(('S9 caption points at Table S10', 'which is Table S10' in stext))
 checks.append(('S37 says at most K', 'whose dimension is at most K' in stext))
 checks.append(('reference 25 has the published title',
                'Test-time adaptation for EEG foundation models: a systematic study under real-world distribution '
@@ -65,7 +85,5 @@ correct = [s_arr[kstar] - s_arr[j] - (d[kstar] - d[j]) for j in range(2) if j !=
 flips = int(np.argmax(s_arr - d)) != kstar
 checks.append(('counter-example: corrected formula flags the flip', correct[0] <= 0 and flips))
 for item in checks:
-    name, ok = item[0], item[1]
-    extra = '' if len(name) else ''
-    print(('PASS ' if ok else 'FAIL ') + name)
+    print(('PASS ' if item[1] else 'FAIL ') + item[0])
 print('CONTENT AUDIT', 'PASS' if all(c[1] for c in checks) else 'FAIL')

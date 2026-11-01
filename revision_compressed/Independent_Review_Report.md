@@ -134,3 +134,12 @@ other content error exists, and the independent review is the only check that ha
 | SEED film duration quoted as 235 s in S31 and 226 s in Section 4.7 | measured from the cached features: 675 film groups over 45 sessions, mean 226.3 s, median 235 s, range 185-265 s. Both numbers are right and different statistics. The manuscript now says 226 s on average and 235 s at the median in both places |
 | the submission checklist still said 7,015 words while the CSV said 7,219 | every artefact regenerated from the DOCX: body is 7,228 words, and all five documents now carry that number |
 | the abstract was exactly 250 words, too close to the limit | trimmed to 248 without removing any result |
+
+## Part K. After the seventh review
+
+| finding | fix |
+|---|---|
+| S1 pointed at main Table 4 and Table 5 for the transductive and past-only comparisons | repointed to Table S9 and Table S10, which are the tables that actually hold them |
+| S22 said the sleep-EDF validation protocol was fixed before the data were read in Section 4.7 | Section 4.8 is the one that carries it; corrected |
+| S34 archived numbers read like current results | a provenance paragraph now opens S34: the +0.034, -0.091 and -0.120 belong to the superseded unanchored bookkeeping, the current values are in Section 4.6 and S36, and nothing in S34 is endorsed |
+| the graphical abstract said stable offset leads to full correction | the original had its text outlined into paths, so it could not be edited. It was regenerated from the same numbers with the wording the reviewer asked for: stable baseline drift leads to correction may help, alongside class-prior shift, short memory and the sorted cache. Size 3245 x 1205 px at 240 dpi |
