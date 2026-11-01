@@ -1,14 +1,10 @@
 group,baseline_words,revised_words,delta
 Front matter and abstract,0,0,+0
 Introduction,935,575,-360
-Theory,1463,757,-706
+Theory,1463,830,-633
 Data and protocol,954,461,-493
-Results,5281,3788,-1493
-Discussion,461,449,-12
+Results,5281,3838,-1443
+Discussion,461,492,+31
 Conclusion,944,144,-800
 Declarations,317,317,+0
-TOTAL (incl. abstract and declarations),10710,6846,-3864
-
-# Counting definition: every paragraph from the title through the declarations, excluding the reference list and
-# excluding table cells. Word's own count over the same file is 8,236 because it also counts tables and captions.
-# The section sums add exactly to the total because the groups partition the same paragraphs.
+TOTAL (incl. abstract and declarations),10710,7014,-3696

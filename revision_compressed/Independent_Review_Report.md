@@ -1,6 +1,6 @@
 # Independent review of the optimised manuscript — post-fix
 
-Version: `Revised_Manuscript.docx`, **17 pages, 6,846 body words** (title through declarations, excluding the
+Version: `Revised_Manuscript.docx`, **17 pages, 7,015 body words** (title through declarations, excluding the
 reference list and table cells), 8 tables, 5 figures; supplement 34 pages, S1-S37.
 
 ## What the reviewer found, and what was done
@@ -25,7 +25,7 @@ reference list and table cells), 8 tables, 5 figures; supplement 34 pages, S1-S3
 
 ```
 SUBMISSION CHECK PASS   (16 checks, run from the unzipped archive)
-manuscript 17 pages, 8,236 words by Word's count, 6,846 by the declared body definition
+manuscript 17 pages, 8,236 words by Word's count, 7,015 by the declared body definition
 supplement 34 pages including the new S37 proofs
 ```
 
@@ -85,3 +85,15 @@ The 16 checks verify file presence, figure and table numbering, highlight length
 They cannot tell whether a cross-reference points at the *right* table, which is how "Tables 4 and 5" survived the
 earlier round. The content audit above covers the cases that were found; it does not constitute a proof that no
 other content error exists, and the independent review is the only check that has caught such errors so far.
+
+## Part F. Final acceptance round
+
+| finding | fix |
+|---|---|
+| content_audit.py still carried a hard-coded Windows path and failed when run from the unzipped package | rewritten to resolve its inputs relative to the archive; verified by unzipping the delivered ZIP and running both scripts from it |
+| Section 2.3 wrote the displacement as two terms without qualification | now qualifies the split to the case where source and target share their class support, names the third term, and points to Section 4.6 |
+| Section 4.4 inferred what a longer memory would do from Section 4.7 | the inference is withdrawn: the grid varies correction strength, not memory |
+| the Discussion said both protocols estimate the target mean from the whole target session | now separates the transductive batch comparison of Section 4.1 from the block-wise past-only estimator of Sections 4.4 to 4.9 |
+| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,014 body words |
+| supplement DOCX and PDF metadata kept the old title | core properties of both files updated |
+| Elsevier AI disclosure for the annotated panels | Fig. 1 and Fig. 2 captions now name the tool and version and state that no image content was model-generated |
