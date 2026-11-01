@@ -94,7 +94,7 @@ other content error exists, and the independent review is the only check that ha
 | Section 2.3 wrote the displacement as two terms without qualification | now qualifies the split to the case where source and target share their class support, names the third term, and points to Section 4.6 |
 | Section 4.4 inferred what a longer memory would do from Section 4.7 | the inference is withdrawn: the grid varies correction strength, not memory |
 | the Discussion said both protocols estimate the target mean from the whole target session | now separates the transductive batch comparison of Section 4.1 from the block-wise past-only estimator of Sections 4.4 to 4.9 |
-| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,219 body words |
+| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,228 body words |
 | supplement DOCX and PDF metadata kept the old title | core properties of both files updated |
 | Elsevier AI disclosure for the annotated panels | Fig. 1 and Fig. 2 captions now name the tool and version and state that no image content was model-generated |
 
@@ -126,3 +126,11 @@ other content error exists, and the independent review is the only check that ha
 | Table S9's caption pointed at main Table 5 | now points at Table S10, which holds the multi-estimator comparison |
 | S37 called the row space of W a K-dimensional subspace | now says its dimension is at most K |
 | reference [25] carried the benchmark name as the title | replaced by the published title, authors and pages (PMLR 340, 948-984) |
+
+## Part J. After the sixth review
+
+| finding | fix |
+|---|---|
+| SEED film duration quoted as 235 s in S31 and 226 s in Section 4.7 | measured from the cached features: 675 film groups over 45 sessions, mean 226.3 s, median 235 s, range 185-265 s. Both numbers are right and different statistics. The manuscript now says 226 s on average and 235 s at the median in both places |
+| the submission checklist still said 7,015 words while the CSV said 7,219 | every artefact regenerated from the DOCX: body is 7,228 words, and all five documents now carry that number |
+| the abstract was exactly 250 words, too close to the limit | trimmed to 248 without removing any result |
