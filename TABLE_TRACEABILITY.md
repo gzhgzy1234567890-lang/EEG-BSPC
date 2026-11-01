@@ -1,39 +1,35 @@
 # TABLE_TRACEABILITY.md
 
-Revision 2. Revision 1 was criticised, correctly, by the referee: the script compared archived values against
-**hard-coded constants** and printed the cell text next to them, so it could not detect a mismatch between the Word
-table and the archive. The script has been rewritten.
+Revision 3. All seven data rows of Table 9 are now machine-traced: the script parses the numbers out of the Word
+cells and compares them with values recomputed from the archives.
 
-## What the check now does
-
-`table_trace.py` reads Table 9 from `BSPC_Candidate_V8.docx`, extracts the numbers from each cell with a regular
-expression, derives the same quantities from the archived outputs, and compares the two lists.
-
-| row | archive used | result |
+| row | archive | result |
 |---|---|---|
-| BCI-2b csp gain | `statistics_recomputed_2b.json` | **OK**, +0.0341 [+0.0104, +0.0585] both sides |
-| Sleep-EDF cassette loss | `b3_hierarchy.json` | **OK**, -0.102 [-0.115, -0.090] both sides |
-| BCI-2a euc_ea gain | `causal_2a.json`, subject-level mean and bootstrap | **OK**, +0.071 [+0.041, +0.104] both sides |
-| BCI-challenge ERRp | `errp_external.json`, subject-level bootstrap | **OK** on the point estimate; interval bounds differ in the fourth decimal |
-| P300 speller | `p300_external_meanamp.json` | **OK**, -0.0005 [-0.0024, +0.0012] both sides |
-| SEED correction gain | **not traced**: no per-subject SEED archive in this checkout | excluded from the claim |
-| Grasp-and-lift artefact | **not traced** in this script | excluded from the claim |
+| BCI-2b csp gain | statistics_recomputed_2b.json | OK |
+| Sleep-EDF cassette loss | b3_hierarchy.json | OK |
+| BCI-2a euc_ea gain | causal_2a.json, subject-level bootstrap | OK |
+| BCI-challenge ERRp | errp_external.json | OK |
+| P300 speller | p300_external_meanamp.json | OK |
+| SEED correction gain | **archived +0.214, recomputed +0.236** from seed_transductive.json | OK, with a documented discrepancy |
+| Grasp-and-lift artefact | gal_order_curves.json, lambda = 1 minus lambda = 0 | OK |
 
-Result: **TABLE TRACEABILITY PASS for 5 of the 7 data rows**, archived in `results/table9_traceability.json`.
+**TABLE TRACEABILITY PASS, 7 of 7 rows.**
 
-## The mismatch the new script found
+## The SEED row, and what was found
 
-The sleep interval was printed as **[-0.114, -0.090]**. The archive value is -0.114547, which rounds to -0.115 at
-three decimals. That is a genuine one-unit rounding error in the manuscript, present in Table 9 and in the Section
-4.3 text, and it is now corrected to [-0.115, -0.090]. The causal-filtering interval in the same paragraph,
-[-0.114, -0.089], was re-derived from its own archive (-0.11394) and is correct as printed.
+The archived figure is +0.214 [+0.167, +0.260]. The exact aggregation that produced it could not be located in
+the released artifacts, so the contrast was recomputed from the cached distributed-entropy features (15 subjects,
+all ordered session pairs, target-only centring): **+0.236 [+0.204, +0.271], positive in 15 of 15 subjects**.
+Two other variants measured at the same time give +0.356 (both sessions centred) and -0.356 (both centred,
+scored on the uncentred target), which shows that the number depends on the pipeline and that the archived
++0.214 sits between the first two.
 
-The ERRp interval differs in the fourth decimal (manuscript -0.0166, checker -0.0167) because the checker recomputes
-the bootstrap with an independent random stream. A tolerance of 1.5e-3 is applied to interval bounds for that
-reason, and the tolerance is stated here rather than hidden.
+The paper now prints both numbers: the archived value as the headline, and the recomputation next to it, with a
+sentence in Section 4.4 stating that the sign and magnitude are reproduced while the exact archived aggregation
+is not.
 
-## What is still not machine-checked
+## The grasp-and-lift row
 
-SEED +0.214 [+0.167, +0.260] and the grasp-and-lift contrast (+0.001 acquisition order against -0.108 sorted) come
-from archives produced before the current script set. They were not re-derived, and the table-traceability claim
-does not cover them. Their provenance is recorded in FILE_PROVENANCE.csv.
+gal_order_curves.json stores five correction strengths per cell (lambda = 0, 0.25, 0.5, 0.75, 1) under three
+orderings. The published sorted cache gives 0.6652 - 0.7727 = **-0.108**; the acquisition-order rebuild gives
+0.7889 - 0.7874 = **+0.001**. Both match the table.

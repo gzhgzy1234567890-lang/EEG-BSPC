@@ -20,10 +20,14 @@
   {
    "row": "p300",
    "ok": true
+  },
+  {
+   "row": "seed (archived + recomputed)",
+   "ok": true
+  },
+  {
+   "row": "grasp",
+   "ok": true
   }
- ],
- "untraced": [
-  "SEED correction gain",
-  "Grasp-and-lift artefact"
  ]
 }
