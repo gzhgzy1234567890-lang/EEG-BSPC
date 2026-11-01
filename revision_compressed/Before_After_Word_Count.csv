@@ -1,0 +1,11 @@
+section,baseline_words,revised_words,delta
+Introduction,935,576,-359
+Theory (2.1-2.3),1461,729,-732
+Data and protocol,954,461,-493
+Results (4.1-4.7),2887,2231,-656
+Independent validation (4.8),614,614,0
+Filtering and alignment (4.9),406,406,0
+Discussion,461,449,-12
+Conclusion,946,144,-802
+Declarations and front matter,373,373,0
+TOTAL body (no references, no tables),10710,7232,-3478
