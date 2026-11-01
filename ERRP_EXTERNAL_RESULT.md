@@ -24,6 +24,28 @@ Per-subject values: S02 -0.0074, S06 +0.0436, S07 -0.0317, S11 -0.0004, S12 -0.0
 S16 +0.0033, S17 -0.0196, S18 +0.0191, S20 -0.0008, S21 -0.0236, S22 -0.0622, S23 +0.0010, S24 +0.0217,
 S26 +0.0260. All 16 reported; none dropped.
 
+## Post-hoc conditional analysis (added after the referee's MC6)
+
+The referee noted that a near-chance decoder limits what a null result can mean. Conditioning on decoding quality
+shows the effect is not flat:
+
+| subset | n | mean delta | 95 per cent interval | positive |
+|---|---|---|---|---|
+| all subjects | 16 | -0.0044 | [-0.0166, +0.0074] | 6/16 |
+| balanced accuracy >= 0.52 | 6 | **-0.0239** | **[-0.0415, -0.0093]** | 1/6 |
+| balanced accuracy >= 0.55 | 3 | -0.0297 | [-0.0622, -0.0074] | 0/3 |
+
+Spearman correlation between per-subject balanced accuracy and the correction effect: **rho = -0.71, p < 0.01**.
+
+Reading, and its limits:
+
+- the correction is *more harmful where decoding is better*, which is the opposite of what a pure power explanation
+  would predict, and it points in the same direction as the sleep-EDF loss;
+- the subsets were chosen **after** seeing the data, n is 6 and 3, and the correlation is across subjects in one
+  corpus; this is **EXPLORATORY and post-hoc**, not a replication of the sleep result;
+- the honest summary is therefore: overall near zero, negative where decoding is usable, with the caveat that the
+  conditional analysis was not pre-registered.
+
 ## Interpretation
 
 1. **No significant cross-session effect** on this dataset, in either direction. The mean is -0.004 with six
