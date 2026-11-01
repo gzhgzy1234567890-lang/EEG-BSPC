@@ -4,7 +4,7 @@
 
 | item type | file | note |
 |---|---|---|
-| Manuscript | `Revised_Manuscript.docx` / `.pdf` | 17 pages, 7,232 body words, 5 figures, 7 tables |
+| Manuscript | `Revised_Manuscript.docx` / `.pdf` | 16 pages, 6,818 body words, 5 figures, 8 tables |
 | Supplementary Material | `Revised_Supplementary.pdf` | 33 pages, S1-S36 |
 | Highlights | `Revised_Highlights.docx` | 5 items, 60-77 characters |
 | Cover Letter | `Revised_Cover_Letter.pdf` | 1 page, 444 words |
@@ -12,7 +12,7 @@
 
 ## Before pressing submit
 
-- [ ] open the merged PDF; check Tables 1-7, Figs 1-5 and the equations render; Table 7 is the evidence table at the end of Results;
+- [ ] open the merged PDF; check Tables 1-8, Figs 1-5 and the equations render; Table 7 is the evidence table at the end of Results and Table 8 the mechanism matrix at the start of the Discussion;
 - [ ] approve the PDF;
 - [ ] confirm commit `ef8c890` is reachable (it is an ancestor of origin/main and holds every result cited).
 
@@ -34,7 +34,7 @@
 
 ## Open risks
 
-1. Length is now 7,232 body words; the third-party index reports a 5,000-word figure for this journal and the official
+1. Length is now 6,818 body words; the third-party index reports a 5,000-word figure for this journal and the official
    guide could not be reached from this environment (HTTP 403). The paper was not cut below 6,500 because that would
    remove evidence.
 2. No independent end-to-end replication; the SEED archived figure cannot be regenerated exactly.
