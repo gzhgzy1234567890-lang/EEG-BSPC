@@ -109,3 +109,15 @@ The referee's central criticism — that a self-audit reporting "theory verified
 evidence of correctness — is accepted without qualification. Three of the four mathematical items were errors, not
 ambiguities. The gate that passed them has been regraded downward and the failure is recorded in
 FINAL_QUALITY_GATE.md rather than quietly overwritten.
+
+## Round 2 of the referee response
+
+| item | status |
+|---|---|
+| MC5 evidence tiers | fixed: the five-test family is pre-specified but explicitly not five independent confirmations; SEED preprocessing, development reuse of 2a/2b and the two failing datasets are stated together |
+| MC6 equivalence | fixed: inert removed; P300 -0.0005 [-0.0024, +0.0012]; ERRp -0.0044 [-0.0166, +0.0075]; 0.02 margin quoted with the caveat that the decoders are too weak for an equivalence claim |
+| MC7 mechanism | fixed: the text claims only that the harm is located in the class-mix component under an oracle diagnostic |
+| minor 1 | pair counting corrected |
+| minor 3 | references 23 and 25 completed |
+| minor 4 | abstract reduced to 219 words |
+| minor 5 | partial-strength advice removed |
