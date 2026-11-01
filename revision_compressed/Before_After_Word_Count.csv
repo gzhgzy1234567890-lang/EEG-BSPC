@@ -1,10 +1,10 @@
 group,baseline_words,revised_words,delta
 Front matter and abstract,0,0,+0
 Introduction,935,575,-360
-Theory,1463,830,-633
-Data and protocol,954,461,-493
+Theory,1463,880,-583
+Data and protocol,954,502,-452
 Results,5281,3838,-1443
 Discussion,461,492,+31
 Conclusion,944,144,-800
 Declarations,317,317,+0
-TOTAL (incl. abstract and declarations),10710,7014,-3696
+TOTAL (incl. abstract and declarations),10710,7105,-3605

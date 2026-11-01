@@ -94,6 +94,17 @@ other content error exists, and the independent review is the only check that ha
 | Section 2.3 wrote the displacement as two terms without qualification | now qualifies the split to the case where source and target share their class support, names the third term, and points to Section 4.6 |
 | Section 4.4 inferred what a longer memory would do from Section 4.7 | the inference is withdrawn: the grid varies correction strength, not memory |
 | the Discussion said both protocols estimate the target mean from the whole target session | now separates the transductive batch comparison of Section 4.1 from the block-wise past-only estimator of Sections 4.4 to 4.9 |
-| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,014 body words |
+| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,105 body words |
 | supplement DOCX and PDF metadata kept the old title | core properties of both files updated |
 | Elsevier AI disclosure for the annotated panels | Fig. 1 and Fig. 2 captions now name the tool and version and state that no image content was model-generated |
+
+## Part G. Round after the third independent review
+
+| finding | fix |
+|---|---|
+| S37 Proposition 1 mixed the two definitions of the mean pipeline and dropped a c | the proof now follows Table 1 exactly: none and mean cancel the shift against the intercepts, the refitted double-centring pipeline is invariant term by term, and zero is the one that fails. The false equality (X_B+c)-(mu_B+c)+(mu_A+c) = X_B-mu_B+mu_A is gone; the corrected line keeps the +c and shows it cancelling against -w'c |
+| the within-session reference was called an upper bound while Table 3 shows 0.5355 against 0.6119 | now called a label-informed reference, not a ceiling, with the table cited |
+| equations (2)-(6) had been removed but the supplement still cited them | main equations renumbered to (1)-(4) and every supplement citation repointed either to the renumbered equation or to the quantity by name |
+| the two S35 tables sat at the end of the supplement after S37 | moved back under their captions in S35 and renumbered Table S9 and S10 to avoid clashing with the main text |
+| five datasets announced, six listed | now states five development datasets supplying all 845 cells and a sixth (SEED-IV) used only for the implementation audit |
+| Table 8 described the memory mechanism as stationarity | reworded to stability of the displacement over the window plus coverage of the class runs, which is what the sweep tests |
