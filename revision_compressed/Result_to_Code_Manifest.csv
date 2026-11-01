@@ -1,12 +1,12 @@
 result_id,result,paper_location,script,input_data,seed,output_file,commit
-R1,SEED full-strength gain +0.214 (+0.236 recomputed),Section 4.4,seed_multistudy/seed_transductive.py,cache_seed/*.npz,20261101,results/seed_transductive.json,ef8c890
-R2,BCI-2a +0.0705 Section 4.4,origin_equivariance/src/causal_2a.py,causal_2a.json,20261101,results/causal_2a.json,ef8c890
-R3,BCI-2b +0.0341 Section 4.9,origin_equivariance/src/recompute_2b.py,statistics_recomputed_2b.json,20261101,results/statistics_recomputed_2b.json,ef8c890
-R4,sleep-EDF full -0.1023 Section 4.6,sleep_edf/online_decomp_anchored.py,sleep-edf cache,20261101,results/online_decomposition_anchored.json,ef8c890
-R5,anchored decomposition -0.0715/+0.0202/-0.0148 Section 4.6,sleep_edf/online_decomp_anchored.py,sleep-edf cache,20261101,results/online_decomposition_anchored.json,ef8c890
-R6,factorial main effects Section 4.7,factorial_intervention/factorial_rich.py,factorial_cache.npz,6000+,results/factorial_2x2_rich.json,ef8c890
-R7,strength optimum 0.6/0.9 Section 4.7,factorial_intervention/factorial_lambda_dense.py,factorial_cache.npz,6000+,results/factorial_lambda_dense.json,ef8c890
-R8,SEED memory crossing Section 4.4,seed_multistudy/seed_mem.py,seed_memory_scale.json,n/a,results/seed_memory_scale.json,ef8c890
-R9,sleep memory sweep Section 4.4,temporal_memory/sleep_memory_sweep.py,sleep-edf cache,20261101,results/sleep_memory_sweep.json,ef8c890
-R10,grasp cache artefact Section 4.5,origin_equivariance/src/gal_order.py,gal_order_curves.json,n/a,results/gal_order_curves.json,ef8c890
-R11,P300 and ERRp Section 4.8,errp_conditional_analysis.py,errp_external.json,20261101,results/errp_external.json,ef8c890
+R1,SEED full-strength gain +0.214 archived and +0.236 recomputed,Section 4.4,seed_multistudy/seed_transductive.py,cache_seed/*.npz,20261101,seed_multistudy/results/seed_transductive.json,ef8c890
+R2,BCI-2a euc_ea gain +0.0705,Section 4.9,origin_equivariance/src/causal_2a.py,causal feature cache,20261101,origin_equivariance/results/causal_2a.json,ef8c890
+R3,BCI-2b csp gain +0.0341,Section 4.9,origin_equivariance/src/recompute_2b.py,causal feature cache,20261101,origin_equivariance/results/statistics_recomputed_2b.json,ef8c890
+R4,sleep-EDF full correction -0.1023,Section 4.6,sleep_edf/online_decomp_anchored.py,sleep-edf cassette,20261101,sleep_edf/results/online_decomposition_anchored.json,ef8c890
+R5,anchored components -0.0715 / +0.0202 / -0.0148,Section 4.6,sleep_edf/online_decomp_anchored.py,sleep-edf cassette,20261101,sleep_edf/results/online_decomposition_anchored.json,ef8c890
+R6,factorial main effects and interaction,Section 4.7,factorial_intervention/factorial_rich.py,factorial_cache.npz,6000,factorial_intervention/results/factorial_2x2_rich.json,ef8c890
+R7,strength optima 0.6 / 0.8 / 0.9,Section 4.7,factorial_intervention/factorial_lambda_dense.py,factorial_cache.npz,6000,factorial_intervention/results/factorial_lambda_dense.json,ef8c890
+R8,SEED memory crossing between 50 and 100 s,Section 4.4,seed_multistudy/seed_mem.py,seed_memory_scale.json,not applicable,seed_multistudy/results/seed_memory_scale.json,ef8c890
+R9,sleep-EDF memory sweep -0.1138 / -0.1057 / -0.1023,Section 4.4,temporal_memory/sleep_memory_sweep.py,sleep-edf cassette,20261101,temporal_memory/results/sleep_memory_sweep.json,ef8c890
+R10,grasp cache artefact -0.108 sorted and +0.001 in order,Section 4.5,origin_equivariance/src/gal_order.py,gal order cache,not applicable,origin_equivariance/results/gal_order_curves.json,ef8c890
+R11,P300 and ERRp external results,Section 4.8,errp_conditional_analysis.py,errp_external.json and p300_external_meanamp.json,20261101,errp_conditional_analysis_results,ef8c890
