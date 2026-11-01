@@ -94,7 +94,7 @@ other content error exists, and the independent review is the only check that ha
 | Section 2.3 wrote the displacement as two terms without qualification | now qualifies the split to the case where source and target share their class support, names the third term, and points to Section 4.6 |
 | Section 4.4 inferred what a longer memory would do from Section 4.7 | the inference is withdrawn: the grid varies correction strength, not memory |
 | the Discussion said both protocols estimate the target mean from the whole target session | now separates the transductive batch comparison of Section 4.1 from the block-wise past-only estimator of Sections 4.4 to 4.9 |
-| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,209 body words |
+| word counts disagreed between the CSV and the manuscript | recomputed from the DOCX; every artefact now states 7,219 body words |
 | supplement DOCX and PDF metadata kept the old title | core properties of both files updated |
 | Elsevier AI disclosure for the annotated panels | Fig. 1 and Fig. 2 captions now name the tool and version and state that no image content was model-generated |
 
@@ -116,3 +116,13 @@ other content error exists, and the independent review is the only check that ha
 | S37's Setting still defined mean as fit on X_A - mu_A, apply to X_B - mu_B + mu_A, which is a third pipeline | the Setting now lists all five pipelines exactly as Table 1 does: none, mean (fit on X_A), dbl (fit on X_A - mu_A), zero, train-only |
 | Table 4's fourth method column was headed Eq. (9), an equation that no longer exists | renamed to variance-ratio (Eq. 4) in the main table, and the two supplement tables that used the same header were renamed the same way |
 | the AI declaration pointed at an Implementation and AI assistance section that did not exist | a Methods paragraph with that name now sits at the end of Section 3 and states the tool, version, the division of labour and the authors' responsibility; the declaration cites that paragraph by section |
+
+## Part I. After the fifth review
+
+| finding | fix |
+|---|---|
+| Table 8 still claimed a sufficient condition for the memory mechanism | the theory cell now reads that memory changes the bias of the estimated displacement through historical composition and drift, and that its effect on accuracy depends on the decision geometry. The Discussion no longer says the two corpora sit on one curve, only that they show different memory-response patterns |
+| the two BCI-2a protocols were easy to conflate | the abstract now separates the strict online comparison (0.214 SEED, 0.034 BCI-2b pre-fixed, -0.102 sleep-EDF) from the target-informed alignment on BCI-2a (0.0705, exploratory); Section 4.9 names the alignment background in the same sentence, and the cover letter carries the same split |
+| Table S9's caption pointed at main Table 5 | now points at Table S10, which holds the multi-estimator comparison |
+| S37 called the row space of W a K-dimensional subspace | now says its dimension is at most K |
+| reference [25] carried the benchmark name as the title | replaced by the published title, authors and pages (PMLR 340, 948-984) |
